@@ -131,23 +131,28 @@ def pattern_stats(pattern) -> dict:
     }
 
 
-def verify(qc: QuantumCircuit, pattern, seed: int = 0, atol: float = 1e-8) -> float:
-    """Check the pattern against Qiskit's statevector. Returns |<ψ_qiskit|ψ_mbqc>|.
+def verify(qc: QuantumCircuit, pattern, seed: int = 0, n_states: int = 3, atol: float = 1e-8) -> float:
+    """Check the pattern against the circuit. Returns the worst |<ψ_qiskit|ψ_mbqc>|.
 
-    Both are run on the |+>^n input. Measurement outcomes are sampled randomly;
-    a correct deterministic pattern gives fidelity 1 for every outcome branch.
+    Both are run on `n_states` random input states (Haar-random over all qubits),
+    so a pattern that agrees with the circuit on one special input but not in
+    general is caught. Measurement outcomes inside the pattern are sampled at
+    random; a correct deterministic pattern gives overlap 1 on every branch.
+    Global phase is ignored (patterns don't track it).
     """
-    n = qc.num_qubits
-    prep = QuantumCircuit(n)
-    prep.h(range(n))
-    ref = Statevector(prep.compose(qc.remove_final_measurements(inplace=False))).reverse_qargs()
+    from qiskit.quantum_info import random_statevector
 
-    state = pattern.simulate(rng=np.random.default_rng(seed))
-    psi = np.asarray(state.flatten())
-    overlap = abs(np.vdot(ref.data, psi))
-    if not math.isclose(overlap, 1.0, abs_tol=atol):
-        raise AssertionError(f"Pattern does not match circuit: |overlap| = {overlap:.6f}")
-    return overlap
+    qc = qc.remove_final_measurements(inplace=False)
+    rng = np.random.default_rng(seed)
+    worst = 1.0
+    for _ in range(n_states):
+        psi = random_statevector(2 ** qc.num_qubits, seed=int(rng.integers(2 ** 31)))
+        ref = psi.evolve(qc).reverse_qargs().data                  # Graphix is big-endian
+        out = pattern.simulate(input_state=psi.reverse_qargs().data, rng=rng, optimized=False)
+        worst = min(worst, abs(np.vdot(ref, np.asarray(out.flatten()))))
+    if not math.isclose(worst, 1.0, abs_tol=atol):
+        raise AssertionError(f"Pattern does not match circuit: |overlap| = {worst:.6f}")
+    return worst
 
 
 # ----------------------------------------------------------------------------
