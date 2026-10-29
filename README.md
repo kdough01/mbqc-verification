@@ -52,6 +52,16 @@ review queue. The rendered browser is also attached to every run as the `theorem
 
 Workflows live in `.github/workflows/`; the shared setup steps are in `.github/actions/setup/`.
 
+### The theorem browser
+
+One page, three tabs. **Dependency graph** shows every claim with its truth and faithfulness; click one for its
+statement, evidence and neighbours, or search by id, title, tag or status. **Circuits** draws the smallest instance of
+each method three ways: the Qiskit circuit as built, the MBQC pattern the compiler makes from it (one row per qubit,
+each CZ drawn at the step it is applied), and the pattern after Pauli measurements are removed (edges this creates
+are drawn curved). Hover a vertex for its measurement. **Review queue** lists what a person should review next.
+Scaling claims plot the compiled counts against the claimed formula, one line per `n`, with held-out points and any
+miss marked, and a data table underneath. The circuit drawings come from `src/mbqc_verify/compile/export.py`.
+
 ### One-time setup
 
 - **Pages:** Settings → Pages → Source: **GitHub Actions**. Until then the `pages` job fails without failing the run.

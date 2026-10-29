@@ -32,6 +32,7 @@ class ScalingCheck(Check):
         train, holdout = grid(method, ctx.quick)
         domain = domain_text(method, ctx.quick)
         ev = {"method": method, "optimize": optimize, "quantity": q,
+              "training": [list(p) for p in train], "holdout": [list(p) for p in holdout],
               "counts": [{"n": n, "k": k, q: v[q], "space": v["space"]} for (n, k), v in sorted(data.items())],
               "least_squares_fit": least_squares(data, q, train)}
 

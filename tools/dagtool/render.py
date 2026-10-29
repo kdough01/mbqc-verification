@@ -25,6 +25,16 @@ from .status import compute, summary_counts
 TEMPLATE = Path(__file__).with_name("browser.html")
 COL_W, ROW_H, NODE_W, NODE_H = 260, 46, 216, 34
 EVIDENCE_LIMIT = 6000    # bytes of check-specific payload kept per evidence record
+KEEP_KEYS = {"counts", "training", "holdout", "mismatches", "interpolated", "interpolated_through",
+             "counterexample"}   # always kept: the browser plots or shows them
+
+# One small instance per method for the circuit viewer: (id, method, n, k, label)
+CIRCUIT_INSTANCES = [
+    ("trotter1", "trotter1", 2, 2, "First-order Trotter · n = 2, r = 2"),
+    ("trotter2", "trotter2", 2, 2, "Second-order Trotter · n = 2, r = 2"),
+    ("qsvt", "qsvt", 2, 3, "QSVT · n = 2, D = 3"),
+    ("gqsp", "gqsp", 2, 1, "GQSP · n = 2, d = 1"),
+]
 
 
 def _slug(node_id: str) -> str:
@@ -73,7 +83,8 @@ def _evidence_payload(ev) -> dict:
     text = json.dumps(payload, default=str)
     trimmed = False
     if len(text) > EVIDENCE_LIMIT:
-        payload = {k: v for k, v in payload.items() if len(json.dumps(v, default=str)) < 1200}
+        payload = {k: v for k, v in payload.items()
+                   if k in KEEP_KEYS or len(json.dumps(v, default=str)) < 1200}
         trimmed = True
     prov = rec.get("provenance", {})
     return {
@@ -85,7 +96,47 @@ def _evidence_payload(ev) -> dict:
     }
 
 
-def build_data(dag: Dag) -> dict:
+def circuit_instances() -> list[dict]:
+    """The circuit viewer's data: each instance's Qiskit circuit and its two MBQC patterns.
+    Empty when qiskit/graphix are not installed (the browser then hides the viewer)."""
+    try:
+        import numpy as np
+
+        from mbqc_verify.compile.export import circuit_json, pattern_json
+        from mbqc_verify.hamsim.analysis import generic_circuit
+        from mbqc_verify.hamsim.circuits import IsingChain, trotter_circuit
+    except ImportError:
+        return []
+    out = []
+    for iid, method, n, k, label in CIRCUIT_INSTANCES:
+        if method == "trotter1":
+            hc = trotter_circuit(IsingChain.random(n, seed=n), 1.0, k, order=1)
+        else:
+            hc = generic_circuit(method, n, k, np.random.default_rng(1000 * n + k))
+        out.append({"id": iid, "method": method, "n": n, "k": k, "label": label,
+                    "circuit": circuit_json(hc.circuit, hc.layout, hc.postselect),
+                    "patterns": {"unopt": pattern_json(hc.circuit, optimize=False),
+                                 "opt": pattern_json(hc.circuit, optimize=True)}})
+    return out
+
+
+def node_method(node) -> str | None:
+    """Which circuit family a node is about, if any (for linking it to the circuit viewer)."""
+    for c in node.checks:
+        m = c.params.get("method")
+        if m in ("trotter1", "trotter2", "qsvt", "gqsp"):
+            return m
+        if c.params.get("instances"):
+            return c.params["instances"][-1].get("method")
+    for m in ("qsvt", "gqsp"):
+        if m in node.tags:
+            return m
+    if "trotter" in node.tags:
+        return "trotter1" if "trotter1" in node.id else "trotter2"
+    return None
+
+
+def build_data(dag: Dag, circuits: bool = True) -> dict:
     st = compute(dag)
     pos = layout(dag)
     slugs = {i: _slug(i) for i in dag.nodes}
@@ -98,6 +149,7 @@ def build_data(dag: Dag) -> dict:
         nodes.append({
             "id": i, "slug": slugs[i], "kind": n.kind, "layer": n.layer, "area": n.area or "(root)",
             "title": n.title, "statement": n.statement.strip(), "statement_tex": n.statement_tex,
+            "method": node_method(n),
             "description": (n.description or "").strip(), "notes": (n.notes or "").strip(),
             "lean_decl": n.lean_decl, "code": n.code, "conventions": n.conventions.as_dict(),
             "assumptions": n.assumptions, "source": n.source, "tags": n.tags,
@@ -122,6 +174,7 @@ def build_data(dag: Dag) -> dict:
                                  for k, m in CHECK_KINDS.items()}},
         "nodes": nodes,
         "edges": [{"src": e.src, "dst": e.dst, "kind": e.kind, "convert": list(e.convert)} for e in dag.edges],
+        "circuits": circuit_instances() if circuits else [],
     }
 
 

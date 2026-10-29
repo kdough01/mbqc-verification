@@ -21,18 +21,25 @@
   --f-math: "Source Serif 4", "Cambria", "Georgia", serif;
   --f-mono: "IBM Plex Mono", "Cascadia Mono", "Consolas", ui-monospace, monospace;
   --s-1: 11.5px; --s-2: 13px; --s-3: 14.5px; --s-4: 17px; --s-5: 22px;
+  /* ordinal ramp for n in the scaling plot (validated: one hue, monotone, visible gaps) and pattern vertex kinds */
+  --r1: #86b6ef; --r2: #5598e7; --r3: #2a78d6; --r4: #1c5cab; --r5: #104281;
+  --pat-nonpauli: #eb6834; --pat-output: #1baf7a; --crit-mark: #d03b3b;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0f1215; --panel: #171b20; --sunk: #12161a; --ink: #e6eaee; --ink-2: #a7b0ba; --ink-3: #6f7a85;
   --line: #2a3138; --accent: #86afd9; --accent-soft: #1d2a37; --warn: #e0a24e; --crit: #ef6d5f;
   --t-proved: #4cc387; --t-modulo: #82cfa0; --t-defined: #8e9aa7; --t-assumed: #a88be2; --t-bounded: #6ea8e8;
-  --t-empirical: #e0a94c; --t-conjecture: #858f9a; --t-refuted: #ef6d5f; --t-broken: #ef6d5f; color-scheme: dark } }
+  --t-empirical: #e0a94c; --t-conjecture: #858f9a; --t-refuted: #ef6d5f; --t-broken: #ef6d5f;
+  --r1: #184f95; --r2: #256abf; --r3: #3987e5; --r4: #6da7ec; --r5: #9ec5f4;
+  --pat-nonpauli: #d95926; --pat-output: #199e70; --crit-mark: #ef6d5f; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0f1215; --panel: #171b20; --sunk: #12161a; --ink: #e6eaee; --ink-2: #a7b0ba; --ink-3: #6f7a85;
   --line: #2a3138; --accent: #86afd9; --accent-soft: #1d2a37; --warn: #e0a24e; --crit: #ef6d5f;
   --t-proved: #4cc387; --t-modulo: #82cfa0; --t-defined: #8e9aa7; --t-assumed: #a88be2; --t-bounded: #6ea8e8;
-  --t-empirical: #e0a94c; --t-conjecture: #858f9a; --t-refuted: #ef6d5f; --t-broken: #ef6d5f; color-scheme: dark }
+  --t-empirical: #e0a94c; --t-conjecture: #858f9a; --t-refuted: #ef6d5f; --t-broken: #ef6d5f;
+  --r1: #184f95; --r2: #256abf; --r3: #3987e5; --r4: #6da7ec; --r5: #9ec5f4;
+  --pat-nonpauli: #d95926; --pat-output: #199e70; --crit-mark: #ef6d5f; color-scheme: dark }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -167,6 +174,68 @@ details pre, pre.json { margin: 8px 0 0; padding: 8px 10px; background: var(--su
 a { color: var(--accent); }
 .faithdot { width: 12px; height: 12px; flex: none; }
 
+
+/* circuit viewer */
+.circwrap { display: grid; grid-template-rows: auto 1fr; min-height: 0; }
+.circbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 12px; border-bottom: 1px solid var(--line); font-size: var(--s-2); }
+.circbar select { font: inherit; padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; background: var(--panel); padding: 4px 10px; cursor: pointer; color: var(--ink-2); font-weight: 500; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); }
+.circstats { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.canvas { position: relative; min-height: 0; overflow: hidden; touch-action: none; cursor: grab; }
+.canvas.dragging { cursor: grabbing; }
+.canvas > svg { width: 100%; height: 100%; display: block; }
+.circ text { font: 500 11px var(--f-ui); fill: var(--ink); }
+.circ .wire { stroke: var(--ink-3); stroke-width: 1; }
+.circ .wlabel { font: 11px var(--f-mono); fill: var(--ink-2); }
+.circ .gate rect { fill: var(--panel); stroke: var(--ink-2); stroke-width: 1; }
+.circ .gate line, .circ .gate .tgt { stroke: var(--ink); stroke-width: 1.2; fill: none; }
+.circ .gate .on { fill: var(--ink); }
+.circ .gate .off { fill: var(--panel); stroke: var(--ink); stroke-width: 1.2; }
+.circ .gate:hover rect, .circ .gate:hover .tgt { stroke: var(--accent); }
+.circ .post rect { fill: var(--sunk); stroke: var(--ink-3); }
+.pat .wire { stroke: var(--line); stroke-width: 1; }
+.pat .wlabel { font: 11px var(--f-mono); fill: var(--ink-2); }
+.pat .e { stroke: var(--ink-2); stroke-width: 1.2; fill: none; }
+.pat .e.new { stroke: var(--accent); stroke-width: 1; opacity: 0.35; }
+.pat .e.hl { stroke: var(--ink); opacity: 1; stroke-width: 2.2; }
+.pat .e.new.hl { stroke: var(--accent); }
+.pat .v { stroke: var(--panel); stroke-width: 1.5; }
+.pat .v.pauli { fill: var(--ink-3); }
+.pat .v.nonpauli { fill: var(--pat-nonpauli); }
+.pat .v.output { fill: var(--pat-output); }
+.pat .v.input { stroke: var(--ink); stroke-width: 1.4; }
+.pat .v.hl { stroke: var(--accent); stroke-width: 2.5; }
+.tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px;
+  font-size: var(--s-1); color: var(--ink-2); box-shadow: 0 2px 8px rgba(0,0,0,0.12); max-width: 280px; z-index: 3; }
+.tip b { color: var(--ink); font-weight: 600; }
+.circbtns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.circbtns button { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 4px 10px; cursor: pointer; color: var(--accent); font-weight: 500; }
+
+/* scaling chart */
+.chart { position: relative; margin-top: 4px; }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .axis { stroke: var(--ink-3); stroke-width: 1; }
+.chart .tick { font: 10.5px var(--f-ui); fill: var(--ink-3); font-variant-numeric: tabular-nums; }
+.chart .atitle { font: 500 11px var(--f-ui); fill: var(--ink-2); }
+.chart .dlabel { font: 500 10.5px var(--f-ui); fill: var(--ink-2); }
+.chart .xhair { stroke: var(--ink-3); stroke-width: 1; }
+.chart .miss { fill: none; stroke: var(--crit-mark); stroke-width: 1.6; }
+.chart .misstxt { font: 700 10px var(--f-ui); fill: var(--crit-mark); }
+.chart:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ckey { display: flex; flex-wrap: wrap; gap: 3px 12px; font-size: var(--s-1); color: var(--ink-2); margin: 4px 0 2px; }
+.ckey svg { vertical-align: middle; margin-right: 4px; }
+.ctitle { font-weight: 600; font-size: var(--s-2); margin-top: 6px; }
+.ctable { border-collapse: collapse; font-size: var(--s-1); font-variant-numeric: tabular-nums; margin-top: 4px; }
+.ctable th, .ctable td { padding: 2px 10px 2px 0; text-align: right; border-bottom: 1px solid var(--line); }
+.ctable th { color: var(--ink-3); font-weight: 600; text-transform: none; letter-spacing: 0; }
+.ctable td.l, .ctable th.l { text-align: left; }
+.ctable .bad { color: var(--crit-mark); font-weight: 600; }
+.chart .tip { min-width: 150px; }
+
 @media (max-width: 1180px) {
   .panes { grid-template-columns: 280px minmax(0, 1fr); grid-template-rows: minmax(360px, 58%) auto; }
   .index { grid-row: 1 / span 2; }
@@ -214,6 +283,7 @@ a { color: var(--accent); }
     <section class="pane center" aria-label="Graph and review queue">
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" id="tab-graph" aria-selected="true">Dependency graph</button>
+        <button class="tab" role="tab" id="tab-circuits" aria-selected="false">Circuits</button>
         <button class="tab" role="tab" id="tab-queue" aria-selected="false">Review queue</button>
         <div class="tools" id="graphtools">
           <button class="tool" id="zoomout" aria-label="Zoom out">−</button>
@@ -224,6 +294,23 @@ a { color: var(--accent); }
       <div class="graphwrap" id="graphwrap">
         <svg class="graph" id="graph" role="img" aria-label="Dependency graph of the theorems; arrows run from what is used to what uses it"></svg>
         <div class="legend" id="legend"></div>
+      </div>
+      <div class="circwrap" id="circwrap" hidden>
+        <div class="circbar">
+          <label for="circinst">Instance</label>
+          <select id="circinst"></select>
+          <div class="seg" id="circview" role="group" aria-label="What to show">
+            <button data-v="circuit" aria-pressed="true">Qiskit circuit</button>
+            <button data-v="unopt" aria-pressed="false">MBQC pattern</button>
+            <button data-v="opt" aria-pressed="false">Optimized pattern</button>
+          </div>
+          <span class="circstats" id="circstats"></span>
+        </div>
+        <div class="canvas" id="circcanvas">
+          <svg id="circsvg" role="img" aria-label="Circuit or MBQC pattern"></svg>
+          <div class="legend" id="circlegend"></div>
+          <div class="tip" id="circtip" hidden></div>
+        </div>
       </div>
       <div class="queue" id="queue" hidden></div>
     </section>
@@ -334,9 +421,70 @@ a { color: var(--accent); }
   }
 
   // ---------- graph ----------
+  // pan & zoom on an <svg> inside a wrapper; content size from size()
+  function panZoom(wrapEl, svgEl, size) {
+    let v = {x: 0, y: 0, w: 1, h: 1}, drag = null, moved = false;
+    const set = () => svgEl.setAttribute("viewBox", `${v.x} ${v.y} ${v.w} ${v.h}`);
+    const aspect = () => { const r = wrapEl.getBoundingClientRect(); return r.width && r.height ? r.width / r.height : 1.6; };
+    const api = {
+      get moved() { return moved; },
+      fit(pad = 16) {
+        const {w: cw, h: ch} = size(), ar = aspect();
+        let w = cw + pad * 2, h = ch + pad * 2;
+        if (w / h < ar) w = h * ar; else h = w / ar;
+        v = {x: (cw - w) / 2, y: (ch - h) / 2, w, h}; set();
+      },
+      start(pad = 16) {
+        // readable scale, anchored at the left edge; fit everything if it fits
+        const {w: cw, h: ch} = size(), r = wrapEl.getBoundingClientRect();
+        if (!r.width || !r.height) return api.fit(pad);
+        const sc = Math.min(1.4, Math.max(0.55, (r.height - 70) / (ch + pad * 2)));
+        if ((cw + pad * 2) * sc <= r.width) {
+          api.fit(pad);
+          if (v.w < r.width / 1.6) api.zoom(r.width / 1.6 / v.w);
+          return;
+        }
+        const w = r.width / sc, h = r.height / sc;
+        v = {x: -pad, y: Math.min(-pad, ch / 2 - h / 2 + 20), w, h}; set();
+      },
+      zoom(f, cx, cy) {
+        cx ??= v.x + v.w / 2; cy ??= v.y + v.h / 2;
+        const nw = Math.min(Math.max(v.w * f, 120), Math.max(size().w, size().h * aspect()) * 3), k = nw / v.w;
+        v = {x: cx - (cx - v.x) * k, y: cy - (cy - v.y) * k, w: nw, h: v.h * k}; set();
+      },
+      focus(cx, cy, width) {
+        const w = Math.min(width, v.w), h = w / aspect();
+        v = {x: cx - w / 2, y: cy - h / 2, w, h}; set();
+      },
+      panTo(cx, cy) {
+        const inside = cx > v.x + 40 && cx < v.x + v.w - 40 && cy > v.y + 20 && cy < v.y + v.h - 20;
+        if (!inside) { v.x = cx - v.w / 2; v.y = cy - v.h / 2; set(); }
+      },
+      toContent(clientX, clientY) {
+        const r = svgEl.getBoundingClientRect();
+        return [v.x + (clientX - r.left) / r.width * v.w, v.y + (clientY - r.top) / r.height * v.h];
+      },
+    };
+    wrapEl.addEventListener("pointerdown", ev => { drag = {x: ev.clientX, y: ev.clientY, vx: v.x, vy: v.y}; moved = false; });
+    wrapEl.addEventListener("pointermove", ev => {
+      if (!drag) return;
+      const r = wrapEl.getBoundingClientRect(), k = v.w / r.width;
+      const dx = ev.clientX - drag.x, dy = ev.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) > 4) { moved = true; wrapEl.classList.add("dragging"); }
+      if (moved) { v.x = drag.vx - dx * k; v.y = drag.vy - dy * k; set(); }
+    });
+    const end = () => { drag = null; wrapEl.classList.remove("dragging"); setTimeout(() => moved = false, 0); };
+    wrapEl.addEventListener("pointerup", end); wrapEl.addEventListener("pointerleave", end);
+    wrapEl.addEventListener("wheel", ev => {
+      ev.preventDefault();
+      const [cx, cy] = api.toContent(ev.clientX, ev.clientY);
+      api.zoom(ev.deltaY > 0 ? 1.12 : 1 / 1.12, cx, cy);
+    }, {passive: false});
+    return api;
+  }
+
   const svg = $("#graph");
-  let view = {x: 0, y: 0, w: META.width, h: META.height};
-  const setView = () => svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+  const graphPZ = panZoom($("#graphwrap"), svg, () => ({w: META.width, h: META.height}));
   function edgePath(e) {
     const a = byId.get(e.src), b = byId.get(e.dst);
     const x1 = a.x + W, y1 = a.y + H / 2, x2 = b.x, y2 = b.y + H / 2, dx = Math.max(40, (x2 - x1) / 2);
@@ -363,7 +511,7 @@ a { color: var(--accent); }
     }).join("");
     svg.innerHTML = defs + `<g id="edges">${edges}</g><g id="nodes">${nodes}</g>`;
     for (const g of svg.querySelectorAll(".node")) {
-      g.addEventListener("click", ev => { if (!moved) select(g.dataset.id, {scrollSheet: true}); });
+      g.addEventListener("click", ev => { if (!graphPZ.moved) select(g.dataset.id, {scrollSheet: true}); });
       g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(g.dataset.id); } });
     }
     $("#legend").innerHTML = [
@@ -391,49 +539,13 @@ a { color: var(--accent); }
       p.setAttribute("marker-end", on ? "url(#arr-lit)" : "url(#arr)");
     }
   }
-  function fit() {
-    const r = $("#graphwrap").getBoundingClientRect(), pad = 16;
-    const ar = r.width && r.height ? r.width / r.height : 1.6;
-    let w = META.width + pad * 2, h = META.height + pad * 2;
-    if (w / h < ar) w = h * ar; else h = w / ar;
-    view = {x: (META.width - w) / 2, y: (META.height - h) / 2, w, h}; setView();
-  }
-  function zoom(f, cx, cy) {
-    cx ??= view.x + view.w / 2; cy ??= view.y + view.h / 2;
-    const nw = Math.min(Math.max(view.w * f, 220), META.width * 4), k = nw / view.w;
-    view = {x: cx - (cx - view.x) * k, y: cy - (cy - view.y) * k, w: nw, h: view.h * k}; setView();
-  }
-  function focusOn(n, width = 1100) {
-    const r = $("#graphwrap").getBoundingClientRect(), ar = r.width && r.height ? r.width / r.height : 1.6;
-    const w = Math.min(width, view.w), h = w / ar;
-    view = {x: n.x + W / 2 - w / 2, y: n.y + H / 2 - h / 2, w, h}; setView();
-  }
-  function panTo(n) {
-    const cx = n.x + W / 2, cy = n.y + H / 2;
-    const inside = cx > view.x + 40 && cx < view.x + view.w - 40 && cy > view.y + 20 && cy < view.y + view.h - 20;
-    if (!inside) { view.x = cx - view.w / 2; view.y = cy - view.h / 2; setView(); }
-  }
-  let drag = null, moved = false;
-  const wrap = $("#graphwrap");
-  wrap.addEventListener("pointerdown", ev => { drag = {x: ev.clientX, y: ev.clientY, vx: view.x, vy: view.y}; moved = false; });
-  wrap.addEventListener("pointermove", ev => {
-    if (!drag) return;
-    const r = wrap.getBoundingClientRect(), k = view.w / r.width;
-    const dx = ev.clientX - drag.x, dy = ev.clientY - drag.y;
-    if (Math.abs(dx) + Math.abs(dy) > 4) { moved = true; wrap.classList.add("dragging"); }
-    if (moved) { view.x = drag.vx - dx * k; view.y = drag.vy - dy * k; setView(); }
-  });
-  const endDrag = () => { drag = null; wrap.classList.remove("dragging"); setTimeout(() => moved = false, 0); };
-  wrap.addEventListener("pointerup", endDrag); wrap.addEventListener("pointerleave", endDrag);
-  wrap.addEventListener("wheel", ev => {
-    ev.preventDefault();
-    const r = wrap.getBoundingClientRect();
-    const cx = view.x + (ev.clientX - r.left) / r.width * view.w, cy = view.y + (ev.clientY - r.top) / r.height * view.h;
-    zoom(ev.deltaY > 0 ? 1.12 : 1 / 1.12, cx, cy);
-  }, {passive: false});
-  $("#zoomin").addEventListener("click", () => zoom(1 / 1.25));
-  $("#zoomout").addEventListener("click", () => zoom(1.25));
-  $("#fit").addEventListener("click", fit);
+  const fit = () => graphPZ.fit();
+  const focusOn = (n, width = 1100) => graphPZ.focus(n.x + W / 2, n.y + H / 2, width);
+  const panTo = n => graphPZ.panTo(n.x + W / 2, n.y + H / 2);
+  const activePZ = () => state.view === "circuits" ? circPZ : graphPZ;
+  $("#zoomin").addEventListener("click", () => activePZ().zoom(1 / 1.25));
+  $("#zoomout").addEventListener("click", () => activePZ().zoom(1.25));
+  $("#fit").addEventListener("click", () => activePZ().fit());
   window.addEventListener("resize", () => { if (state.view === "graph") fit(); });
 
   // ---------- review queue ----------
@@ -454,24 +566,300 @@ a { color: var(--accent); }
     for (const tr of document.querySelectorAll("#queue tr.clickable")) tr.addEventListener("click", () => select(tr.dataset.id, {scrollSheet: true}));
   }
   function setTab(v) {
+    if (v === "circuits" && !CIRCUITS.length) v = "graph";
     state.view = v;
     try { localStorage.setItem("dag-view", v); } catch (e) {}
-    $("#tab-graph").setAttribute("aria-selected", v === "graph"); $("#tab-queue").setAttribute("aria-selected", v === "queue");
-    $("#graphwrap").hidden = v !== "graph"; $("#queue").hidden = v !== "queue"; $("#graphtools").hidden = v !== "graph";
+    for (const t of ["graph", "circuits", "queue"]) $("#tab-" + t).setAttribute("aria-selected", v === t);
+    $("#graphwrap").hidden = v !== "graph"; $("#queue").hidden = v !== "queue"; $("#circwrap").hidden = v !== "circuits";
+    $("#graphtools").hidden = v === "queue";
     if (v === "graph") requestAnimationFrame(fit);
+    if (v === "circuits") requestAnimationFrame(drawCircuitView);
   }
   $("#tab-graph").addEventListener("click", () => setTab("graph"));
+  $("#tab-circuits").addEventListener("click", () => {
+    const n = state.sel && byId.get(state.sel), inst = n && n.method && CIRCUITS.find(c => c.method === n.method);
+    if (inst) circState.inst = inst.id;
+    setTab("circuits");
+  });
   $("#tab-queue").addEventListener("click", () => setTab("queue"));
+
+  // ---------- circuit viewer ----------
+  const CIRCUITS = DATA.circuits || [];
+  const circState = {inst: CIRCUITS.length ? (CIRCUITS.find(c => c.id === "qsvt") || CIRCUITS[0]).id : null, view: "circuit"};
+  const circSvg = $("#circsvg"), circTip = $("#circtip");
+  let circSize = {w: 100, h: 100};
+  const circPZ = panZoom($("#circcanvas"), circSvg, () => circSize);
+  if (!CIRCUITS.length) $("#tab-circuits").hidden = true;
+  $("#circinst").innerHTML = CIRCUITS.map(c => `<option value="${esc(c.id)}">${esc(c.label)}</option>`).join("");
+  $("#circinst").addEventListener("change", ev => { circState.inst = ev.target.value; drawCircuitView(); });
+  for (const b of document.querySelectorAll("#circview button")) b.addEventListener("click", () => { circState.view = b.dataset.v; drawCircuitView(); });
+  const fmt = x => Number(x).toLocaleString("en-US");
+  const GATE_LABEL = {h: "H", x: "X", y: "Y", z: "Z", s: "S", sdg: "S†", t: "T", tdg: "T†", sx: "√X", sxdg: "√X†",
+    rx: "Rx", ry: "Ry", rz: "Rz", rzz: "Rzz", u: "U", unitary: "U", p: "P"};
+  const gl = name => GATE_LABEL[name] || name;
+
+  function openCircuit(method, view) {
+    const inst = CIRCUITS.find(c => c.method === method) || CIRCUITS.find(c => c.id === "qsvt");
+    if (!inst) return;
+    circState.inst = inst.id; circState.view = view;
+    setTab("circuits");
+  }
+
+  function drawCircuitView() {
+    const inst = CIRCUITS.find(c => c.id === circState.inst);
+    if (!inst) return;
+    $("#circinst").value = inst.id;
+    for (const b of document.querySelectorAll("#circview button")) b.setAttribute("aria-pressed", b.dataset.v === circState.view);
+    circTip.hidden = true;
+    if (circState.view === "circuit") drawCircuit(inst); else drawPattern(inst, circState.view);
+    circPZ.start();
+  }
+
+  function drawCircuit(inst) {
+    const C = inst.circuit, X0 = 56, COL = 44, ROW = 34, Y0 = 26, BW = 30, BH = 22;
+    const nw = C.wires.length, xEnd = X0 + C.columns * COL + 20;
+    const y = q => Y0 + q * ROW, x = col => X0 + col * COL + COL / 2;
+    const out = [];
+    for (let q = 0; q < nw; q++) {
+      out.push(`<line class="wire" x1="${X0 - 6}" y1="${y(q)}" x2="${xEnd}" y2="${y(q)}"/>`,
+        `<text class="wlabel" x="${X0 - 12}" y="${y(q) + 4}" text-anchor="end">${esc(C.wires[q])}</text>`);
+    }
+    C.ops.forEach((op, i) => {
+      const cx = x(op.col), title = `${op.name}${op.params ? "(" + op.params.join(", ") + ")" : ""} on ${op.qubits.map(q => C.wires[q]).join(", ")}`;
+      const g = [`<g class="gate" data-i="${i}"><title>${esc(title)}</title>`];
+      const box = (qs, label) => {
+        const lo = Math.min(...qs), hi = Math.max(...qs), w = Math.max(BW, 8 + 7 * label.length);
+        g.push(`<rect x="${cx - w / 2}" y="${y(lo) - BH / 2}" width="${w}" height="${y(hi) - y(lo) + BH}" rx="3"/>`,
+          `<text x="${cx}" y="${(y(lo) + y(hi)) / 2 + 4}" text-anchor="middle">${esc(label)}</text>`);
+      };
+      if (op.controls) {
+        const all = op.qubits, lo = Math.min(...all), hi = Math.max(...all);
+        g.push(`<line x1="${cx}" y1="${y(lo)}" x2="${cx}" y2="${y(hi)}"/>`);
+        op.controls.forEach((q, j) => g.push(`<circle class="${op.ctrl_state[j] ? "on" : "off"}" cx="${cx}" cy="${y(q)}" r="4"/>`));
+        if (op.base === "x" && op.targets.length === 1) {
+          const t = y(op.targets[0]);
+          g.push(`<circle class="tgt" cx="${cx}" cy="${t}" r="9"/><line x1="${cx - 9}" y1="${t}" x2="${cx + 9}" y2="${t}"/><line x1="${cx}" y1="${t - 9}" x2="${cx}" y2="${t + 9}"/>`);
+        } else if (op.base === "z") {
+          op.targets.forEach(q => g.push(`<circle class="on" cx="${cx}" cy="${y(q)}" r="4"/>`));
+        } else box(op.targets, gl(op.base));
+      } else if (op.name === "swap") {
+        const [a, b] = op.qubits;
+        g.push(`<line x1="${cx}" y1="${y(a)}" x2="${cx}" y2="${y(b)}"/>`);
+        for (const q of [a, b]) g.push(`<line x1="${cx - 5}" y1="${y(q) - 5}" x2="${cx + 5}" y2="${y(q) + 5}"/><line x1="${cx - 5}" y1="${y(q) + 5}" x2="${cx + 5}" y2="${y(q) - 5}"/>`);
+      } else box(op.qubits, gl(op.name));
+      g.push(`</g>`);
+      out.push(g.join(""));
+    });
+    for (const [q, b] of Object.entries(C.postselect)) {
+      out.push(`<g class="post"><title>post-selected on ${b}</title><rect x="${xEnd}" y="${y(+q) - 10}" width="28" height="20" rx="3"/>` +
+        `<text x="${xEnd + 14}" y="${y(+q) + 4}" text-anchor="middle">⟨${b}|</text></g>`);
+    }
+    circSize = {w: xEnd + 40, h: Y0 + nw * ROW};
+    circSvg.innerHTML = `<g class="circ">${out.join("")}</g>`;
+    $("#circstats").textContent = `${nw} qubits · ${fmt(C.gates)} gates · depth ${fmt(C.depth)} · as built, before compiling`;
+    $("#circlegend").innerHTML = `<span><svg width="10" height="10"><circle cx="5" cy="5" r="4" fill="var(--ink)"/></svg>control on |1⟩</span>` +
+      `<span><svg width="10" height="10"><circle cx="5" cy="5" r="4" fill="var(--panel)" stroke="var(--ink)"/></svg>control on |0⟩</span>` +
+      (Object.keys(C.postselect).length ? `<span>⟨b| post-selected ancilla</span>` : "") + `<span>hover a gate for its angles · drag to pan, scroll to zoom</span>`;
+  }
+
+  function drawPattern(inst, which) {
+    const P = inst.patterns[which], wires = inst.circuit.wires, X0 = 56, TX = 10, ROW = 40, Y0 = 26;
+    const pos = new Map(P.nodes.map(([id, w, t]) => [id, [X0 + t * TX, Y0 + w * ROW]]));
+    const xEnd = X0 + P.times * TX + 12;
+    const out = [`<g class="pat${which === "opt" ? " opt" : ""}">`];
+    wires.forEach((name, q) => out.push(`<line class="wire" x1="${X0 - 6}" y1="${Y0 + q * ROW}" x2="${xEnd}" y2="${Y0 + q * ROW}"/>`,
+      `<text class="wlabel" x="${X0 - 12}" y="${Y0 + q * ROW + 4}" text-anchor="end">${esc(name)}</text>`));
+    out.push(`<g id="pedges">`);
+    let nNew = 0;
+    P.edges.forEach(([a, b, col], i) => {
+      const [x1, y1] = pos.get(a), [x2, y2] = pos.get(b);
+      let d, cls = "e";
+      if (col >= 0) { const xc = X0 + col * TX; d = `M${x1} ${y1}H${xc}V${y2}H${x2}`; cls += " cz"; }
+      else if (col === -1) d = `M${x1} ${y1}L${x2} ${y2}`;
+      else {
+        nNew++; cls += " new";
+        const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
+        const bend = y1 === y2 ? Math.min(ROW * 0.8, Math.abs(dx) * 0.25) : Math.min(ROW, len * 0.12);
+        d = `M${x1} ${y1}Q${(x1 + x2) / 2 + dy / len * bend} ${(y1 + y2) / 2 - Math.abs(dx) / len * bend} ${x2} ${y2}`;
+      }
+      out.push(`<path class="${cls}" data-i="${i}" d="${d}"/>`);
+    });
+    out.push(`</g><g id="pnodes">`);
+    for (const [id, , , kind, , isIn] of P.nodes) {
+      const [cx, cy] = pos.get(id), cls = `v ${kind}${isIn ? " input" : ""}`;
+      out.push(isIn ? `<rect class="${cls}" data-id="${id}" x="${cx - 5}" y="${cy - 5}" width="10" height="10"/>`
+                    : `<circle class="${cls}" data-id="${id}" cx="${cx}" cy="${cy}" r="4.5"/>`);
+    }
+    out.push(`</g></g>`);
+    circSize = {w: xEnd + 20, h: Y0 + wires.length * ROW};
+    circSvg.innerHTML = out.join("");
+    const st = P.stats, other = inst.patterns[which === "opt" ? "unopt" : "opt"].stats;
+    $("#circstats").textContent = `N ${fmt(st.N)} vertices · E ${fmt(st.E)} CZ edges · M ${fmt(st.M)} measurements · peak ${fmt(st.space)} live qubits` +
+      (which === "opt" ? ` (unoptimized: N ${fmt(other.N)}, E ${fmt(other.E)})` : "");
+    $("#circlegend").innerHTML = [["input", `<rect x="1" y="1" width="9" height="9" fill="var(--ink-3)" stroke="var(--ink)"/>`],
+      ["Pauli measurement", `<circle cx="5.5" cy="5.5" r="4.5" fill="var(--ink-3)"/>`],
+      ["non-Pauli measurement", `<circle cx="5.5" cy="5.5" r="4.5" fill="var(--pat-nonpauli)"/>`],
+      ["output", `<circle cx="5.5" cy="5.5" r="4.5" fill="var(--pat-output)"/>`]]
+      .map(([l, m]) => `<span><svg width="11" height="11">${m}</svg>${l}</span>`).join("") +
+      `<span><svg width="18" height="12"><path d="M1 10H9V2H17" fill="none" stroke="var(--ink-2)" stroke-width="1.3"/></svg>CZ edge, at the step it is applied</span>` +
+      (nNew ? `<span><svg width="18" height="12"><path d="M1 10Q9 -2 17 10" fill="none" stroke="var(--accent)" stroke-width="1.3"/></svg>edge made by removing Pauli measurements (${fmt(nNew)})</span>` : "") +
+      `<span>rows: circuit qubits · left to right: order of construction${which === "opt" ? "; removed vertices leave gaps" : ""} · drag to pan, scroll to zoom</span>`;
+    // hover: highlight a vertex's edges and show its measurement
+    const adj = new Map();
+    P.edges.forEach(([a, b], i) => { for (const v of [a, b]) { if (!adj.has(v)) adj.set(v, []); adj.get(v).push(i); } });
+    const info = new Map(P.nodes.map(n => [n[0], n]));
+    let lit = [];
+    circSvg.onpointermove = ev => {
+      const t = ev.target.closest && ev.target.closest(".v");
+      for (const el of lit) el.classList.remove("hl");
+      lit = [];
+      if (!t) { circTip.hidden = true; return; }
+      const id = +t.dataset.id, [, w, , kind, label, isIn] = info.get(id);
+      t.classList.add("hl"); lit.push(t);
+      for (const i of adj.get(id) || []) { const el = circSvg.querySelector(`.e[data-i="${i}"]`); el.classList.add("hl"); lit.push(el); }
+      circTip.innerHTML = `<b>vertex ${id}</b> · ${esc(wires[w] || "?")}${isIn ? " · input" : ""}<br>${kind === "output" ? "output (not measured)" : `measured: <b>${esc(label)}</b>`}<br>${(adj.get(id) || []).length} CZ edges`;
+      const r = $("#circcanvas").getBoundingClientRect();
+      circTip.style.left = Math.min(ev.clientX - r.left + 14, r.width - 230) + "px";
+      circTip.style.top = (ev.clientY - r.top + 14) + "px";
+      circTip.hidden = false;
+    };
+    circSvg.onpointerleave = () => { circTip.hidden = true; for (const el of lit) el.classList.remove("hl"); lit = []; };
+  }
 
   // ---------- theorem sheet ----------
   function nodeLink(id, kind) {
     const n = byId.get(id);
     return `<button class="link" data-goto="${esc(id)}"><span class="k">${esc(kind || "")}</span><i class="sw" style="background:${tcolor(n.status.truth)}"></i><span class="t">${esc(n.title)}</span></button>`;
   }
+  // ---------- scaling chart ----------
+  const K_NAME = {trotter1: "r, Trotter steps", trotter2: "r, Trotter steps", qsvt: "D, QSVT degree", gqsp: "d, GQSP degree"};
+  const Q_NAME = {N: "N, pattern vertices", E: "E, CZ edges", M: "M, measurements"};
+  const frac = v => { if (typeof v === "number") return v; const [a, b] = String(v).split("/"); return b === undefined ? +a : +a / +b; };
+  const showNum = v => Number.isInteger(v) ? fmt(v) : (Math.round(v * 100) / 100).toLocaleString("en-US");
+  function niceTicks(lo, hi, count = 5) {
+    const span = hi - lo || 1, step0 = span / count, mag = 10 ** Math.floor(Math.log10(step0));
+    const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(st => st >= step0);
+    const top = Math.ceil(hi / step - 1e-9) * step;
+    const out = []; for (let v = Math.floor(lo / step) * step; v <= top + 1e-9; v += step) out.push(+v.toFixed(10));
+    return out;
+  }
+  const CHARTS = [];
+  function scalingChart(ev) {
+    const p = ev.payload || {}, prm = ev.params || {}, q = prm.quantity || p.quantity;
+    if (!Array.isArray(p.counts) || !q) return "";
+    const notBilinear = prm.claim === "not_bilinear";
+    const coef = notBilinear ? p.interpolated : prm.coef;
+    const f = coef ? ((n, k) => { const [a, b, c, e] = coef.map(frac); return (a * n + b) * k + c * n + e; }) : null;
+    const pts = p.counts.map(r => ({n: r.n, k: r.k, v: r[q]}));
+    const key = (n, k) => n + "," + k;
+    let held;
+    if (Array.isArray(p.holdout)) held = new Set(p.holdout.map(([n, k]) => key(n, k)));
+    else { const per = new Map(); for (const r of pts) per.set(r.n, (per.get(r.n) || 0) + 1); held = new Set(pts.filter(r => per.get(r.n) === 1).map(r => key(r.n, r.k))); }
+    const missSet = new Set((p.mismatches || []).map(m => key(m.n, m.k)));
+    for (const r of pts) { r.held = held.has(key(r.n, r.k)); r.fv = f ? f(r.n, r.k) : null; r.miss = missSet.has(key(r.n, r.k)); }
+    const trainN = [...new Set(pts.filter(r => !r.held).map(r => r.n))].sort((a, b) => a - b);
+    const ramp = ["--r1", "--r2", "--r3", "--r4"].slice(4 - Math.min(4, trainN.length));
+    const color = n => { const i = trainN.indexOf(n); return i < 0 ? "var(--r5)" : `var(${ramp[Math.min(i, ramp.length - 1)]})`; };
+    const ks = [...new Set(pts.map(r => r.k))].sort((a, b) => a - b);
+    const kMin = ks[0], kMax = ks[ks.length - 1];
+    const vals = pts.flatMap(r => [r.v, ...(r.fv != null ? [r.fv] : [])]);
+    if (f) for (const n of trainN) vals.push(f(n, kMin), f(n, kMax));
+    const yT = niceTicks(Math.min(0, ...vals), Math.max(...vals));
+    const W = 400, H = 240, L = 50, R = 58, T = 12, B = 40;
+    const xs = k => L + (kMax === kMin ? (W - L - R) / 2 : (k - kMin) / (kMax - kMin) * (W - L - R));
+    const ys = v => T + (1 - (v - yT[0]) / (yT[yT.length - 1] - yT[0])) * (H - T - B);
+    const o = [];
+    for (const t of yT) o.push(`<line class="grid" x1="${L}" x2="${W - R}" y1="${ys(t)}" y2="${ys(t)}"/><text class="tick" x="${L - 6}" y="${ys(t) + 3.5}" text-anchor="end">${fmt(t)}</text>`);
+    o.push(`<line class="axis" x1="${L}" x2="${W - R}" y1="${ys(yT[0])}" y2="${ys(yT[0])}"/>`);
+    for (const k of ks) o.push(`<text class="tick" x="${xs(k)}" y="${H - B + 14}" text-anchor="middle">${k}</text>`);
+    o.push(`<text class="atitle" x="${(L + W - R) / 2}" y="${H - 6}" text-anchor="middle">${esc(K_NAME[prm.method] || "k")}</text>`,
+      `<text class="atitle" transform="translate(11 ${(T + H - B) / 2}) rotate(-90)" text-anchor="middle">${esc(Q_NAME[q] || q)}</text>`);
+    // formula lines: solid for training n, dashed extrapolation to each held-out point
+    const labels = [];
+    if (f) {
+      for (const n of trainN) {
+        const kk = pts.filter(r => r.n === n).map(r => r.k), a = Math.min(...kk), b = Math.max(...kk);
+        o.push(`<line x1="${xs(a)}" y1="${ys(f(n, a))}" x2="${xs(b)}" y2="${ys(f(n, b))}" stroke="${color(n)}" stroke-width="2" stroke-linecap="round"/>`);
+        labels.push({n, y: ys(f(n, b)), x: xs(b), held: false});
+      }
+      for (const r of pts.filter(r => r.held)) {
+        o.push(`<line x1="${xs(kMin)}" y1="${ys(f(r.n, kMin))}" x2="${xs(r.k)}" y2="${ys(f(r.n, r.k))}" stroke="var(--r5)" stroke-width="1.5" stroke-dasharray="4 3"/>`);
+        labels.push({n: r.n, y: ys(r.v), x: xs(r.k), held: true});
+      }
+    } else {
+      for (const n of trainN) { const s2 = pts.filter(r => r.n === n).sort((a, b) => a.k - b.k);
+        o.push(`<polyline fill="none" points="${s2.map(r => xs(r.k) + "," + ys(r.v)).join(" ")}" stroke="${color(n)}" stroke-width="2"/>`);
+        const last = s2[s2.length - 1]; labels.push({n, y: ys(last.v), x: xs(last.k), held: false}); }
+    }
+    // measured counts
+    for (const r of pts) {
+      const cx = xs(r.k), cy = ys(r.v);
+      o.push(r.held ? `<circle cx="${cx}" cy="${cy}" r="4.5" fill="var(--panel)" stroke="var(--r5)" stroke-width="2"/>`
+                    : `<circle cx="${cx}" cy="${cy}" r="4" fill="${color(r.n)}" stroke="var(--panel)" stroke-width="2"/>`);
+      if (r.miss) o.push(`<circle class="miss" cx="${cx}" cy="${cy}" r="7.5"/>`);
+    }
+    // direct labels at the right end, nudged apart
+    labels.sort((a, b) => a.y - b.y);
+    for (let i = 1; i < labels.length; i++) if (labels[i].y - labels[i - 1].y < 11) labels[i].y = labels[i - 1].y + 11;
+    for (const lb of labels) o.push(`<text class="dlabel" x="${Math.min(lb.x + 8, W - 4)}" y="${lb.y + 3.5}"${lb.x + 8 > W - R + 30 ? ' text-anchor="end"' : ""}>n=${lb.n}${lb.held ? "*" : ""}</text>`);
+    const nMiss = pts.filter(r => r.miss).length;
+    o.push(`<line class="xhair" x1="0" x2="0" y1="${T}" y2="${H - B}" visibility="hidden"/>`);
+    const id = CHARTS.length;
+    CHARTS.push({pts, ks, xs, f, q, W, L, R});
+    const what = notBilinear ? "line: the bilinear formula through the 4 corner points" : "line: the claimed formula";
+    const key2 = trainN.map(n => `<span><svg width="16" height="10"><line x1="0" y1="5" x2="16" y2="5" stroke="${color(n)}" stroke-width="2"/><circle cx="8" cy="5" r="3.5" fill="${color(n)}"/></svg>n = ${n}</span>`).join("") +
+      (held.size ? `<span><svg width="16" height="10"><line x1="0" y1="5" x2="16" y2="5" stroke="var(--r5)" stroke-width="1.5" stroke-dasharray="4 3"/><circle cx="8" cy="5" r="3.5" fill="var(--panel)" stroke="var(--r5)" stroke-width="1.8"/></svg>held out (*)</span>` : "") +
+      (nMiss ? `<span><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="none" stroke="var(--crit-mark)" stroke-width="1.6"/></svg><b style="color:var(--crit-mark)">✕</b>&nbsp;${nMiss} count${nMiss > 1 ? "s" : ""} off the line</span>` : "");
+    const rows = pts.slice().sort((a, b) => a.n - b.n || a.k - b.k).map(r => `<tr><td>${r.n}</td><td>${r.k}</td><td>${fmt(r.v)}</td><td>${r.fv == null ? "–" : showNum(r.fv)}</td>` +
+      `<td class="l">${r.held ? "held out" : "training"}</td><td class="l${r.miss ? " bad" : ""}">${r.fv == null ? "" : r.miss ? "✕ off by " + showNum(r.v - r.fv) : "exact"}</td></tr>`).join("");
+    return `<div class="ctitle">${esc(q)} against ${esc((K_NAME[prm.method] || "k").split(",")[0])}, one line per n</div>
+      <div class="ckey">${key2}</div>
+      <div class="chart" data-chart="${id}" tabindex="0" role="img" aria-label="${esc(`${Q_NAME[q] || q} for n = ${[...new Set(pts.map(r => r.n))].join(", ")}; ${nMiss ? nMiss + " counts off the formula" : "every count on the formula"}`)}">
+        <svg viewBox="0 0 ${W} ${H}">${o.join("")}</svg><div class="tip" hidden></div></div>
+      <div class="dom">Dots: counts from compiling with Graphix. ${what}${held.size ? "; * fitted without these points" : ""}.</div>
+      <details><summary>Data table</summary><table class="ctable"><thead><tr><th>n</th><th>${esc((K_NAME[prm.method] || "k")[0])}</th><th>count</th><th>formula</th><th class="l">set</th><th class="l">match</th></tr></thead><tbody>${rows}</tbody></table></details>`;
+  }
+  function wireCharts(root) {
+    for (const el of root.querySelectorAll(".chart[data-chart]")) {
+      const C = CHARTS[+el.dataset.chart], svgEl = el.querySelector("svg"), tip = el.querySelector(".tip"), xh = el.querySelector(".xhair");
+      let cur = -1;
+      const show = i => {
+        cur = i; const k = C.ks[i], x = C.xs(k);
+        xh.setAttribute("x1", x); xh.setAttribute("x2", x); xh.setAttribute("visibility", "visible");
+        const at = C.pts.filter(r => r.k === k).sort((a, b) => b.v - a.v);
+        tip.innerHTML = `<b>k = ${k}</b>` + at.map(r => `<br>n=${r.n}${r.held ? "*" : ""}: <b>${fmt(r.v)}</b>` +
+          (r.fv == null ? "" : r.miss ? ` <span style="color:var(--crit-mark)">✕ formula ${showNum(r.fv)}</span>` : " ✓")).join("");
+        tip.hidden = false;
+        const w = el.clientWidth, px = x / C.W * w;
+        tip.style.top = "8px";
+        if (px > w / 2) { tip.style.left = ""; tip.style.right = (w - px + 12) + "px"; } else { tip.style.right = ""; tip.style.left = (px + 12) + "px"; }
+      };
+      const hide = () => { cur = -1; tip.hidden = true; xh.setAttribute("visibility", "hidden"); };
+      el.addEventListener("pointermove", ev => {
+        const r = svgEl.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * C.W;
+        let best = 0; C.ks.forEach((k, i) => { if (Math.abs(C.xs(k) - x) < Math.abs(C.xs(C.ks[best]) - x)) best = i; });
+        show(best);
+      });
+      el.addEventListener("pointerleave", hide);
+      el.addEventListener("blur", hide);
+      el.addEventListener("keydown", ev => {
+        if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") { ev.preventDefault();
+          show(Math.max(0, Math.min(C.ks.length - 1, cur < 0 ? 0 : cur + (ev.key === "ArrowRight" ? 1 : -1)))); }
+      });
+    }
+  }
   function payloadHtml(ev) {
     const p = ev.payload || {};
+    if (ev.kind === "scaling") return scalingChart(ev);
     if (p.counterexample) return `<div class="dom">Counterexample: <span class="mono">${esc(JSON.stringify(p.counterexample))}</span></div>`;
     return "";
+  }
+  function circuitSection(n) {
+    if (!n.method || !CIRCUITS.length) return "";
+    const inst = CIRCUITS.find(c => c.method === n.method);
+    if (!inst) return "";
+    return `<div class="section"><h4>Circuit</h4><p class="prose">Smallest instance: ${esc(inst.label)}. The circuit is drawn as built in Qiskit; the patterns are what the compiler produces from it.</p>
+      <div class="circbtns"><button data-circ="circuit">Qiskit circuit</button><button data-circ="unopt">MBQC pattern</button><button data-circ="opt">Optimized pattern</button></div></div>`;
   }
   function sheet() {
     const el = $("#sheet");
@@ -483,6 +871,7 @@ a { color: var(--accent); }
       return;
     }
     const n = byId.get(state.sel), s = n.status;
+    CHARTS.length = 0;
     const up = parents.get(n.id), down = children.get(n.id);
     const evs = n.evidence.map(ev => `<div class="ev">
         <div class="head"><span class="name">${esc(ev.name)}</span><span class="faint">${esc(ev.question)}</span>
@@ -518,6 +907,7 @@ a { color: var(--accent); }
       </div>
       ${n.flags.length ? `<div class="section"><h4>Flags</h4>${n.flags.map(f => `<div class="flag"><span class="pill ${f.level}">${esc(f.code.replace(/_/g, " "))}</span><span>${esc(f.message)}</span></div>`).join("")}</div>` : ""}
       ${n.description ? `<p class="prose">${esc(n.description)}</p>` : ""}
+      ${circuitSection(n)}
       <div class="section"><h4>Evidence</h4>${evs || `<p class="prose">No checks are attached yet${n.kind === "definition" ? "; definitions are settled by review" : ""}.</p>`}</div>
       <div class="section"><h4>Relies on</h4><div class="links">${up.length ? up.map(e => nodeLink(e.src, e.kind)).join("") : `<span class="faint">nothing: a root</span>`}</div></div>
       <div class="section"><h4>Used by</h4><div class="links">${down.length ? down.map(e => nodeLink(e.dst, e.kind)).join("") : `<span class="faint">nothing yet</span>`}</div></div>
@@ -532,6 +922,8 @@ a { color: var(--accent); }
         ${n.notes ? `<p class="prose" style="margin-top:8px">${esc(n.notes)}</p>` : ""}</div>
     </div>`;
     for (const b of el.querySelectorAll("[data-goto]")) b.addEventListener("click", () => select(b.dataset.goto, {pan: true}));
+    for (const b of el.querySelectorAll("[data-circ]")) b.addEventListener("click", () => openCircuit(n.method, b.dataset.circ));
+    wireCharts(el);
     $("#copyid").addEventListener("click", ev => {
       const btn = ev.currentTarget;
       const done = () => { btn.textContent = "Copied"; setTimeout(() => btn.textContent = "Copy id", 1200); };
