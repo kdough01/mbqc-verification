@@ -1,0 +1,24 @@
+id: hamsim.C.ours.d_ge_g.M.unopt
+kind: theorem
+layer: C
+title: Slide's claim with our unoptimized M
+statement: |
+  With our unoptimized compilation, for all n ≥ 2 and degrees D ≥ d (QSVT degree D odd): QSVT's measurements M exceed GQSP's.
+description: |
+  The slide's conclusion re-tested on our compiler. Note the comparison pairs our QSVT D (calls per sequence) with our GQSP d (Laurent degree): the convention check flags it, because the two degrees measure different things. The equal-accuracy comparison avoids this.
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {degree: qsvt_calls_per_sequence}
+depends_on:
+- {node: hamsim.B.qsvt.M.unopt, kind: uses}
+- {node: hamsim.B.gqsp.M.unopt, kind: uses}
+checks:
+- kind: refuter
+  params: {quantity: M, source: formula, qsvt: hamsim.B.qsvt.M.unopt, gqsp: hamsim.B.gqsp.M.unopt, n_max: 50,
+    k_max: 41}
+acknowledged:
+- {code: convention_mismatch, reason: 'the slide''s claim compares degrees directly, so re-testing it
+    on our compiler has to pair our QSVT D with our GQSP d; hamsim.C.equal_accuracy is the convention-free
+    comparison'}
+- {code: refuted, reason: 'this re-tests the slide''s conclusion on our compiler, where we expect it to
+    fail'}
+tags: [hamsim, consequence, unoptimized]

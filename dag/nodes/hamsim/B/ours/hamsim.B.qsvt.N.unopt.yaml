@@ -1,0 +1,26 @@
+id: hamsim.B.qsvt.N.unopt
+kind: theorem
+layer: B
+title: QSVT N formula (unoptimized)
+statement: |
+  Compiling the QSVT circuit for n ≥ 2 data qubits gate by gate (unoptimized), with odd D ≥ 3, gives a pattern with N = (294n − 144)D + 362n − 30 vertices.
+statement_tex: N = (294n - 144)D + 362n - 30
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: qsvt_calls_per_sequence}
+depends_on:
+- {node: transfer.gate_to_mbqc, kind: instantiates}
+- {node: transfer.gate_to_mbqc_counts, kind: instantiates}
+- {node: def.resource_counts, kind: uses}
+- {node: def.jcz_construction, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: qsvt
+    optimize: false
+    quantity: N
+    coef: [294, -144, 362, -30]
+- kind: mutation
+  params: {target: scaling}
+- kind: differential
+  params: {method: qsvt}
+tags: [hamsim, qsvt, resources, unoptimized]

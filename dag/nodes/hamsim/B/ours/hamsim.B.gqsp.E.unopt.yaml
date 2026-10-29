@@ -1,0 +1,26 @@
+id: hamsim.B.gqsp.E.unopt
+kind: theorem
+layer: B
+title: GQSP E formula (unoptimized)
+statement: |
+  Compiling the GQSP circuit for n ≥ 2 data qubits gate by gate (unoptimized), with d ≥ 1, gives a pattern with E = (532n − 300)d + 12 CZ edges.
+statement_tex: E = (532n - 300)d + 12
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: gqsp_laurent_degree}
+depends_on:
+- {node: transfer.gate_to_mbqc, kind: instantiates}
+- {node: transfer.gate_to_mbqc_counts, kind: instantiates}
+- {node: def.resource_counts, kind: uses}
+- {node: def.jcz_construction, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: gqsp
+    optimize: false
+    quantity: E
+    coef: [532, -300, 0, 12]
+- kind: mutation
+  params: {target: scaling}
+- kind: differential
+  params: {method: gqsp}
+tags: [hamsim, gqsp, resources, unoptimized]

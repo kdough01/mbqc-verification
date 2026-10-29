@@ -1,0 +1,61 @@
+name: Set up mbqc-verification
+description: Python with the pinned packages, and optionally the Lean toolchain with the Lean project built.
+
+inputs:
+  packages:
+    description: "full = everything in requirements.txt; light = only what dagtool needs to read the DAG"
+    default: full
+  lean:
+    description: Install Lean and build lean/
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+        cache: pip
+        cache-dependency-path: requirements.txt
+
+    - name: Install Python packages
+      shell: bash
+      env:
+        PACKAGES: ${{ inputs.packages }}
+      run: |
+        if [ "$PACKAGES" = light ]; then
+          python -m pip install pyyaml jsonschema
+        else
+          python -m pip install -r requirements.txt
+        fi
+        python -m pip install --no-deps -e .
+
+    - name: Cache the Lean toolchain
+      if: inputs.lean == 'true'
+      uses: actions/cache@v4
+      with:
+        path: ~/.elan
+        key: elan-${{ runner.os }}-${{ hashFiles('lean/lean-toolchain') }}
+
+    - name: Install elan
+      if: inputs.lean == 'true'
+      shell: bash
+      run: |
+        if [ ! -x "$HOME/.elan/bin/lake" ]; then
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+        fi
+        echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+    - name: Cache the Lean build
+      if: inputs.lean == 'true'
+      uses: actions/cache@v4
+      with:
+        path: lean/.lake
+        key: lake-${{ runner.os }}-${{ hashFiles('lean/lean-toolchain', 'lean/lakefile.lean', 'lean/**/*.lean') }}
+        restore-keys: lake-${{ runner.os }}-
+
+    - name: Build the Lean project
+      if: inputs.lean == 'true'
+      shell: bash
+      working-directory: lean
+      run: lake build

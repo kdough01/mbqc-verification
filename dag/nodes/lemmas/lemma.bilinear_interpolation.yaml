@@ -1,0 +1,15 @@
+id: lemma.bilinear_interpolation
+kind: lemma
+title: Bilinear interpolation from four corners
+statement: |
+  If f(i, j) has a constant step in j for every i, and a constant step in i for every j, then f(i, j) = f00 + j(f01 − f00) + i(f10 − f00) + ij(f11 − f10 − f01 + f00).
+statement_tex: f(i,j) = f_{00} + j(f_{01}-f_{00}) + i(f_{10}-f_{00}) + ij(f_{11}-f_{10}-f_{01}+f_{00})
+description: |
+  Turns 'the fit is exact on held-out points' into a proof: prove the count is affine in each argument, then four values determine the formula everywhere.
+lean_decl: MBQC.Math.bilinear_interpolation
+checks:
+- {kind: lean}
+- {kind: vocabulary}
+- kind: nonvacuity
+  params: {witness: MBQC.Math.bilinear_interpolation_nonvacuous}
+tags: [math, interpolation]

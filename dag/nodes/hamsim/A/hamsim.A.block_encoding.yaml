@@ -1,0 +1,14 @@
+id: hamsim.A.block_encoding
+kind: lemma
+layer: A
+title: Unary block encoding of H/α
+statement: |
+  With one ancilla per Hamiltonian term held in a one-hot state, U = PREP† · SELECT · PREP satisfies (⟨e_0| ⊗ I) U (|e_0⟩ ⊗ I) = H/α.
+statement_tex: (\langle e_0|\otimes I)\,U\,(|e_0\rangle\otimes I) = H/\alpha
+description: |
+  Shared by QSVT and GQSP (circuits.block_encoding_circuit). Planned check: extract the |e_0⟩ block numerically.
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/qsp_angles.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: radians, endian: little, input: zero, phase: exact}
+depends_on:
+- {node: def.hamsim.ising_chain, kind: uses}
+tags: [hamsim, block-encoding]

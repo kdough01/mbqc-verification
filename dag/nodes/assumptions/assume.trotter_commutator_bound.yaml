@@ -1,0 +1,17 @@
+id: assume.trotter_commutator_bound
+kind: assumption
+title: Trotter error bounds with commutator scaling
+statement: |
+  With H = A + B: ‖S1(t/r)^r − e^{−iHt}‖ ≤ t²/(2r) ‖[A, B]‖ for S1(s) = e^{−iBs} e^{−iAs}, and ‖S2(t/r)^r − e^{−iHt}‖ ≤ t³/r² (‖[B, [B, A]]‖/12 + ‖[A, [A, B]]‖/24) for S2(s) = e^{−iAs/2} e^{−iBs} e^{−iAs/2}.
+statement_tex: \|S_2(t/r)^r - e^{-iHt}\| \le \frac{t^3}{r^2}\Big(\tfrac{1}{12}\|[B,[B,A]]\| + \tfrac{1}{24}\|[A,[A,B]]\|\Big)
+code: [src/mbqc_verify/hamsim/analysis.py]
+checks:
+- {kind: literature}
+source:
+  citation: Childs, Su, Tran, Wiebe & Zhu, Theory of Trotter error with commutator scaling, Phys. Rev.
+    X 11, 011020 (2021)
+  url: https://doi.org/10.1103/PhysRevX.11.011020
+  exact_form: 'first order: t²/(2r)‖[A,B]‖; second order: t³/r² (‖[B,[B,A]]‖/12 + ‖[A,[A,B]]‖/24)'
+  convention_map: A = X part of H, B = Z and ZZ part; spectral norm; r = Trotter steps (our r). analysis.trotter_steps
+    with exact=False replaces each norm by the sum of |Pauli coefficients|, which is larger.
+tags: [hamsim, literature, trotter]

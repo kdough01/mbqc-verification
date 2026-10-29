@@ -1,0 +1,138 @@
+{
+ "input_hash": "4a8b312fa7045759",
+ "inputs": {
+  "check_code": {
+   "verification/truth/scaling/check.py": "cea1af075f002980a1528feb620149e04347c3be90846afd321f349c76115c58",
+   "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
+  },
+  "check_params": "db34a775a2234e54",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "lean_sources": "aad561f2c225afa88fe054415bc7c2f411c664e6910d244562d67f5de520a53d",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
+  "parents": {
+   "def.resource_counts": "b75d507a2b247ac8:4f53cda1"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "cdb29c0671ff4200"
+ },
+ "kind": "scaling",
+ "name": "scaling",
+ "node": "assume.hamsim.qsvt_opt_N",
+ "params": {
+  "coef": [
+   36,
+   -18,
+   92,
+   -20
+  ],
+  "method": "qsvt",
+  "optimize": true,
+  "quantity": "N"
+ },
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:26:18+00:00",
+  "quick": false,
+  "seconds": 266.99,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "n in [2, 3, 4], k in [3, 5, 7] (training) + held-out [(5, 9)]",
+  "evidence": {
+   "counts": [
+    {
+     "N": 326,
+     "k": 3,
+     "n": 2,
+     "space": 112
+    },
+    {
+     "N": 434,
+     "k": 5,
+     "n": 2,
+     "space": 170
+    },
+    {
+     "N": 542,
+     "k": 7,
+     "n": 2,
+     "space": 210
+    },
+    {
+     "N": 526,
+     "k": 3,
+     "n": 3,
+     "space": 230
+    },
+    {
+     "N": 706,
+     "k": 5,
+     "n": 3,
+     "space": 312
+    },
+    {
+     "N": 886,
+     "k": 7,
+     "n": 3,
+     "space": 667
+    },
+    {
+     "N": 726,
+     "k": 3,
+     "n": 4,
+     "space": 401
+    },
+    {
+     "N": 978,
+     "k": 5,
+     "n": 4,
+     "space": 457
+    },
+    {
+     "N": 1230,
+     "k": 7,
+     "n": 4,
+     "space": 721
+    },
+    {
+     "N": 1898,
+     "k": 9,
+     "n": 5,
+     "space": 991
+    }
+   ],
+   "least_squares_fit": [
+    "36",
+    "-18",
+    "92",
+    "-20"
+   ],
+   "method": "qsvt",
+   "mismatches": [],
+   "optimize": true,
+   "quantity": "N"
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "exact on all 9 training and 1 held-out points"
+ }
+}

@@ -1,0 +1,114 @@
+{
+ "input_hash": "1ebed54b5f6da6ee",
+ "inputs": {
+  "check_code": {
+   "verification/truth/translation/check.py": "12aadd7ae2150c2f9988a4d33fdabba326a1f12cbffde9d0d125708290a3f56b"
+  },
+  "check_params": "32b364c8d7c5312c",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.hamsim.ising_chain": "b085def53b3f0f38",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "parents": {
+   "def.hamsim.ising_chain": "b085def53b3f0f38:4f53cda1",
+   "def.pattern": "20379a417004e168:4f53cda1",
+   "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "9b0a2a4a1e49e849"
+ },
+ "kind": "translation",
+ "name": "translation",
+ "node": "hamsim.compiled_patterns_match",
+ "params": {
+  "instances": [
+   {
+    "method": "trotter2",
+    "n": 2,
+    "optimize": false,
+    "r": 3,
+    "seed": 2,
+    "t": 1.0
+   },
+   {
+    "method": "trotter2",
+    "n": 2,
+    "optimize": true,
+    "r": 3,
+    "seed": 2,
+    "t": 1.0
+   },
+   {
+    "eps": 0.01,
+    "method": "qsvt",
+    "n": 2,
+    "optimize": false,
+    "seed": 2,
+    "t": 0.3
+   },
+   {
+    "eps": 0.01,
+    "method": "gqsp",
+    "n": 2,
+    "optimize": false,
+    "seed": 2,
+    "t": 0.3
+   }
+  ]
+ },
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:27:06+00:00",
+  "quick": false,
+  "seconds": 2.27,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "instances: trotter2 n=2 r=3 (unoptimized); trotter2 n=2 r=3 (optimized); qsvt n=2 15 calls (unoptimized); gqsp n=2 8 calls (unoptimized)",
+  "evidence": {
+   "atol": 1e-08,
+   "rows": [
+    {
+     "instance": "trotter2 n=2 r=3 (unoptimized)",
+     "ok": true,
+     "overlap": 1.0
+    },
+    {
+     "instance": "trotter2 n=2 r=3 (optimized)",
+     "ok": true,
+     "overlap": 1.0
+    },
+    {
+     "instance": "qsvt n=2 15 calls (unoptimized)",
+     "ok": true,
+     "overlap": 0.999999999999997
+    },
+    {
+     "instance": "gqsp n=2 8 calls (unoptimized)",
+     "ok": true,
+     "overlap": 0.9999999999999943
+    }
+   ]
+  },
+  "frontier": [],
+  "grants": "bounded",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "4 instances match; worst |overlap| = 1.000000000000"
+ }
+}

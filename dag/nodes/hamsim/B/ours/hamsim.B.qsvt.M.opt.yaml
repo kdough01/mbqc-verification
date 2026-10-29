@@ -1,0 +1,24 @@
+id: hamsim.B.qsvt.M.opt
+kind: theorem
+layer: B
+title: QSVT M formula (optimized)
+statement: |
+  Compiling the QSVT circuit for n ≥ 2 data qubits after standardizing and removing Pauli measurements (optimized), with odd D ≥ 3, gives a pattern with M = (36n − 18)D + 88n − 21 measurements.
+statement_tex: M = (36n - 18)D + 88n - 21
+description: |
+  Optimization trades vertices for memory: peak live qubits rise from about 10–22 to 55–991 on the grid.
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: qsvt_calls_per_sequence}
+depends_on:
+- {node: transfer.gate_to_mbqc, kind: instantiates}
+- {node: def.resource_counts, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: qsvt
+    optimize: true
+    quantity: M
+    coef: [36, -18, 88, -21]
+- kind: mutation
+  params: {target: scaling}
+tags: [hamsim, qsvt, resources, optimized]

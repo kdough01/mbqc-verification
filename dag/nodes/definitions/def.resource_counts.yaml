@@ -1,0 +1,13 @@
+id: def.resource_counts
+kind: definition
+title: Resource counts N, E, M of a pattern
+statement: |
+  For a pattern P: N(P) = |I| + #N commands (vertices of its graph), E(P) = #E commands (CZ edges), M(P) = #M commands (measurements).
+statement_tex: N(P) = |I| + \#\{N_i\},\quad E(P) = \#\{E_{ij}\},\quad M(P) = \#\{M_i\}
+description: |
+  Implemented by pattern_stats() in compile/qiskit_to_mbqc.py (keys total_nodes, 'edges (CZ)', measurements).
+lean_decl: [MBQC.Defs.numVertices, MBQC.Defs.numEdges, MBQC.Defs.numMeasurements]
+code: [src/mbqc_verify/compile/qiskit_to_mbqc.py]
+depends_on:
+- {node: def.pattern, kind: uses}
+tags: [mbqc, vocabulary, resources]

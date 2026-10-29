@@ -1,0 +1,24 @@
+id: hamsim.B.trotter2.M.opt
+kind: theorem
+layer: B
+title: second-order Trotter M formula (optimized)
+statement: |
+  Compiling the second-order Trotter circuit for n ≥ 2 data qubits after standardizing and removing Pauli measurements (optimized), with r ≥ 1, gives a pattern with M = (3n − 1)r + 2n measurements.
+statement_tex: M = (3n - 1)r + 2n
+description: |
+  Optimization trades vertices for memory: peak live qubits rise from about 10–22 to 55–991 on the grid.
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps}
+depends_on:
+- {node: transfer.gate_to_mbqc, kind: instantiates}
+- {node: def.resource_counts, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: trotter2
+    optimize: true
+    quantity: M
+    coef: [3, -1, 2, 0]
+- kind: mutation
+  params: {target: scaling}
+tags: [hamsim, trotter2, resources, optimized]

@@ -1,0 +1,49 @@
+{
+ "input_hash": "aac645e75be688a1",
+ "inputs": {
+  "check_code": {
+   "verification/truth/literature/check.py": "732dcd4563bd463d777c6025fd40d27a1e7f541a1dce1af950cecebcf43af220"
+  },
+  "check_params": "44136fa355b3678a",
+  "code": {
+   "src/mbqc_verify/hamsim/qsp_angles.py": "ea2a2675f394feca697bbf445a2d5fb01c7468e9a3320010f236bf0fb59777ff"
+  },
+  "definitions": {},
+  "parents": {},
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "5793a1f38eaba2cb"
+ },
+ "kind": "literature",
+ "name": "literature",
+ "node": "assume.jacobi_anger_truncation",
+ "params": {},
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:21:51+00:00",
+  "quick": false,
+  "seconds": 0.01,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "as stated in the source",
+  "evidence": {
+   "citation": "Jacobi\u2013Anger expansion: Abramowitz & Stegun, Handbook of Mathematical Functions (1964), \u00a79.1; its use for QSVT Hamiltonian simulation: Gily\u00e9n, Su, Low & Wiebe, STOC 2019 (arXiv:1806.01838)",
+   "convention_map": true,
+   "exact_form": true,
+   "url": "https://arxiv.org/abs/1806.01838"
+  },
+  "frontier": [],
+  "grants": "assumed",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "imported from Jacobi\u2013Anger expansion: Abramowitz & Stegun, Handbook of Mathematical Functions (1964), \u00a79.1; its use for QSVT Hamiltonian simulation: Gily\u00e9n, Su, Low & Wiebe, STOC 2019 (arXiv:1806.01838)"
+ }
+}

@@ -1,0 +1,15 @@
+id: hamsim.B.slide.E_Q
+kind: theorem
+layer: B
+title: 'Slide: QSVT executed CZs formula'
+statement: |
+  The slide's compiler gives E_Q = (168n − 102)d + 45n + 185, for n ≥ 2 and odd degree ≥ 3 (its d_ε, g_ε).
+statement_tex: E_Q = (168n-102)d + 45n + 185
+description: |
+  A claim about a compiler we do not have, so no check can run; it enters Layer C only as an explicit assumption. Our optimized E has no bilinear formula, so the slide's compiler apparently counts E before Pauli removal or does not rewire.
+code: [src/mbqc_verify/hamsim/slide.py]
+conventions: {degree: slide_polynomial_degree}
+depends_on:
+- {node: hamsim.B.qsvt.E.opt, kind: variant_of}
+- {node: def.hamsim.slide_formulas, kind: uses}
+tags: [hamsim, slide, resources]

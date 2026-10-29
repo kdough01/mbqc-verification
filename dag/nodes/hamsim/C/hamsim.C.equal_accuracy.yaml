@@ -1,0 +1,30 @@
+id: hamsim.C.equal_accuracy
+kind: theorem
+layer: C
+title: Cheapest method at equal accuracy
+statement: |
+  At equal accuracy, for n ∈ {4, 16, 64}, t ∈ {1, 10} and ε ∈ {10⁻², 10⁻⁴, 10⁻⁸}, with either our unoptimized or optimized vertex formulas: GQSP is never the method with the fewest vertices, second-order Trotter is cheapest at ε = 10⁻², and QSVT is cheapest at ε = 10⁻⁸.
+description: |
+  This comparison does not depend on how each method counts degree. Trotter steps use the triangle-inequality norm bound, which overestimates them, so Trotter does even better in practice.
+code: [src/mbqc_verify/hamsim/analysis.py, src/mbqc_verify/hamsim/qsp_angles.py]
+depends_on:
+- {node: hamsim.B.trotter2.N.unopt, kind: uses}
+- {node: hamsim.B.qsvt.N.unopt, kind: uses}
+- {node: hamsim.B.gqsp.N.unopt, kind: uses}
+- {node: hamsim.B.trotter2.N.opt, kind: uses}
+- {node: hamsim.B.qsvt.N.opt, kind: uses}
+- {node: hamsim.B.gqsp.N.opt, kind: uses}
+- {node: hamsim.A.trotter2_accuracy, kind: uses}
+- {node: hamsim.A.qsvt_accuracy, kind: uses}
+- {node: hamsim.A.gqsp_accuracy, kind: uses}
+checks:
+- kind: numerical
+  params:
+    which: equal_accuracy
+    formulas:
+      unopt: {trotter2: hamsim.B.trotter2.N.unopt, qsvt: hamsim.B.qsvt.N.unopt, gqsp: hamsim.B.gqsp.N.unopt}
+      opt: {trotter2: hamsim.B.trotter2.N.opt, qsvt: hamsim.B.qsvt.N.opt, gqsp: hamsim.B.gqsp.N.opt}
+    expect:
+      never_cheapest: [gqsp]
+      cheapest_at_eps: {'0.01': trotter2, 1e-08: qsvt}
+tags: [hamsim, consequence, equal-accuracy]

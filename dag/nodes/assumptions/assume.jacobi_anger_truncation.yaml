@@ -1,0 +1,21 @@
+id: assume.jacobi_anger_truncation
+kind: assumption
+title: Jacobi–Anger truncation bound
+statement: |
+  For τ > 0 and x ∈ [−1, 1], truncating the Jacobi–Anger expansions of cos(τx) and sin(τx) at Chebyshev degree D, or of e^{iτ cos ω} at Laurent degree d, leaves an error at most 2 Σ_{k > D} |J_k(τ)| (resp. Σ_{|k| > d} |J_k(τ)|).
+statement_tex: \Big|e^{i\tau x} - \sum_{k\le D} c_k T_k(x)\Big| \le 2\sum_{k>D} |J_k(\tau)|
+description: |
+  Used to pick the QSVT degree D and the GQSP degree d (qsp_angles.smallest_degree). The tail bound itself follows from |T_k(x)| ≤ 1 and |e^{ikω}| = 1, so it is a good first Lean target.
+code: [src/mbqc_verify/hamsim/qsp_angles.py]
+checks:
+- {kind: literature}
+source:
+  citation: 'Jacobi–Anger expansion: Abramowitz & Stegun, Handbook of Mathematical Functions (1964), §9.1;
+    its use for QSVT Hamiltonian simulation: Gilyén, Su, Low & Wiebe, STOC 2019 (arXiv:1806.01838)'
+  url: https://arxiv.org/abs/1806.01838
+  exact_form: cos(τx) = J_0(τ) + 2 Σ_{k≥1} (−1)^k J_{2k}(τ) T_{2k}(x); sin(τx) = 2 Σ_{k≥0} (−1)^k J_{2k+1}(τ)
+    T_{2k+1}(x); e^{iτ cos ω} = Σ_k i^k J_k(τ) e^{ikω}; truncation error ≤ bessel_tail(τ, D+1) = 2 Σ_{k≥D+1}
+    |J_k(τ)|
+  convention_map: τ = α t; x = eigenvalue of H/α. Chebyshev degree D of the sin polynomial (cos uses D
+    − 1) = our QSVT D (block-encoding calls per sequence). Laurent degree d = our GQSP d (2d walk calls).
+tags: [hamsim, literature, qsp]

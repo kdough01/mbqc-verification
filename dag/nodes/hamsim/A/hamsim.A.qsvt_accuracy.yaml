@@ -1,0 +1,16 @@
+id: hamsim.A.qsvt_accuracy
+kind: theorem
+layer: A
+title: QSVT reaches accuracy ε
+statement: |
+  Let D be the smallest odd degree with 2 Σ_{k>D} |J_k(αt)| ≤ 0.1ε, and scale both polynomials by β = 1 − 0.1ε. The QSVT circuit (cos and sin sequences combined by LCU, then one round of oblivious amplitude amplification, 3D block-encoding calls), post-selected on its ancillas, applies U with ‖U − e^{−iHt}‖ ≤ ε.
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/qsp_angles.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: radians, endian: little, input: zero, phase: exact, degree: qsvt_calls_per_sequence}
+depends_on:
+- {node: def.hamsim.ising_chain, kind: uses}
+- {node: hamsim.A.block_encoding, kind: instantiates}
+- {node: assume.jacobi_anger_truncation, kind: assumes}
+checks:
+- kind: numerical
+  params: {which: accuracy, method: qsvt}
+tags: [hamsim, qsvt, accuracy]

@@ -1,0 +1,94 @@
+{
+ "input_hash": "980e75dcf8dc25f6",
+ "inputs": {
+  "check_code": {
+   "verification/truth/symbolic/check.py": "63d2d0c5709e9cf094fdccc786336cbe2c5971e5debaa5f22477f84ad209a518",
+   "verification/truth/symbolic/coeff_positivity.py": "b2376ab044fe60e0f3eb10dcbea117681008845b7c39832f73ca5072c4c46483"
+  },
+  "check_params": "486c2b216c85329b",
+  "code": {
+   "src/mbqc_verify/hamsim/slide.py": "d16d18ac21475ebe60c2984dc1b3a54bfff3ba013d33678c3edd72c78472623f"
+  },
+  "definitions": {
+   "def.hamsim.slide_formulas": "5c1e5f2f83715021"
+  },
+  "lean_sources": "aad561f2c225afa88fe054415bc7c2f411c664e6910d244562d67f5de520a53d",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
+  "parents": {
+   "def.hamsim.slide_formulas": "5c1e5f2f83715021:4f53cda1"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "0cd039b554d91b49"
+ },
+ "kind": "symbolic",
+ "name": "symbolic",
+ "node": "hamsim.C.slide.d_ge_g.E",
+ "params": {
+  "certificate": "slide_d_ge_g",
+  "quantity": "E"
+ },
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:26:37+00:00",
+  "quick": false,
+  "seconds": 0.04,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "all n >= 2 and odd d >= g >= 3",
+  "evidence": {
+   "certificate": [
+    {
+     "case": "g = 3",
+     "certifies_positive": true,
+     "coefficients": {
+      "(0, 0, 0)": 378,
+      "(0, 0, 1)": 468,
+      "(1, 0, 0)": 55,
+      "(1, 0, 1)": 336
+     },
+     "difference": "336*k*p + 468*k + 55*p + 378"
+    },
+    {
+     "case": "g = 7 + 4q  (g = 3 mod 4, g >= 7)",
+     "certifies_positive": true,
+     "coefficients": {
+      "(0, 0, 0)": 785,
+      "(0, 0, 1)": 468,
+      "(0, 1, 0)": 408,
+      "(1, 0, 0)": 231,
+      "(1, 0, 1)": 336,
+      "(1, 1, 0)": 176
+     },
+     "difference": "336*k*p + 468*k + 176*p*q + 231*p + 408*q + 785"
+    },
+    {
+     "case": "g = 5 + 4q  (g = 1 mod 4)",
+     "certifies_positive": true,
+     "coefficients": {
+      "(0, 0, 0)": 580,
+      "(0, 0, 1)": 468,
+      "(0, 1, 0)": 408,
+      "(1, 0, 0)": 144,
+      "(1, 0, 1)": 336,
+      "(1, 1, 0)": 176
+     },
+     "difference": "336*k*p + 468*k + 176*p*q + 144*p + 408*q + 580"
+    }
+   ]
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "QSVT - GQSP is a positive-coefficient polynomial in all 3 cases"
+ }
+}

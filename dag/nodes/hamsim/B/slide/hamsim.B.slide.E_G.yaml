@@ -1,0 +1,15 @@
+id: hamsim.B.slide.E_G
+kind: theorem
+layer: B
+title: 'Slide: GQSP executed CZs formula'
+statement: |
+  The slide's compiler gives E_G = (124n − 116)g + (122 − χ)n − 40 + 3χ − η, with χ = [g ≡ 1 mod 4], η = [g = 3], for n ≥ 2 and odd degree ≥ 3 (its d_ε, g_ε).
+statement_tex: E_G = (124n-116)g + (122-\chi)n - 40 + 3\chi - \eta
+description: "A claim about a compiler we do not have, so no check can run; it enters Layer C only as\
+  \ an explicit assumption. \n"
+code: [src/mbqc_verify/hamsim/slide.py]
+conventions: {degree: slide_polynomial_degree}
+depends_on:
+- {node: hamsim.B.gqsp.E.opt, kind: variant_of}
+- {node: def.hamsim.slide_formulas, kind: uses}
+tags: [hamsim, slide, resources]

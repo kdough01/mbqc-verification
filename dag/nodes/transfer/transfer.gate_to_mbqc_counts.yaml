@@ -1,0 +1,17 @@
+id: transfer.gate_to_mbqc_counts
+kind: transfer
+title: Transfer theorem, resource part
+statement: |
+  For any J/CZ stream on w qubits, the pattern built by the J-∧z construction has N = w + #J vertices and M = #J measurements, and E ≤ #J + #CZ edges, with equality unless a CZ cancels an existing edge.
+statement_tex: N = w + \#J,\quad M = \#J,\quad E \le \#J + \#CZ
+description: |
+  The counting half of the transfer theorem, proved in Lean. With it, every gate-level count becomes an MBQC count by counting J and CZ instructions.
+lean_decl: MBQC.Transfer.compile_counts
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped}
+depends_on:
+- {node: def.jcz_construction, kind: uses}
+checks:
+- {kind: lean}
+- {kind: vocabulary}
+- {kind: nonvacuity}
+tags: [mbqc, transfer, resources]

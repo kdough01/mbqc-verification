@@ -1,0 +1,30 @@
+id: hamsim.B.qsvt.N.opt
+kind: theorem
+layer: B
+title: QSVT N formula (optimized)
+statement: |
+  Compiling the QSVT circuit for n ≥ 2 data qubits after standardizing and removing Pauli measurements (optimized), with odd D ≥ 3, gives a pattern with N = (36n − 18)D + 92n − 20 vertices.
+statement_tex: N = (36n - 18)D + 92n - 20
+description: |
+  Optimization trades vertices for memory: peak live qubits rise from about 10–22 to 55–991 on the grid.
+lean_decl: MBQC.Results.HamSim.qsvt_vertices_opt
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: qsvt_calls_per_sequence}
+depends_on:
+- {node: transfer.gate_to_mbqc, kind: instantiates}
+- {node: lemma.bilinear_interpolation, kind: uses}
+- {node: assume.hamsim.qsvt_opt_N, kind: assumes}
+checks:
+- kind: scaling
+  params:
+    method: qsvt
+    optimize: true
+    quantity: N
+    coef: [36, -18, 92, -20]
+- kind: mutation
+  params: {target: scaling}
+- {kind: lean}
+- {kind: vocabulary}
+- kind: nonvacuity
+  params: {witness: MBQC.Results.HamSim.qsvt_vertices_opt_nonvacuous}
+tags: [hamsim, qsvt, resources, optimized]

@@ -1,0 +1,14 @@
+id: core.gflow_determinism
+kind: core
+title: gflow implies determinism
+statement: |
+  If the open graph (G, I, O) of a pattern has a generalized flow (gflow), then measuring in the planes and at the angles given, with corrections derived from the gflow, gives a pattern that is uniformly, strongly and stepwise deterministic.
+description: |
+  Standard result: Browne, Kashefi, Mhalla & Perdrix, Generalized flow and determinism in measurement-based quantum computation, New J. Phys. 9, 250 (2007).
+conventions: {angle: pi_units, input: plus, phase: global_dropped}
+depends_on:
+- {node: def.pattern, kind: uses}
+- {node: def.graph_state, kind: uses}
+tags: [mbqc, core, determinism]
+notes: |
+  Human-reviewed core: reviewed once, then proved in Lean (design doc, M4-M5).

@@ -1,0 +1,26 @@
+id: hamsim.B.trotter2.N.unopt
+kind: theorem
+layer: B
+title: second-order Trotter N formula (unoptimized)
+statement: |
+  Compiling the second-order Trotter circuit for n ≥ 2 data qubits gate by gate (unoptimized), with r ≥ 1, gives a pattern with N = (10n − 6)r + 3n vertices.
+statement_tex: N = (10n - 6)r + 3n
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps}
+depends_on:
+- {node: transfer.gate_to_mbqc, kind: instantiates}
+- {node: transfer.gate_to_mbqc_counts, kind: instantiates}
+- {node: def.resource_counts, kind: uses}
+- {node: def.jcz_construction, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: trotter2
+    optimize: false
+    quantity: N
+    coef: [10, -6, 3, 0]
+- kind: mutation
+  params: {target: scaling}
+- kind: differential
+  params: {method: trotter2}
+tags: [hamsim, trotter2, resources, unoptimized]

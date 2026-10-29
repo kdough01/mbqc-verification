@@ -1,0 +1,78 @@
+# Record a human statement review from the Actions tab:
+# Actions > review > Run workflow, then pick the node and your decision.
+# Reviewers check that the statement (and the definitions it rests on) means what
+# we intend; Lean and the other checks cover whether it is true.
+name: review
+
+on:
+  workflow_dispatch:
+    inputs:
+      node:
+        description: Node id, e.g. def.graph_state (see the review queue in the latest verify run)
+        required: true
+        type: string
+      decision:
+        description: Does the statement mean what we intend?
+        required: true
+        type: choice
+        options: [approve, reject]
+      notes:
+        description: Notes (required when rejecting)
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: dag-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+        with:
+          packages: light
+          lean: "false"
+
+      - name: Show what is being reviewed
+        env:
+          NODE: ${{ inputs.node }}
+        run: |
+          { echo '```'; dagtool show "$NODE"; echo '```'; } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Record the review
+        env:
+          NODE: ${{ inputs.node }}
+          DECISION: ${{ inputs.decision }}
+          NOTES: ${{ inputs.notes }}
+          REVIEWER: ${{ github.actor }}
+        run: |
+          if [ "$DECISION" = reject ] && [ -z "$NOTES" ]; then
+            echo "::error::A rejection needs notes saying what is wrong with the statement."
+            exit 1
+          fi
+          dagtool review "$NODE" --reviewer "$REVIEWER" --decision "$DECISION" --notes "$NOTES"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dag/reviews
+          git commit -m "Review: $DECISION $NODE ($REVIEWER) [skip ci]"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+          echo "Recorded **$DECISION** for \`$NODE\` by $REVIEWER." >> "$GITHUB_STEP_SUMMARY"
+
+  # Refresh statuses and the published browser with the new review.
+  verify:
+    needs: record
+    uses: ./.github/workflows/verify.yml
+    with:
+      rerun: stale

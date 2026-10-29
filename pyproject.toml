@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mbqc-verification"
+version = "0.1.0"
+description = "Translate gate-based results into MBQC ones and verify them through a DAG of theorems"
+requires-python = ">=3.11"
+authors = [{ name = "Kevin Dougherty" }]
+# Exact versions used for results are pinned in requirements.txt.
+dependencies = [
+    "qiskit>=2.5",
+    "graphix>=0.4.1,<0.5",
+    "numpy",
+    "scipy",
+    "sympy",
+    "networkx",
+    "pyyaml",
+    "jsonschema",
+]
+
+[project.optional-dependencies]
+plots = ["matplotlib", "pylatexenc"]
+dev = ["pytest"]
+
+[project.scripts]
+dagtool = "dagtool.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src", ".", "tools"]
+include = ["mbqc_verify*", "verification*", "dagtool*"]
+
+[tool.setuptools.package-data]
+dagtool = ["*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

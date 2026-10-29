@@ -1,0 +1,191 @@
+{
+ "input_hash": "e125b732c77a2155",
+ "inputs": {
+  "check_code": {
+   "verification/faithfulness/mutation/check.py": "f1e94c6d30a1fb0d706270c49b3e2e3648fdf20c6871c0670ec02f2b62b431d6",
+   "verification/truth/scaling/check.py": "cea1af075f002980a1528feb620149e04347c3be90846afd321f349c76115c58",
+   "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
+  },
+  "check_params": "cdb6ce06dd262a68",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.jcz_construction": "392cb6fd4770bc56",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "parents": {
+   "def.jcz_construction": "392cb6fd4770bc56:b8ffd8b5",
+   "def.resource_counts": "b75d507a2b247ac8:4f53cda1",
+   "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1",
+   "transfer.gate_to_mbqc_counts": "34befe39e1070a89:964b423a"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "01909130ecf68cd0"
+ },
+ "kind": "mutation",
+ "name": "mutation",
+ "node": "hamsim.B.gqsp.E.unopt",
+ "params": {
+  "target": "scaling"
+ },
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:27:07+00:00",
+  "quick": false,
+  "seconds": 0.01,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": null,
+  "evidence": {
+   "mutants": [
+    {
+     "coef": [
+      "533",
+      "-300",
+      "0",
+      "12"
+     ],
+     "first_mismatch": {
+      "count": 776,
+      "formula": "778",
+      "k": 1,
+      "n": 2
+     },
+     "mutant": "a (n*k) +1",
+     "rejected": true
+    },
+    {
+     "coef": [
+      "531",
+      "-300",
+      "0",
+      "12"
+     ],
+     "first_mismatch": {
+      "count": 776,
+      "formula": "774",
+      "k": 1,
+      "n": 2
+     },
+     "mutant": "a (n*k) -1",
+     "rejected": true
+    },
+    {
+     "coef": [
+      "532",
+      "-299",
+      "0",
+      "12"
+     ],
+     "first_mismatch": {
+      "count": 776,
+      "formula": "777",
+      "k": 1,
+      "n": 2
+     },
+     "mutant": "b (k) +1",
+     "rejected": true
+    },
+    {
+     "coef": [
+      "532",
+      "-301",
+      "0",
+      "12"
+     ],
+     "first_mismatch": {
+      "count": 776,
+      "formula": "775",
+      "k": 1,
+      "n": 2
+     },
+     "mutant": "b (k) -1",
+     "rejected": true
+    },
+    {
+     "coef": [
+      "532",
+      "-300",
+      "1",
+      "12"
+     ],
+     "first_mismatch": {
+      "count": 776,
+      "formula": "778",
+      "k": 1,
+      "n": 2
+     },
+     "mutant": "c (n) +1",
+     "rejected": true
+    },
+    {
+     "coef": [
+      "532",
+      "-300",
+      "-1",
+      "12"
+     ],
+     "first_mismatch": {
+      "count": 776,
+      "formula": "774",
+      "k": 1,
+      "n": 2
+     },
+     "mutant": "c (n) -1",
+     "rejected": true
+    },
+    {
+     "coef": [
+      "532",
+      "-300",
+      "0",
+      "13"
+     ],
+     "first_mismatch": {
+      "count": 776,
+      "formula": "777",
+      "k": 1,
+      "n": 2
+     },
+     "mutant": "e (const) +1",
+     "rejected": true
+    },
+    {
+     "coef": [
+      "532",
+      "-300",
+      "0",
+      "11"
+     ],
+     "first_mismatch": {
+      "count": 776,
+      "formula": "775",
+      "k": 1,
+      "n": 2
+     },
+     "mutant": "e (const) -1",
+     "rejected": true
+    }
+   ]
+  },
+  "frontier": [],
+  "grants": null,
+  "outcome": "pass",
+  "seed": null,
+  "summary": "all 8 coefficient mutants rejected"
+ }
+}

@@ -1,0 +1,185 @@
+{
+ "input_hash": "7c36397aff8aeaec",
+ "inputs": {
+  "check_code": {
+   "verification/truth/scaling/check.py": "cea1af075f002980a1528feb620149e04347c3be90846afd321f349c76115c58",
+   "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
+  },
+  "check_params": "fd53ae77dbfd1a4c",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "parents": {
+   "def.resource_counts": "b75d507a2b247ac8:4f53cda1",
+   "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "eb7613d57222d436"
+ },
+ "kind": "scaling",
+ "name": "scaling",
+ "node": "hamsim.B.trotter2.N.opt",
+ "params": {
+  "coef": [
+   3,
+   -1,
+   3,
+   0
+  ],
+  "method": "trotter2",
+  "optimize": true,
+  "quantity": "N"
+ },
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:27:03+00:00",
+  "quick": false,
+  "seconds": 0.01,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "n in [2, 3, 4, 5], k in [1, 2, 3, 4] (training) + held-out [(7, 6), (9, 3)]",
+  "evidence": {
+   "counts": [
+    {
+     "N": 11,
+     "k": 1,
+     "n": 2,
+     "space": 5
+    },
+    {
+     "N": 16,
+     "k": 2,
+     "n": 2,
+     "space": 6
+    },
+    {
+     "N": 21,
+     "k": 3,
+     "n": 2,
+     "space": 6
+    },
+    {
+     "N": 26,
+     "k": 4,
+     "n": 2,
+     "space": 6
+    },
+    {
+     "N": 17,
+     "k": 1,
+     "n": 3,
+     "space": 8
+    },
+    {
+     "N": 25,
+     "k": 2,
+     "n": 3,
+     "space": 8
+    },
+    {
+     "N": 33,
+     "k": 3,
+     "n": 3,
+     "space": 11
+    },
+    {
+     "N": 41,
+     "k": 4,
+     "n": 3,
+     "space": 11
+    },
+    {
+     "N": 23,
+     "k": 1,
+     "n": 4,
+     "space": 8
+    },
+    {
+     "N": 34,
+     "k": 2,
+     "n": 4,
+     "space": 12
+    },
+    {
+     "N": 45,
+     "k": 3,
+     "n": 4,
+     "space": 15
+    },
+    {
+     "N": 56,
+     "k": 4,
+     "n": 4,
+     "space": 22
+    },
+    {
+     "N": 29,
+     "k": 1,
+     "n": 5,
+     "space": 8
+    },
+    {
+     "N": 43,
+     "k": 2,
+     "n": 5,
+     "space": 16
+    },
+    {
+     "N": 57,
+     "k": 3,
+     "n": 5,
+     "space": 22
+    },
+    {
+     "N": 71,
+     "k": 4,
+     "n": 5,
+     "space": 16
+    },
+    {
+     "N": 141,
+     "k": 6,
+     "n": 7,
+     "space": 31
+    },
+    {
+     "N": 105,
+     "k": 3,
+     "n": 9,
+     "space": 23
+    }
+   ],
+   "least_squares_fit": [
+    "3",
+    "-1",
+    "3",
+    "0"
+   ],
+   "method": "trotter2",
+   "mismatches": [],
+   "optimize": true,
+   "quantity": "N"
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "exact on all 16 training and 2 held-out points"
+ }
+}

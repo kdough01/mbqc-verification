@@ -1,0 +1,10 @@
+id: def.graph_state
+kind: definition
+title: Graph state
+statement: |
+  For a graph G = (V, E), the graph state is |G⟩ = ∏_{(i,j)∈E} CZ_ij |+⟩^{⊗V}.
+statement_tex: '|G\rangle = \prod_{(i,j)\in E} CZ_{ij}\, |+\rangle^{\otimes V}'
+description: |
+  The resource state every pattern entangles. CZ gates commute, so the order of the product does not matter.
+conventions: {input: plus}
+tags: [mbqc, vocabulary]

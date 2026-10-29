@@ -1,0 +1,14 @@
+id: core.jalpha_byproduct
+kind: core
+title: J(α) pattern implements J(α) up to a byproduct
+statement: |
+  For every angle α, the pattern X_2^{s_1} M_1^{-α} E_12 N_2 implements J(α) = H·diag(1, e^{iα}) from qubit 1 to qubit 2, for both outcomes s_1 ∈ {0, 1}, up to global phase.
+statement_tex: X_2^{s_1} M_1^{-\alpha} E_{12} N_2 \;\simeq\; J(\alpha) = H\,\mathrm{diag}(1, e^{i\alpha})
+description: |
+  Standard result: Danos, Kashefi & Panangaden, The measurement calculus, J. ACM 54(2), 2007.
+conventions: {angle: pi_units, input: plus, phase: global_dropped}
+depends_on:
+- {node: def.pattern, kind: uses}
+tags: [mbqc, core]
+notes: |
+  Human-reviewed core: reviewed once, then proved in Lean (design doc, M4-M5).

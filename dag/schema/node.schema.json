@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Theorem DAG node",
+  "description": "One claim (or definition) in the theorem DAG. Status is never written here: dagtool computes it from dag/evidence and dag/reviews.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "kind",
+    "title",
+    "statement"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-zA-Z0-9_]+)+$",
+      "description": "Dotted, globally unique; must equal the file name."
+    },
+    "kind": {
+      "enum": [
+        "definition",
+        "core",
+        "assumption",
+        "transfer",
+        "lemma",
+        "theorem"
+      ]
+    },
+    "layer": {
+      "enum": [
+        "A",
+        "B",
+        "C"
+      ],
+      "description": "Hamiltonian-simulation layer: A accuracy, B cost formula, C consequence."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3
+    },
+    "statement": {
+      "type": "string",
+      "minLength": 3,
+      "description": "The claim in plain text (Unicode math allowed). Hashed: editing it voids reviews and marks evidence stale."
+    },
+    "statement_tex": {
+      "type": "string",
+      "description": "Optional LaTeX rendering of the statement for the browser. Hashed."
+    },
+    "description": {
+      "type": "string",
+      "description": "Context for readers. Not hashed."
+    },
+    "lean_decl": {
+      "description": "The Lean declaration this node is about. For definition and assumption nodes, a list of names or namespaces that make up the definition.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z0-9_]*(\\.[A-Za-z0-9_']+)+$"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9_]*(\\.[A-Za-z0-9_']+)+$"
+          }
+        }
+      ]
+    },
+    "code": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Repo-relative files whose contents this claim is about. Hashed."
+    },
+    "conventions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "angle": {
+          "enum": [
+            "pi_units",
+            "radians"
+          ]
+        },
+        "endian": {
+          "enum": [
+            "big",
+            "little"
+          ]
+        },
+        "input": {
+          "enum": [
+            "plus",
+            "zero"
+          ]
+        },
+        "phase": {
+          "enum": [
+            "global_dropped",
+            "exact"
+          ]
+        },
+        "degree": {
+          "enum": [
+            "qsvt_calls_per_sequence",
+            "gqsp_laurent_degree",
+            "trotter_steps",
+            "slide_polynomial_degree"
+          ]
+        }
+      }
+    },
+    "depends_on": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "node"
+        ],
+        "properties": {
+          "node": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "uses",
+              "assumes",
+              "instantiates",
+              "variant_of"
+            ],
+            "default": "uses"
+          },
+          "convert": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Ancestors allowed to be unproved. They join the frontier instead of weakening this node."
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9_-]+$"
+          },
+          "params": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "citation"
+      ],
+      "properties": {
+        "citation": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "exact_form": {
+          "type": "string"
+        },
+        "convention_map": {
+          "type": "string"
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "acknowledged": {
+      "type": "array",
+      "description": "Results accepted on purpose, each with the reason. An acknowledged warning shows as information and does not fail `dagtool check`; an acknowledged `refuted` means the claim is expected to be false, so its refutation is not a regression.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "reason"
+        ],
+        "properties": {
+          "code": {
+            "enum": [
+              "convention_mismatch",
+              "edge_unused",
+              "edge_mismatch",
+              "refuted"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+id: hamsim.B.slide.N_G
+kind: theorem
+layer: B
+title: 'Slide: GQSP vertices formula'
+statement: |
+  The slide's compiler gives N_G = (12n − 6)g + 32n − 11, for n ≥ 2 and odd degree ≥ 3 (its d_ε, g_ε).
+statement_tex: N_G = (12n-6)g + 32n - 11
+description: |
+  A claim about a compiler we do not have, so no check can run; it enters Layer C only as an explicit assumption. Ours costs 80n − 40 per degree. 12n − 6 = (36n − 18)/3 is what one uncontrolled block-encoding call costs in our compiler, which suggests the slide's construction avoids controlling SELECT. Open question for the authors.
+code: [src/mbqc_verify/hamsim/slide.py]
+conventions: {degree: slide_polynomial_degree}
+depends_on:
+- {node: hamsim.B.gqsp.N.opt, kind: variant_of}
+- {node: def.hamsim.slide_formulas, kind: uses}
+tags: [hamsim, slide, resources]

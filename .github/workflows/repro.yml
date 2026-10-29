@@ -1,0 +1,41 @@
+# Weekly: re-run every check from scratch and compare verdicts with the committed
+# evidence. Nothing is committed; a difference fails the run.
+name: repro
+
+on:
+  schedule:
+    - cron: "17 4 * * 1"    # Mondays 04:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repro:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup
+
+      - name: Re-run every check and compare
+        run: |
+          set -o pipefail
+          dagtool repro | tee "$RUNNER_TEMP/repro.txt"
+
+      - name: Write the run summary
+        if: always()
+        run: |
+          {
+            echo "## Reproducibility"
+            echo
+            echo "$(grep -c REPRODUCED "$RUNNER_TEMP/repro.txt" || true) verdicts reproduced."
+            if grep -q DIFFERS "$RUNNER_TEMP/repro.txt"; then
+              echo
+              echo "**Differences:**"
+              echo '```'
+              grep DIFFERS "$RUNNER_TEMP/repro.txt"
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

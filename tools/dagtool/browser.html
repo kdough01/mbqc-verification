@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--HEAD-START-->
+<title>MBQC Theorem DAG</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: a three-pane instrument — theorem index | dependency graph | theorem sheet.
+   Statements are set like a paper's theorem environment (amsthm: plain = italic, definition = upright). */
+:root {
+  --bg: #f4f6f8; --panel: #ffffff; --sunk: #eef1f4; --ink: #151a20; --ink-2: #4a5561; --ink-3: #85909b;
+  --line: #dbe0e6; --accent: #2d5b88; --accent-soft: #e3ecf5; --warn: #a8641a; --crit: #b8382b;
+  --t-proved: #1d7a4c; --t-modulo: #4f9a6c; --t-defined: #5d6b79; --t-assumed: #7656a8; --t-bounded: #2c6db0;
+  --t-empirical: #b07a16; --t-conjecture: #8b95a0; --t-refuted: #c0392b; --t-broken: #c0392b;
+  --f-ui: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-math: "Source Serif 4", "Cambria", "Georgia", serif;
+  --f-mono: "IBM Plex Mono", "Cascadia Mono", "Consolas", ui-monospace, monospace;
+  --s-1: 11.5px; --s-2: 13px; --s-3: 14.5px; --s-4: 17px; --s-5: 22px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1215; --panel: #171b20; --sunk: #12161a; --ink: #e6eaee; --ink-2: #a7b0ba; --ink-3: #6f7a85;
+  --line: #2a3138; --accent: #86afd9; --accent-soft: #1d2a37; --warn: #e0a24e; --crit: #ef6d5f;
+  --t-proved: #4cc387; --t-modulo: #82cfa0; --t-defined: #8e9aa7; --t-assumed: #a88be2; --t-bounded: #6ea8e8;
+  --t-empirical: #e0a94c; --t-conjecture: #858f9a; --t-refuted: #ef6d5f; --t-broken: #ef6d5f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1215; --panel: #171b20; --sunk: #12161a; --ink: #e6eaee; --ink-2: #a7b0ba; --ink-3: #6f7a85;
+  --line: #2a3138; --accent: #86afd9; --accent-soft: #1d2a37; --warn: #e0a24e; --crit: #ef6d5f;
+  --t-proved: #4cc387; --t-modulo: #82cfa0; --t-defined: #8e9aa7; --t-assumed: #a88be2; --t-bounded: #6ea8e8;
+  --t-empirical: #e0a94c; --t-conjecture: #858f9a; --t-refuted: #ef6d5f; --t-broken: #ef6d5f; color-scheme: dark }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 var(--s-2)/1.45 var(--f-ui); }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mono { font-family: var(--f-mono); font-size: 0.92em; }
+.muted { color: var(--ink-2); }
+.faint { color: var(--ink-3); }
+
+.app { height: 100%; display: grid; grid-template-rows: auto 1fr; }
+header.top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px;
+  padding-block: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background: var(--panel); border-bottom: 1px solid var(--line); }
+.brand h1 { margin: 0; font: 600 var(--s-4)/1.2 var(--f-ui); letter-spacing: -0.01em; }
+.brand p { margin: 2px 0 0; font-size: var(--s-1); color: var(--ink-3); }
+.ladder { flex: 1 1 420px; min-width: 0; display: grid; gap: 6px; }
+.ladder-bar { display: flex; height: 10px; border-radius: 3px; overflow: hidden; background: var(--sunk); }
+.ladder-bar span { display: block; height: 100%; }
+.ladder-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--s-1); color: var(--ink-2); }
+.ladder-legend b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: 0; }
+.faithline { font-size: var(--s-1); color: var(--ink-2); }
+
+.panes { min-height: 0; display: grid; grid-template-columns: 300px minmax(0, 1fr) 420px; }
+.pane { min-height: 0; min-width: 0; overflow: auto; }
+.index { background: var(--panel); border-right: 1px solid var(--line); display: flex; flex-direction: column; }
+.sheet { background: var(--panel); border-left: 1px solid var(--line); }
+
+/* index */
+.search { padding: 12px 14px 10px; display: grid; gap: 10px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); z-index: 2; }
+.search input { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+.search input::placeholder { color: var(--ink-3); }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 2px 9px; font-size: var(--s-1); cursor: pointer; color: var(--ink-2); }
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+.resultcount { font-size: var(--s-1); color: var(--ink-3); }
+.list { padding: 4px 0 16px; }
+.group h3 { margin: 12px 14px 4px; font: 600 var(--s-1)/1.3 var(--f-ui); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+.item { display: grid; grid-template-columns: 4px 1fr auto; gap: 0 10px; align-items: center; width: 100%; text-align: left;
+  padding: 6px 14px 6px 10px; border: 0; background: none; cursor: pointer; }
+.item:hover { background: var(--sunk); }
+.item[aria-current="true"] { background: var(--accent-soft); }
+.item .bar { width: 4px; height: 30px; border-radius: 2px; }
+.item .t { min-width: 0; }
+.item .t div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item .t .id { font-family: var(--f-mono); font-size: 10.5px; color: var(--ink-3); }
+
+/* center */
+.center { display: grid; grid-template-rows: auto 1fr; min-height: 0; }
+.tabs { display: flex; align-items: center; gap: 4px; padding: 8px 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.tab { border: 0; background: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; color: var(--ink-2); font-weight: 500; }
+.tab[aria-selected="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.tools { margin-left: auto; display: flex; gap: 4px; }
+.tool { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 3px 9px; cursor: pointer; color: var(--ink-2); }
+.graphwrap { position: relative; min-height: 0; overflow: hidden; touch-action: none; cursor: grab; }
+.graphwrap.dragging { cursor: grabbing; }
+svg.graph { width: 100%; height: 100%; display: block; }
+.graph .edge { fill: none; stroke: var(--ink-3); stroke-width: 1.1; opacity: 0.55; }
+.graph .edge.assumes { stroke: var(--t-assumed); stroke-dasharray: 5 3; opacity: 0.8; }
+.graph .edge.instantiates { stroke-dasharray: 1.5 3; }
+.graph .edge.variant_of { stroke: var(--warn); stroke-dasharray: 7 4; opacity: 0.7; }
+.graph .edge.lit { stroke: var(--accent); opacity: 1; stroke-width: 1.8; }
+.graph .edge.dim { opacity: 0.12; }
+.graph .node { cursor: pointer; }
+.graph .node rect.box { fill: var(--panel); stroke: var(--line); stroke-width: 1; }
+.graph .node.stale rect.box { stroke-dasharray: 4 3; stroke: var(--ink-3); }
+.graph .node:hover rect.box { stroke: var(--ink-2); }
+.graph .node.sel rect.box { stroke: var(--accent); stroke-width: 2; }
+.graph .node.dim { opacity: 0.22; }
+.graph .node text { fill: var(--ink); font: 500 12px var(--f-ui); }
+.graph .node .warnmark { fill: var(--warn); font: 700 12px var(--f-ui); }
+.legend { position: absolute; left: max(10px, env(safe-area-inset-left, 0px)); bottom: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+  padding: 6px 10px; font-size: var(--s-1); color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 14px; max-width: calc(100% - 20px); }
+.legend svg { vertical-align: middle; margin-right: 4px; }
+.queue { overflow: auto; padding: 14px 16px 24px; }
+.queue p { margin: 0 0 12px; max-width: 70ch; color: var(--ink-2); }
+table { border-collapse: collapse; width: 100%; font-size: var(--s-2); }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: var(--s-1); font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; }
+td.num { font-variant-numeric: tabular-nums; text-align: right; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td { background: var(--sunk); }
+.tablewrap { overflow-x: auto; }
+
+/* sheet */
+.sheet-inner { padding: 18px 20px 32px; display: grid; gap: 18px; }
+.empty { color: var(--ink-2); max-width: 46ch; }
+.empty h2 { color: var(--ink); }
+.eyebrow { font-size: var(--s-1); text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); }
+.sheet h2 { margin: 2px 0 0; font: 600 var(--s-5)/1.2 var(--f-ui); letter-spacing: -0.01em; text-wrap: balance; }
+.idline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.copy { border: 1px solid var(--line); background: none; border-radius: 5px; padding: 1px 7px; font-size: var(--s-1); cursor: pointer; color: var(--ink-2); }
+.thm { font-family: var(--f-math); font-size: 16.5px; line-height: 1.55; padding: 12px 14px; background: var(--sunk); border-radius: 6px; }
+.thm b { font-style: normal; font-weight: 600; }
+.thm .body { font-style: italic; }
+.thm.upright .body { font-style: normal; }
+details summary { cursor: pointer; color: var(--ink-2); font-size: var(--s-1); }
+details pre, pre.json { margin: 8px 0 0; padding: 8px 10px; background: var(--sunk); border-radius: 5px; overflow: auto; max-height: 320px;
+  font: 11.5px/1.45 var(--f-mono); white-space: pre-wrap; word-break: break-word; }
+.statgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.stat .k { font-size: var(--s-1); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+.stat .v { font: 600 var(--s-4)/1.2 var(--f-ui); display: flex; align-items: center; gap: 7px; }
+.stat .v .sw { width: 11px; height: 11px; }
+.stat .d { font-size: var(--s-1); color: var(--ink-2); overflow-wrap: anywhere; }
+.section h4 { margin: 0 0 6px; font: 600 var(--s-1)/1.3 var(--f-ui); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+.flag { display: grid; grid-template-columns: auto 1fr; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: var(--s-2); }
+.flag:last-child { border-bottom: 0; }
+.pill { display: inline-block; padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 600; line-height: 18px; border: 1px solid currentColor; white-space: nowrap; }
+.pill.warn { color: var(--warn); } .pill.info { color: var(--ink-3); }
+.pill.pass { color: var(--t-proved); } .pill.fail, .pill.error { color: var(--crit); } .pill.skip { color: var(--ink-3); }
+.pill.stale { color: var(--warn); }
+.ev { border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; display: grid; gap: 4px; }
+.ev + .ev { margin-top: 8px; }
+.ev .head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.ev .head .name { font-weight: 600; }
+.ev .sum { font-size: var(--s-2); }
+.ev .dom { font-size: var(--s-1); color: var(--ink-2); }
+.links { display: grid; gap: 2px; }
+.link { border: 0; background: none; padding: 3px 0; text-align: left; cursor: pointer; color: var(--accent); display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.link span.k { font-size: var(--s-1); color: var(--ink-3); min-width: 78px; }
+.link span.t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link:hover span.t { text-decoration: underline; }
+.frontier { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+.fchip { border: 1px solid var(--t-assumed); color: var(--t-assumed); background: none; border-radius: 4px; padding: 0 6px; font: 11px var(--f-mono); cursor: pointer; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; font-size: var(--s-2); }
+.kv dt { color: var(--ink-3); }
+.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.prose { max-width: 62ch; color: var(--ink-2); margin: 0; }
+a { color: var(--accent); }
+.faithdot { width: 12px; height: 12px; flex: none; }
+
+@media (max-width: 1180px) {
+  .panes { grid-template-columns: 280px minmax(0, 1fr); grid-template-rows: minmax(360px, 58%) auto; }
+  .index { grid-row: 1 / span 2; }
+  .sheet { border-left: 0; border-top: 1px solid var(--line); }
+}
+@media (max-width: 760px) {
+  .app { height: auto; display: block; }
+  html, body { height: auto; }
+  .panes { display: block; }
+  .index { border-right: 0; border-bottom: 1px solid var(--line); }
+  .list { max-height: 42vh; overflow: auto; }
+  .center { height: 70vh; }
+  .sheet-inner, .search, .item, .tabs, .queue { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .group h3 { margin-left: max(16px, env(safe-area-inset-left, 0px)); }
+  .statgrid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) { .graph .node, .graph .edge { transition: opacity 120ms ease; } }
+</style>
+<!--HEAD-END-->
+</head>
+<body>
+<!--BODY-START-->
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1>MBQC Theorem DAG</h1>
+      <p id="meta"></p>
+    </div>
+    <div class="ladder" aria-label="Effective truth status of all nodes">
+      <div class="ladder-bar" id="ladderbar"></div>
+      <div class="ladder-legend" id="ladderlegend"></div>
+    </div>
+    <div class="faithline" id="faithline"></div>
+  </header>
+  <div class="panes">
+    <aside class="pane index">
+      <div class="search">
+        <input id="q" type="search" placeholder="Search theorems, ids, statements…  ( / )" autocomplete="off" aria-label="Search theorems">
+        <div class="chips" id="truthchips" aria-label="Filter by truth status"></div>
+        <div class="chips" id="kindchips" aria-label="Filter by kind"></div>
+        <div class="resultcount" id="resultcount"></div>
+      </div>
+      <nav class="list" id="list" aria-label="Theorems"></nav>
+    </aside>
+    <section class="pane center" aria-label="Graph and review queue">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tab-graph" aria-selected="true">Dependency graph</button>
+        <button class="tab" role="tab" id="tab-queue" aria-selected="false">Review queue</button>
+        <div class="tools" id="graphtools">
+          <button class="tool" id="zoomout" aria-label="Zoom out">−</button>
+          <button class="tool" id="zoomin" aria-label="Zoom in">+</button>
+          <button class="tool" id="fit">Fit</button>
+        </div>
+      </div>
+      <div class="graphwrap" id="graphwrap">
+        <svg class="graph" id="graph" role="img" aria-label="Dependency graph of the theorems; arrows run from what is used to what uses it"></svg>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="queue" id="queue" hidden></div>
+    </section>
+    <aside class="pane sheet" id="sheet" aria-live="polite"></aside>
+  </div>
+</div>
+<script type="application/json" id="dag-data">/*__DAG_DATA__*/{}</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("dag-data").textContent);
+  const NODES = DATA.nodes, EDGES = DATA.edges, META = DATA.meta;
+  const byId = new Map(NODES.map(n => [n.id, n]));
+  const bySlug = new Map(NODES.map(n => [n.slug, n]));
+  const W = META.node_w, H = META.node_h;
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+  const NS = "http://www.w3.org/2000/svg";
+
+  const TRUTH = ["proved", "proved_modulo", "defined", "assumed", "bounded", "empirical", "conjecture", "broken", "refuted"];
+  const TRUTH_LABEL = {proved: "proved", proved_modulo: "proved modulo", defined: "definition", assumed: "assumed",
+    bounded: "bounded", empirical: "empirical", conjecture: "conjecture", broken: "broken", refuted: "refuted"};
+  const TRUTH_VAR = {proved: "--t-proved", proved_modulo: "--t-modulo", defined: "--t-defined", assumed: "--t-assumed",
+    bounded: "--t-bounded", empirical: "--t-empirical", conjecture: "--t-conjecture", broken: "--t-broken", refuted: "--t-refuted"};
+  const TRUTH_HELP = {
+    proved: "Lean proof with only standard axioms", proved_modulo: "proved, given the assumptions in its frontier",
+    defined: "a definition: reviewed, not proved", assumed: "imported from the literature",
+    bounded: "proved on a stated finite domain or instance", empirical: "evidence on a stated domain, no proof",
+    conjecture: "no evidence yet", broken: "relies on a refuted node", refuted: "a counterexample exists"};
+  const FAITH_LABEL = {unreviewed: "unreviewed", tested: "tested", human_reviewed: "human-reviewed"};
+  const KIND_LABEL = {definition: "Definition", core: "Core lemma", assumption: "Assumption", transfer: "Transfer theorem", lemma: "Lemma", theorem: "Theorem"};
+  const tcolor = t => `var(${TRUTH_VAR[t] || "--t-conjecture"})`;
+
+  // ---------- adjacency ----------
+  const parents = new Map(NODES.map(n => [n.id, []])), children = new Map(NODES.map(n => [n.id, []]));
+  for (const e of EDGES) { parents.get(e.dst).push(e); children.get(e.src).push(e); }
+  const closure = (start, step) => { const out = new Set(), st = [start];
+    while (st.length) for (const o of step(st.pop())) if (!out.has(o)) { out.add(o); st.push(o); }
+    return out; };
+  const upSet = id => closure(id, x => parents.get(x).map(e => e.src));
+  const downSet = id => closure(id, x => children.get(x).map(e => e.dst));
+  const lineage = id => new Set([id, ...upSet(id), ...downSet(id)]);
+
+  // ---------- state ----------
+  const state = { sel: null, q: "", truth: new Set(), kind: new Set(), view: "graph" };
+  try { const v = localStorage.getItem("dag-view"); if (v === "queue") state.view = "queue"; } catch (e) {}
+
+  // ---------- header ----------
+  function header() {
+    const when = META.generated ? META.generated.replace("T", " ").replace("+00:00", " UTC") : "";
+    const commit = META.commit ? ` · commit ${META.commit.slice(0, 7)}${META.dirty ? " (uncommitted changes)" : ""}` : "";
+    $("#meta").textContent = `${NODES.length} nodes · ${EDGES.length} edges · rendered ${when}${commit}`;
+    const counts = META.counts.truth, total = NODES.length;
+    $("#ladderbar").innerHTML = TRUTH.filter(t => counts[t]).map(t =>
+      `<span style="width:${100 * counts[t] / total}%;background:${tcolor(t)}" title="${TRUTH_LABEL[t]}: ${counts[t]}"></span>`).join("");
+    $("#ladderlegend").innerHTML = TRUTH.filter(t => counts[t]).map(t =>
+      `<span title="${esc(TRUTH_HELP[t])}"><i class="sw" style="background:${tcolor(t)}"></i>${TRUTH_LABEL[t]} <b>${counts[t]}</b></span>`).join("");
+    const f = META.counts.faithfulness;
+    $("#faithline").innerHTML = `Faithfulness: ${["human_reviewed", "tested", "unreviewed"].filter(k => f[k]).map(k =>
+      `${faithDot(k)} ${FAITH_LABEL[k]} <b>${f[k]}</b>`).join(" &nbsp; ")}`;
+  }
+  function faithDot(f) {
+    const inner = f === "human_reviewed" ? `<circle cx="6" cy="6" r="4.5" fill="var(--ink-2)"/>`
+      : f === "tested" ? `<circle cx="6" cy="6" r="4.5" fill="none" stroke="var(--ink-2)" stroke-width="1.3"/><circle cx="6" cy="6" r="2" fill="var(--ink-2)"/>`
+      : `<circle cx="6" cy="6" r="4.5" fill="none" stroke="var(--ink-3)" stroke-width="1.3"/>`;
+    return `<svg class="faithdot" viewBox="0 0 12 12" aria-label="${FAITH_LABEL[f]}" style="vertical-align:-2px">${inner}</svg>`;
+  }
+
+  // ---------- filters & search ----------
+  function chips() {
+    const counts = META.counts.truth;
+    $("#truthchips").innerHTML = TRUTH.filter(t => counts[t]).map(t =>
+      `<button class="chip" data-truth="${t}" aria-pressed="false"><i class="sw" style="background:${tcolor(t)}"></i>${TRUTH_LABEL[t]}</button>`).join("");
+    const kinds = [...new Set(NODES.map(n => n.kind))];
+    const order = ["definition", "core", "assumption", "transfer", "lemma", "theorem"];
+    kinds.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+    $("#kindchips").innerHTML = kinds.map(k => `<button class="chip" data-kind="${k}" aria-pressed="false">${KIND_LABEL[k]}</button>`).join("");
+    for (const b of document.querySelectorAll(".chip")) b.addEventListener("click", () => {
+      const set = b.dataset.truth ? state.truth : state.kind, key = b.dataset.truth || b.dataset.kind;
+      set.has(key) ? set.delete(key) : set.add(key);
+      b.setAttribute("aria-pressed", set.has(key)); refresh();
+    });
+  }
+  const haystack = new Map(NODES.map(n => [n.id, [n.id, n.title, n.statement, n.description, (n.tags || []).join(" "),
+    n.kind, n.layer ? "layer:" + n.layer : "", "truth:" + n.status.truth, "faith:" + n.status.faith, n.area].join(" ").toLowerCase()]));
+  function matches(n) {
+    if (state.truth.size && !state.truth.has(n.status.truth)) return false;
+    if (state.kind.size && !state.kind.has(n.kind)) return false;
+    if (!state.q) return true;
+    const h = haystack.get(n.id);
+    return state.q.toLowerCase().split(/\s+/).filter(Boolean).every(t => h.includes(t));
+  }
+
+  // ---------- list ----------
+  function list() {
+    const shown = NODES.filter(matches);
+    $("#resultcount").textContent = shown.length === NODES.length ? `${NODES.length} nodes` : `${shown.length} of ${NODES.length} nodes match`;
+    const groups = new Map();
+    for (const n of shown) { if (!groups.has(n.area)) groups.set(n.area, []); groups.get(n.area).push(n); }
+    const areaOrder = a => ["definitions", "core", "transfer", "assumptions"].indexOf(a.split("/")[0]) + 1 || 9;
+    const html = [...groups.entries()].sort((a, b) => areaOrder(a[0]) - areaOrder(b[0]) || a[0].localeCompare(b[0])).map(([area, ns]) =>
+      `<div class="group"><h3>${esc(area.replace(/\//g, " / "))}</h3>${ns.map(n =>
+        `<button class="item" data-id="${esc(n.id)}" aria-current="${state.sel === n.id}">
+           <span class="bar" style="background:${tcolor(n.status.truth)}"></span>
+           <span class="t"><div>${esc(n.title)}</div><div class="id">${esc(n.id)}</div></span>
+           ${faithDot(n.status.faith)}</button>`).join("")}</div>`).join("");
+    $("#list").innerHTML = html || `<p class="empty" style="padding:14px">No node matches. Clear the search or a filter.</p>`;
+    for (const b of document.querySelectorAll(".item")) b.addEventListener("click", () => select(b.dataset.id, {pan: true, scrollSheet: true}));
+  }
+
+  // ---------- graph ----------
+  const svg = $("#graph");
+  let view = {x: 0, y: 0, w: META.width, h: META.height};
+  const setView = () => svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+  function edgePath(e) {
+    const a = byId.get(e.src), b = byId.get(e.dst);
+    const x1 = a.x + W, y1 = a.y + H / 2, x2 = b.x, y2 = b.y + H / 2, dx = Math.max(40, (x2 - x1) / 2);
+    return `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2 - 6},${y2}`;
+  }
+  function drawGraph() {
+    const defs = `<defs><marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--ink-3)"/></marker>
+      <marker id="arr-lit" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent)"/></marker></defs>`;
+    const edges = EDGES.map((e, i) => `<path class="edge ${e.kind}" data-i="${i}" d="${edgePath(e)}" marker-end="url(#arr)"><title>${esc(e.src)} → ${esc(e.dst)} (${e.kind})</title></path>`).join("");
+    const nodes = NODES.map(n => {
+      const warn = n.flags.some(f => f.level === "warn" && f.code !== "stale" && f.code !== "broken");
+      const label = n.title.length > 30 ? n.title.slice(0, 29) + "…" : n.title;
+      const fd = n.status.faith, cx = n.x + W - 13, cy = n.y + H / 2;
+      const dot = fd === "human_reviewed" ? `<circle cx="${cx}" cy="${cy}" r="4.5" fill="var(--ink-2)"/>`
+        : fd === "tested" ? `<circle cx="${cx}" cy="${cy}" r="4.5" fill="none" stroke="var(--ink-2)" stroke-width="1.3"/><circle cx="${cx}" cy="${cy}" r="2" fill="var(--ink-2)"/>`
+        : `<circle cx="${cx}" cy="${cy}" r="4.5" fill="none" stroke="var(--ink-3)" stroke-width="1.3"/>`;
+      return `<g class="node${n.status.stale ? " stale" : ""}" data-id="${esc(n.id)}" tabindex="0" role="button" aria-label="${esc(n.title)}, ${TRUTH_LABEL[n.status.truth]}">
+        <title>${esc(n.id)} — ${TRUTH_LABEL[n.status.truth]}, ${FAITH_LABEL[n.status.faith]}</title>
+        <rect class="box" x="${n.x}" y="${n.y}" width="${W}" height="${H}" rx="5"/>
+        <rect x="${n.x}" y="${n.y}" width="5" height="${H}" rx="2" fill="${tcolor(n.status.truth)}"/>
+        <text x="${n.x + 13}" y="${n.y + H / 2 + 4}">${esc(label)}</text>
+        ${warn ? `<text class="warnmark" x="${n.x + W - 28}" y="${n.y + H / 2 + 4}">!</text>` : ""}
+        ${dot}</g>`;
+    }).join("");
+    svg.innerHTML = defs + `<g id="edges">${edges}</g><g id="nodes">${nodes}</g>`;
+    for (const g of svg.querySelectorAll(".node")) {
+      g.addEventListener("click", ev => { if (!moved) select(g.dataset.id, {scrollSheet: true}); });
+      g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(g.dataset.id); } });
+    }
+    $("#legend").innerHTML = [
+      ["uses", "var(--ink-3)", ""], ["assumes", "var(--t-assumed)", "5 3"], ["instantiates (proof route)", "var(--ink-3)", "1.5 3"], ["variant of", "var(--warn)", "7 4"]
+    ].map(([l, c, d]) => `<span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="${c}" stroke-width="1.5" stroke-dasharray="${d}"/></svg>${l}</span>`).join("")
+      + `<span>${faithDot("unreviewed")}${faithDot("tested")}${faithDot("human_reviewed")} faithfulness</span><span>dashed box: stale</span><span style="color:var(--warn)"><b>!</b> needs a look</span>`;
+    fit();
+  }
+  function paintGraph() {
+    const lit = state.sel ? lineage(state.sel) : null;
+    const up = state.sel ? upSet(state.sel) : null, down = state.sel ? downSet(state.sel) : null;
+    const onPath = e => (up.has(e.src) && (up.has(e.dst) || e.dst === state.sel)) || (down.has(e.dst) && (down.has(e.src) || e.src === state.sel));
+    const anyFilter = state.q || state.truth.size || state.kind.size;
+    for (const g of svg.querySelectorAll(".node")) {
+      const n = byId.get(g.dataset.id);
+      const dim = (anyFilter && !matches(n)) || (lit && !lit.has(n.id));
+      g.classList.toggle("dim", !!dim);
+      g.classList.toggle("sel", state.sel === n.id);
+    }
+    for (const p of svg.querySelectorAll(".edge")) {
+      const e = EDGES[+p.dataset.i];
+      const on = lit && onPath(e);
+      p.classList.toggle("lit", !!on);
+      p.classList.toggle("dim", !!(lit && !on) || !!(anyFilter && !(matches(byId.get(e.src)) && matches(byId.get(e.dst)))));
+      p.setAttribute("marker-end", on ? "url(#arr-lit)" : "url(#arr)");
+    }
+  }
+  function fit() {
+    const r = $("#graphwrap").getBoundingClientRect(), pad = 16;
+    const ar = r.width && r.height ? r.width / r.height : 1.6;
+    let w = META.width + pad * 2, h = META.height + pad * 2;
+    if (w / h < ar) w = h * ar; else h = w / ar;
+    view = {x: (META.width - w) / 2, y: (META.height - h) / 2, w, h}; setView();
+  }
+  function zoom(f, cx, cy) {
+    cx ??= view.x + view.w / 2; cy ??= view.y + view.h / 2;
+    const nw = Math.min(Math.max(view.w * f, 220), META.width * 4), k = nw / view.w;
+    view = {x: cx - (cx - view.x) * k, y: cy - (cy - view.y) * k, w: nw, h: view.h * k}; setView();
+  }
+  function focusOn(n, width = 1100) {
+    const r = $("#graphwrap").getBoundingClientRect(), ar = r.width && r.height ? r.width / r.height : 1.6;
+    const w = Math.min(width, view.w), h = w / ar;
+    view = {x: n.x + W / 2 - w / 2, y: n.y + H / 2 - h / 2, w, h}; setView();
+  }
+  function panTo(n) {
+    const cx = n.x + W / 2, cy = n.y + H / 2;
+    const inside = cx > view.x + 40 && cx < view.x + view.w - 40 && cy > view.y + 20 && cy < view.y + view.h - 20;
+    if (!inside) { view.x = cx - view.w / 2; view.y = cy - view.h / 2; setView(); }
+  }
+  let drag = null, moved = false;
+  const wrap = $("#graphwrap");
+  wrap.addEventListener("pointerdown", ev => { drag = {x: ev.clientX, y: ev.clientY, vx: view.x, vy: view.y}; moved = false; });
+  wrap.addEventListener("pointermove", ev => {
+    if (!drag) return;
+    const r = wrap.getBoundingClientRect(), k = view.w / r.width;
+    const dx = ev.clientX - drag.x, dy = ev.clientY - drag.y;
+    if (Math.abs(dx) + Math.abs(dy) > 4) { moved = true; wrap.classList.add("dragging"); }
+    if (moved) { view.x = drag.vx - dx * k; view.y = drag.vy - dy * k; setView(); }
+  });
+  const endDrag = () => { drag = null; wrap.classList.remove("dragging"); setTimeout(() => moved = false, 0); };
+  wrap.addEventListener("pointerup", endDrag); wrap.addEventListener("pointerleave", endDrag);
+  wrap.addEventListener("wheel", ev => {
+    ev.preventDefault();
+    const r = wrap.getBoundingClientRect();
+    const cx = view.x + (ev.clientX - r.left) / r.width * view.w, cy = view.y + (ev.clientY - r.top) / r.height * view.h;
+    zoom(ev.deltaY > 0 ? 1.12 : 1 / 1.12, cx, cy);
+  }, {passive: false});
+  $("#zoomin").addEventListener("click", () => zoom(1 / 1.25));
+  $("#zoomout").addEventListener("click", () => zoom(1.25));
+  $("#fit").addEventListener("click", fit);
+  window.addEventListener("resize", () => { if (state.view === "graph") fit(); });
+
+  // ---------- review queue ----------
+  function queue() {
+    const rows = NODES.filter(n => n.status.queue_score > 0).sort((a, b) => b.status.queue_score - a.status.queue_score || a.id.localeCompare(b.id));
+    const why = n => {
+      const r = [];
+      if (["definition", "core", "assumption", "transfer"].includes(n.kind) && n.status.own_faith !== "human_reviewed") r.push(`${KIND_LABEL[n.kind].toLowerCase()} needs review`);
+      for (const f of n.flags) if (f.level === "warn") r.push(f.code.replace(/_/g, " "));
+      return [...new Set(r)].join(", ");
+    };
+    $("#queue").innerHTML = `<p>Where a person's attention does the most good. Score = (1 + descendants) × how far the node is from human-reviewed, doubled when a check raised a warning. Reviewers check statements and definitions, not proofs. Record a review from the repository's Actions tab: <b>review</b> → Run workflow, with the node id and your decision.</p>
+      <div class="tablewrap"><table><thead><tr><th>#</th><th>Node</th><th>Faithfulness</th><th style="text-align:right">Descendants</th><th style="text-align:right">Score</th><th>Why</th></tr></thead><tbody>
+      ${rows.map((n, i) => `<tr class="clickable" data-id="${esc(n.id)}"><td class="num">${i + 1}</td>
+        <td><div>${esc(n.title)}</div><div class="mono faint">${esc(n.id)}</div></td>
+        <td>${faithDot(n.status.own_faith)} ${FAITH_LABEL[n.status.own_faith]}</td><td class="num">${n.status.descendants}</td>
+        <td class="num">${n.status.queue_score}</td><td class="muted">${esc(why(n))}</td></tr>`).join("")}</tbody></table></div>`;
+    for (const tr of document.querySelectorAll("#queue tr.clickable")) tr.addEventListener("click", () => select(tr.dataset.id, {scrollSheet: true}));
+  }
+  function setTab(v) {
+    state.view = v;
+    try { localStorage.setItem("dag-view", v); } catch (e) {}
+    $("#tab-graph").setAttribute("aria-selected", v === "graph"); $("#tab-queue").setAttribute("aria-selected", v === "queue");
+    $("#graphwrap").hidden = v !== "graph"; $("#queue").hidden = v !== "queue"; $("#graphtools").hidden = v !== "graph";
+    if (v === "graph") requestAnimationFrame(fit);
+  }
+  $("#tab-graph").addEventListener("click", () => setTab("graph"));
+  $("#tab-queue").addEventListener("click", () => setTab("queue"));
+
+  // ---------- theorem sheet ----------
+  function nodeLink(id, kind) {
+    const n = byId.get(id);
+    return `<button class="link" data-goto="${esc(id)}"><span class="k">${esc(kind || "")}</span><i class="sw" style="background:${tcolor(n.status.truth)}"></i><span class="t">${esc(n.title)}</span></button>`;
+  }
+  function payloadHtml(ev) {
+    const p = ev.payload || {};
+    if (p.counterexample) return `<div class="dom">Counterexample: <span class="mono">${esc(JSON.stringify(p.counterexample))}</span></div>`;
+    return "";
+  }
+  function sheet() {
+    const el = $("#sheet");
+    if (!state.sel) {
+      const worst = NODES.filter(n => n.status.truth === "refuted" || n.status.truth === "broken").length;
+      el.innerHTML = `<div class="sheet-inner empty"><div><div class="eyebrow">Theorem sheet</div><h2>Pick a theorem</h2></div>
+        <p class="prose">Click a node in the graph or the index to see its statement, how it was verified, what it rests on, and what rests on it. Search by id, title, statement, tag or status (try <span class="mono">qsvt</span>, <span class="mono">layer:B</span>, <span class="mono">truth:refuted</span> or <span class="mono">interpolation</span>).</p>
+        <p class="prose">Truth and faithfulness are separate: Lean settles truth, a person or a differential test settles whether the statement means what we intend. ${worst ? `${worst} node${worst > 1 ? "s are" : " is"} refuted or broken right now.` : ""}</p></div>`;
+      return;
+    }
+    const n = byId.get(state.sel), s = n.status;
+    const up = parents.get(n.id), down = children.get(n.id);
+    const evs = n.evidence.map(ev => `<div class="ev">
+        <div class="head"><span class="name">${esc(ev.name)}</span><span class="faint">${esc(ev.question)}</span>
+          <span class="pill ${ev.outcome}">${esc(ev.outcome)}</span>${ev.grants ? `<span class="pill" style="color:${tcolor(ev.grants)}">${esc(TRUTH_LABEL[ev.grants] || ev.grants)}</span>` : ""}
+          ${ev.fresh ? "" : `<span class="pill stale">stale</span>`}</div>
+        <div class="sum">${esc(ev.summary)}</div>
+        ${ev.domain ? `<div class="dom">Domain: ${esc(ev.domain)}</div>` : ""}${payloadHtml(ev)}
+        <details><summary>Parameters, data and provenance</summary><pre>${esc(JSON.stringify({params: ev.params, data: ev.payload, trimmed: ev.trimmed || undefined,
+          ran: ev.finished, seconds: ev.seconds, quick: ev.quick || undefined, commit: ev.commit, versions: ev.versions}, null, 1))}</pre></details></div>`).join("");
+    const req = s.faith_required.length ? s.faith_required.map(k => `${s.faith_missing.includes(k) ? "○" : "●"} ${k}`).join("  ") : "no automatic checks apply";
+    const src = n.source ? `<div class="section"><h4>Source</h4><dl class="kv">
+        <dt>Citation</dt><dd>${n.source.url ? `<a href="${esc(n.source.url)}" target="_blank" rel="noopener">${esc(n.source.citation)}</a>` : esc(n.source.citation)}</dd>
+        ${n.source.exact_form ? `<dt>Exact form</dt><dd>${esc(n.source.exact_form)}</dd>` : ""}
+        ${n.source.convention_map ? `<dt>Conventions</dt><dd>${esc(n.source.convention_map)}</dd>` : ""}</dl></div>` : "";
+    const conv = Object.entries(n.conventions);
+    el.innerHTML = `<div class="sheet-inner">
+      <div><div class="eyebrow">${esc(KIND_LABEL[n.kind])}${n.layer ? ` · Layer ${esc(n.layer)}` : ""} · ${esc(n.area)}</div>
+        <h2>${esc(n.title)}</h2>
+        <div class="idline"><span class="mono muted">${esc(n.id)}</span><button class="copy" id="copyid">Copy id</button>
+          <a class="copy" href="#${esc(n.slug)}" style="text-decoration:none">Link</a></div></div>
+      <div class="thm${["definition"].includes(n.kind) ? " upright" : ""}"><b>${esc(KIND_LABEL[n.kind])}.</b> <span class="body">${esc(n.statement)}</span>
+        ${n.statement_tex ? `<details style="margin-top:8px"><summary>TeX</summary><pre>${esc(n.statement_tex)}</pre></details>` : ""}</div>
+      <div class="statgrid">
+        <div class="stat"><div class="k">Truth</div><div class="v"><i class="sw" style="background:${tcolor(s.truth)}"></i>${TRUTH_LABEL[s.truth]}</div>
+          <div class="d">${esc(TRUTH_HELP[s.truth])}${s.own_truth !== s.truth && s.truth !== "broken" ? `; own evidence: ${TRUTH_LABEL[s.own_truth]}` : ""}</div>
+          ${s.domain ? `<div class="d">On: ${esc(s.domain)}</div>` : ""}
+          ${s.frontier.length ? `<div class="d">Frontier (unproved, assumed):</div><div class="frontier">${s.frontier.map(f => `<button class="fchip" data-goto="${esc(f)}">${esc(f)}</button>`).join("")}</div>` : ""}
+          ${s.stale ? `<div class="d" style="color:var(--warn)">Stale: inputs changed since the evidence ran.</div>` : s.upstream_stale ? `<div class="d" style="color:var(--warn)">Something it relies on is stale.</div>` : ""}</div>
+        <div class="stat"><div class="k">Faithfulness</div><div class="v">${faithDot(s.faith)}${FAITH_LABEL[s.faith]}</div>
+          <div class="d">Own: ${FAITH_LABEL[s.own_faith]}${s.own_faith !== s.faith ? " (limited by unreviewed definitions it rests on)" : ""}</div>
+          <div class="d mono">${esc(req)}</div>
+          ${s.review ? `<div class="d">Reviewed by ${esc(s.review.reviewer)} on ${esc(s.review.date)}: ${esc(s.review.decision)}</div>` : ""}</div>
+      </div>
+      ${n.flags.length ? `<div class="section"><h4>Flags</h4>${n.flags.map(f => `<div class="flag"><span class="pill ${f.level}">${esc(f.code.replace(/_/g, " "))}</span><span>${esc(f.message)}</span></div>`).join("")}</div>` : ""}
+      ${n.description ? `<p class="prose">${esc(n.description)}</p>` : ""}
+      <div class="section"><h4>Evidence</h4>${evs || `<p class="prose">No checks are attached yet${n.kind === "definition" ? "; definitions are settled by review" : ""}.</p>`}</div>
+      <div class="section"><h4>Relies on</h4><div class="links">${up.length ? up.map(e => nodeLink(e.src, e.kind)).join("") : `<span class="faint">nothing: a root</span>`}</div></div>
+      <div class="section"><h4>Used by</h4><div class="links">${down.length ? down.map(e => nodeLink(e.dst, e.kind)).join("") : `<span class="faint">nothing yet</span>`}</div></div>
+      ${src}
+      <div class="section"><h4>Record</h4><dl class="kv">
+        <dt>File</dt><dd class="mono">${esc(n.path)}</dd>
+        ${n.lean_decl ? `<dt>Lean</dt><dd class="mono">${esc(n.lean_decl)}</dd>` : ""}
+        ${n.code.length ? `<dt>Code</dt><dd class="mono">${n.code.map(esc).join("<br>")}</dd>` : ""}
+        ${conv.length ? `<dt>Conventions</dt><dd class="mono">${conv.map(([k, v]) => `${esc(k)}: ${esc(v)}`).join("<br>")}</dd>` : ""}
+        <dt>Statement hash</dt><dd class="mono">${esc(s.statement_hash)}</dd>
+        ${n.tags.length ? `<dt>Tags</dt><dd>${n.tags.map(esc).join(", ")}</dd>` : ""}</dl>
+        ${n.notes ? `<p class="prose" style="margin-top:8px">${esc(n.notes)}</p>` : ""}</div>
+    </div>`;
+    for (const b of el.querySelectorAll("[data-goto]")) b.addEventListener("click", () => select(b.dataset.goto, {pan: true}));
+    $("#copyid").addEventListener("click", ev => {
+      const btn = ev.currentTarget;
+      const done = () => { btn.textContent = "Copied"; setTimeout(() => btn.textContent = "Copy id", 1200); };
+      try { navigator.clipboard.writeText(n.id).then(done, () => selectText(btn)); } catch (e) { selectText(btn); }
+    });
+  }
+  function selectText(btn) { const r = document.createRange(); r.selectNodeContents(btn.previousElementSibling);
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+  // ---------- selection & routing ----------
+  function select(id, opts = {}) {
+    state.sel = id && byId.has(id) ? id : null;
+    const n = state.sel && byId.get(state.sel);
+    if (n && location.hash !== "#" + n.slug) history.replaceState(null, "", "#" + n.slug);
+    if (!n && location.hash) history.replaceState(null, "", location.pathname + location.search);
+    refresh();
+    if (n && opts.pan && state.view === "graph") panTo(n);
+    if (n) document.querySelector(`.item[data-id="${CSS.escape(n.id)}"]`)?.scrollIntoView({block: "nearest"});
+    if (n && opts.scrollSheet && window.matchMedia("(max-width: 760px)").matches) $("#sheet").scrollIntoView({block: "start"});
+    $("#sheet").scrollTop = 0;
+  }
+  function refresh() { list(); paintGraph(); sheet(); }
+  function fromHash() { const n = bySlug.get(location.hash.slice(1)); select(n ? n.id : null, {pan: true}); }
+  window.addEventListener("hashchange", fromHash);
+
+  $("#q").addEventListener("input", ev => { state.q = ev.target.value.trim(); refresh(); });
+  document.addEventListener("keydown", ev => {
+    if (ev.key === "/" && document.activeElement !== $("#q")) { ev.preventDefault(); $("#q").focus(); }
+    else if (ev.key === "Escape") { if (document.activeElement === $("#q") && state.q) { $("#q").value = ""; state.q = ""; refresh(); } else select(null); }
+  });
+
+  header(); chips(); drawGraph(); queue(); setTab(state.view);
+  if (location.hash) fromHash();
+  else { const first = NODES.find(n => n.id === "hamsim.B.qsvt.N.opt") || NODES[0]; select(first.id, {pan: false}); }
+  if (state.sel && state.view === "graph") requestAnimationFrame(() => focusOn(byId.get(state.sel)));
+})();
+</script>
+<!--BODY-END-->
+</body>
+</html>

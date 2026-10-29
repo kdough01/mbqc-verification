@@ -1,0 +1,11 @@
+id: def.hamsim.slide_formulas
+kind: definition
+title: The slide's cost formulas
+statement: |
+  N_Q = (36n − 18)d + 14n + 23, N_G = (12n − 6)g + 32n − 11, E_Q = (168n − 102)d + 45n + 185, E_G = (124n − 116)g + (122 − χ)n − 40 + 3χ − η with χ = [g ≡ 1 mod 4] and η = [g = 3], M_Q = N_Q − n, M_G = N_G − n.
+description: |
+  Transcribed from the slide (docs/img/hamsim_slide.png). Review: compare each formula with the slide.
+lean_decl: [MBQC.Defs.HamSim]
+code: [src/mbqc_verify/hamsim/slide.py]
+conventions: {degree: slide_polynomial_degree}
+tags: [hamsim, slide, vocabulary]

@@ -1,0 +1,24 @@
+id: hamsim.compiled_patterns_match
+kind: lemma
+title: Compiled patterns implement their circuits
+statement: |
+  For each listed instance (Ising chain n = 2, seed 2): second-order Trotter with r = 3 at t = 1 (unoptimized and optimized), and QSVT and GQSP built for t = 0.3, ε = 10⁻² (unoptimized), the Graphix pattern produced by qiskit_to_pattern implements the circuit up to global phase.
+description: |
+  Translation validation: rather than trusting the compiler, check each output. Optimized QSVT/GQSP patterns keep ~100 qubits alive and can't be simulated, so they are not listed.
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped}
+depends_on:
+- {node: transfer.gate_to_mbqc, kind: instantiates}
+- {node: def.pattern, kind: uses}
+- node: def.hamsim.ising_chain
+  kind: uses
+  convert: [little_to_big_endian, zero_to_plus_input]
+checks:
+- kind: translation
+  params:
+    instances:
+    - {method: trotter2, optimize: false, n: 2, seed: 2, t: 1.0, r: 3}
+    - {method: trotter2, optimize: true, n: 2, seed: 2, t: 1.0, r: 3}
+    - {method: qsvt, optimize: false, n: 2, seed: 2, t: 0.3, eps: 0.01}
+    - {method: gqsp, optimize: false, n: 2, seed: 2, t: 0.3, eps: 0.01}
+tags: [mbqc, translation-validation]

@@ -1,0 +1,22 @@
+id: hamsim.C.slide.d_ge_g.N
+kind: theorem
+layer: C
+title: 'Slide''s claim: d ≥ g ⇒ QSVT uses more vertices'
+statement: |
+  With the slide's formulas, for all n ≥ 2 and odd d ≥ g ≥ 3: N_Q(n, d) > N_G(n, g).
+statement_tex: \forall n\ge 2,\; d \ge g \ge 3 \text{ odd}:\; N_Q(n,d) > N_G(n,g)
+description: Pure algebra on the slide's formulas as printed. Proved in Lean by writing the difference
+  as a sum of products of nonnegative factors; sympy finds the same certificate independently.\n
+lean_decl: MBQC.Results.HamSim.slide_d_ge_g_N
+code: [src/mbqc_verify/hamsim/slide.py]
+conventions: {degree: slide_polynomial_degree}
+depends_on:
+- {node: def.hamsim.slide_formulas, kind: uses}
+checks:
+- kind: symbolic
+  params: {certificate: slide_d_ge_g, quantity: N}
+- {kind: lean}
+- {kind: vocabulary}
+- kind: nonvacuity
+  params: {witness: MBQC.Results.HamSim.slide_d_ge_g_nonvacuous}
+tags: [hamsim, slide, consequence]

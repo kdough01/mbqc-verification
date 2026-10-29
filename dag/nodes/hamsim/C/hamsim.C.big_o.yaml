@@ -1,0 +1,14 @@
+id: hamsim.C.big_o
+kind: theorem
+layer: C
+title: Same Big-O, different prefactors
+statement: |
+  For QSVT and GQSP, N, M, E = O(n · (1 + α|t| + log(1/ε))), since the degree needed for accuracy ε is O(1 + α|t| + log(1/ε)) and each cost is linear in n per degree.
+statement_tex: N, M, E = O\big(n\,[1 + \alpha|t| + \log(1/\epsilon)]\big)
+description: |
+  No check yet. Needs a bound on the smallest degree from the Bessel tail, plus the Layer B formulas.
+depends_on:
+- {node: hamsim.B.qsvt.N.unopt, kind: uses}
+- {node: hamsim.B.gqsp.N.unopt, kind: uses}
+- {node: assume.jacobi_anger_truncation, kind: assumes}
+tags: [hamsim, consequence, asymptotics]

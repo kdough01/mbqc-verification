@@ -1,0 +1,20 @@
+id: assume.hamsim.qsvt_opt_N
+kind: assumption
+title: 'Optimized QSVT vertex counts: structure and corners'
+statement: |
+  Let N(n, D) be the vertex count of the optimized QSVT pattern Graphix produces (n ≥ 2, odd D ≥ 3). (i) N(n, D + 2) − N(n, D) does not depend on D; (ii) N(n + 1, D) − N(n, D) does not depend on n; (iii) N(2, 3) = 326, N(2, 5) = 434, N(3, 3) = 526, N(3, 5) = 706.
+description: |
+  What Lean cannot compute: facts about Graphix's output, stated as the axioms in lean/MBQC/Assumptions/HamSim.lean. (i) holds because the per-degree blocks of the circuit are concatenated copies; (ii) and (iii) are supported by exact counts on the grid. A reviewer should judge whether (i) and (ii) are plausible for the optimized (Pauli-removed) pattern.
+lean_decl: [MBQC.Assumptions.HamSim.QsvtOptN]
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: qsvt_calls_per_sequence}
+depends_on:
+- {node: def.resource_counts, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: qsvt
+    optimize: true
+    quantity: N
+    coef: [36, -18, 92, -20]
+tags: [hamsim, qsvt, resources, optimized]

@@ -1,0 +1,11 @@
+id: def.hamsim.ising_chain
+kind: definition
+title: Ising chain Hamiltonian and its normalization
+statement: |
+  H = Σ_{i=0}^{n-1} (h_i X_i + g_i Z_i) + Σ_{i=0}^{n-2} J_i Z_i Z_{i+1}, with n ≥ 2 and h_i, g_i, J_i > 0. Its block-encoding normalization is α = Σ_i (h_i + g_i) + Σ_i J_i.
+statement_tex: H = \sum_{i=0}^{n-1}(h_i X_i + g_i Z_i) + \sum_{i=0}^{n-2} J_i Z_i Z_{i+1},\quad \alpha
+  = \sum_i (h_i+g_i) + \sum_i J_i
+description: |
+  The slide's Hamiltonian. In code: IsingChain in hamsim/circuits.py (terms(), alpha, pauli_op()).
+code: [src/mbqc_verify/hamsim/circuits.py]
+tags: [hamsim, vocabulary]

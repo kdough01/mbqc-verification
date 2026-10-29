@@ -1,0 +1,73 @@
+{
+ "input_hash": "b78cbd9f4e3cebe4",
+ "inputs": {
+  "check_code": {
+   "verification/faithfulness/nonvacuity/check.py": "5ad89e0eb7bad489bde10d115ea53868f859c42a1ee8a4911ec93ca7843a43d9",
+   "verification/truth/lean/check.py": "7d80b6820748d5428f83693c97f8a28bf2a0343a469ad283155dbdaf1a514af1",
+   "verification/truth/lean/leanrun.py": "35ab14f3e9257049664a31c26dc295f2d47ce7c67f78b326a8a8c281ff5fca66"
+  },
+  "check_params": "2f8078fa8c0d7120",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "lean_sources": "aad561f2c225afa88fe054415bc7c2f411c664e6910d244562d67f5de520a53d",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
+  "parents": {
+   "assume.hamsim.qsvt_opt_N": "cdb29c0671ff4200:a442d378",
+   "lemma.bilinear_interpolation": "7dbe5f6a13a24a28:6d232117",
+   "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "083816082dc7a3c4"
+ },
+ "kind": "nonvacuity",
+ "name": "nonvacuity",
+ "node": "hamsim.B.qsvt.N.opt",
+ "params": {
+  "witness": "MBQC.Results.HamSim.qsvt_vertices_opt_nonvacuous"
+ },
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:21:35+00:00",
+  "quick": false,
+  "seconds": 0.01,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": null,
+  "evidence": {
+   "hypotheses": [
+    "2 \u2264 n",
+    "3 \u2264 D",
+    "D % 2 = 1"
+   ],
+   "witness": "MBQC.Results.HamSim.qsvt_vertices_opt_nonvacuous",
+   "witness_axioms": [],
+   "witness_conjuncts": [
+    "2 \u2264 n",
+    "3 \u2264 D",
+    "D % 2 = 1"
+   ]
+  },
+  "frontier": [],
+  "grants": null,
+  "outcome": "pass",
+  "seed": null,
+  "summary": "all 3 hypotheses hold together (MBQC.Results.HamSim.qsvt_vertices_opt_nonvacuous)"
+ }
+}

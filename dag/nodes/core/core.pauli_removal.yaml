@@ -1,0 +1,14 @@
+id: core.pauli_removal
+kind: core
+title: Pauli-measurement removal preserves semantics
+statement: |
+  A qubit measured in a Pauli basis can be removed from a pattern by local complementation and vertex deletion on its graph, with the corresponding byproduct updates on its neighbours, without changing the pattern's semantics.
+description: |
+  Standard result: Hein, Eisert & Briegel, Multiparty entanglement in graph states, Phys. Rev. A 69, 062311 (2004).
+conventions: {angle: pi_units, input: plus, phase: global_dropped}
+depends_on:
+- {node: def.pattern, kind: uses}
+- {node: def.graph_state, kind: uses}
+tags: [mbqc, core, optimization]
+notes: |
+  Human-reviewed core: reviewed once, then proved in Lean (design doc, M4-M5).

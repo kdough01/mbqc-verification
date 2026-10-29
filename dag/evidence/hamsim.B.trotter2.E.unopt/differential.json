@@ -1,0 +1,355 @@
+{
+ "input_hash": "564a9e0a7ea2943d",
+ "inputs": {
+  "check_code": {
+   "verification/faithfulness/differential/check.py": "de20c4cbe92ef720ed4bdc04054eabbdc3524a686c5ee9a6735b93e1018c197d",
+   "verification/truth/lean/check.py": "7d80b6820748d5428f83693c97f8a28bf2a0343a469ad283155dbdaf1a514af1",
+   "verification/truth/lean/leanrun.py": "35ab14f3e9257049664a31c26dc295f2d47ce7c67f78b326a8a8c281ff5fca66",
+   "verification/truth/scaling/check.py": "cea1af075f002980a1528feb620149e04347c3be90846afd321f349c76115c58",
+   "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
+  },
+  "check_params": "8452372514c94344",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.jcz_construction": "392cb6fd4770bc56",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "lean_sources": "aad561f2c225afa88fe054415bc7c2f411c664e6910d244562d67f5de520a53d",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
+  "parents": {
+   "def.jcz_construction": "392cb6fd4770bc56:b8ffd8b5",
+   "def.resource_counts": "b75d507a2b247ac8:4f53cda1",
+   "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1",
+   "transfer.gate_to_mbqc_counts": "34befe39e1070a89:964b423a"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "3d5866528e772f93"
+ },
+ "kind": "differential",
+ "name": "differential",
+ "node": "hamsim.B.trotter2.E.unopt",
+ "params": {
+  "method": "trotter2"
+ },
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:27:23+00:00",
+  "quick": false,
+  "seconds": 0.1,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": null,
+  "evidence": {
+   "rows": [
+    {
+     "agree": true,
+     "graphix": [
+      20,
+      20,
+      18
+     ],
+     "k": 1,
+     "lean": [
+      20,
+      20,
+      18
+     ],
+     "method": "trotter2",
+     "n": 2
+    },
+    {
+     "agree": true,
+     "graphix": [
+      34,
+      36,
+      32
+     ],
+     "k": 2,
+     "lean": [
+      34,
+      36,
+      32
+     ],
+     "method": "trotter2",
+     "n": 2
+    },
+    {
+     "agree": true,
+     "graphix": [
+      48,
+      52,
+      46
+     ],
+     "k": 3,
+     "lean": [
+      48,
+      52,
+      46
+     ],
+     "method": "trotter2",
+     "n": 2
+    },
+    {
+     "agree": true,
+     "graphix": [
+      62,
+      68,
+      60
+     ],
+     "k": 4,
+     "lean": [
+      62,
+      68,
+      60
+     ],
+     "method": "trotter2",
+     "n": 2
+    },
+    {
+     "agree": true,
+     "graphix": [
+      33,
+      34,
+      30
+     ],
+     "k": 1,
+     "lean": [
+      33,
+      34,
+      30
+     ],
+     "method": "trotter2",
+     "n": 3
+    },
+    {
+     "agree": true,
+     "graphix": [
+      57,
+      62,
+      54
+     ],
+     "k": 2,
+     "lean": [
+      57,
+      62,
+      54
+     ],
+     "method": "trotter2",
+     "n": 3
+    },
+    {
+     "agree": true,
+     "graphix": [
+      81,
+      90,
+      78
+     ],
+     "k": 3,
+     "lean": [
+      81,
+      90,
+      78
+     ],
+     "method": "trotter2",
+     "n": 3
+    },
+    {
+     "agree": true,
+     "graphix": [
+      105,
+      118,
+      102
+     ],
+     "k": 4,
+     "lean": [
+      105,
+      118,
+      102
+     ],
+     "method": "trotter2",
+     "n": 3
+    },
+    {
+     "agree": true,
+     "graphix": [
+      46,
+      48,
+      42
+     ],
+     "k": 1,
+     "lean": [
+      46,
+      48,
+      42
+     ],
+     "method": "trotter2",
+     "n": 4
+    },
+    {
+     "agree": true,
+     "graphix": [
+      80,
+      88,
+      76
+     ],
+     "k": 2,
+     "lean": [
+      80,
+      88,
+      76
+     ],
+     "method": "trotter2",
+     "n": 4
+    },
+    {
+     "agree": true,
+     "graphix": [
+      114,
+      128,
+      110
+     ],
+     "k": 3,
+     "lean": [
+      114,
+      128,
+      110
+     ],
+     "method": "trotter2",
+     "n": 4
+    },
+    {
+     "agree": true,
+     "graphix": [
+      148,
+      168,
+      144
+     ],
+     "k": 4,
+     "lean": [
+      148,
+      168,
+      144
+     ],
+     "method": "trotter2",
+     "n": 4
+    },
+    {
+     "agree": true,
+     "graphix": [
+      59,
+      62,
+      54
+     ],
+     "k": 1,
+     "lean": [
+      59,
+      62,
+      54
+     ],
+     "method": "trotter2",
+     "n": 5
+    },
+    {
+     "agree": true,
+     "graphix": [
+      103,
+      114,
+      98
+     ],
+     "k": 2,
+     "lean": [
+      103,
+      114,
+      98
+     ],
+     "method": "trotter2",
+     "n": 5
+    },
+    {
+     "agree": true,
+     "graphix": [
+      147,
+      166,
+      142
+     ],
+     "k": 3,
+     "lean": [
+      147,
+      166,
+      142
+     ],
+     "method": "trotter2",
+     "n": 5
+    },
+    {
+     "agree": true,
+     "graphix": [
+      191,
+      218,
+      186
+     ],
+     "k": 4,
+     "lean": [
+      191,
+      218,
+      186
+     ],
+     "method": "trotter2",
+     "n": 5
+    },
+    {
+     "agree": true,
+     "graphix": [
+      405,
+      470,
+      398
+     ],
+     "k": 6,
+     "lean": [
+      405,
+      470,
+      398
+     ],
+     "method": "trotter2",
+     "n": 7
+    },
+    {
+     "agree": true,
+     "graphix": [
+      279,
+      318,
+      270
+     ],
+     "k": 3,
+     "lean": [
+      279,
+      318,
+      270
+     ],
+     "method": "trotter2",
+     "n": 9
+    }
+   ]
+  },
+  "frontier": [],
+  "grants": null,
+  "outcome": "pass",
+  "seed": null,
+  "summary": "Lean and Graphix agree on N, E, M for all 18 instances"
+ }
+}

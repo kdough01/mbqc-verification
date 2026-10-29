@@ -1,0 +1,14 @@
+id: hamsim.A.trotter_circuit_matches_formula
+kind: lemma
+layer: A
+title: Trotter circuit implements the product formula
+statement: |
+  trotter_circuit(H, t, r, order) applies exactly S_order(t/r)^r, for order 1 and 2.
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/qsp_angles.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: radians, endian: little, input: zero, phase: exact}
+depends_on:
+- {node: def.hamsim.ising_chain, kind: uses}
+checks:
+- kind: numerical
+  params: {which: trotter_circuit, tol: 1.0e-10}
+tags: [hamsim, trotter]

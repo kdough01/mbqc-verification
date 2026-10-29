@@ -1,0 +1,169 @@
+{
+ "input_hash": "efdcea47ebd7a4d5",
+ "inputs": {
+  "check_code": {
+   "verification/truth/numerical/check.py": "f283567880e456ab56867e2f4128390e417708e0ee723d77aab3a4d344e6deab",
+   "verification/truth/numerical/equal_accuracy.py": "bfc7eaaf151dce7c32b9a0522298ea8bb4860b093a944d61a08789e3e870cf0b",
+   "verification/truth/numerical/hamsim_accuracy.py": "24111e0d9dd4fb3cfc8e0477b3712a13fe579805c2562c556f59a9eac036428b"
+  },
+  "check_params": "fa10ae123f385fcc",
+  "code": {
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f",
+   "src/mbqc_verify/hamsim/qsp_angles.py": "ea2a2675f394feca697bbf445a2d5fb01c7468e9a3320010f236bf0fb59777ff"
+  },
+  "definitions": {
+   "def.hamsim.ising_chain": "b085def53b3f0f38"
+  },
+  "parents": {
+   "assume.trotter_commutator_bound": "cd7476d267d5f845:e10808d4",
+   "def.hamsim.ising_chain": "b085def53b3f0f38:4f53cda1",
+   "hamsim.A.trotter_circuit_matches_formula": "31e4218cde64be06:6448449e"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "c0b75c67d96f5148"
+ },
+ "kind": "numerical",
+ "name": "numerical",
+ "node": "hamsim.A.trotter2_accuracy",
+ "params": {
+  "method": "trotter2",
+  "which": "accuracy"
+ },
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:26:36+00:00",
+  "quick": false,
+  "seconds": 0.01,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "n in [2, 3], t in [0.5, 2.0], eps in [0.01, 0.001, 1e-05]",
+  "evidence": {
+   "rows": [
+    {
+     "eps": 0.01,
+     "err": 0.004484188233097341,
+     "method": "trotter2",
+     "n": 2,
+     "ok": true,
+     "reps": 3,
+     "t": 0.5
+    },
+    {
+     "eps": 0.001,
+     "err": 0.0006277034884986803,
+     "method": "trotter2",
+     "n": 2,
+     "ok": true,
+     "reps": 8,
+     "t": 0.5
+    },
+    {
+     "eps": 1e-05,
+     "err": 7.136588653415014e-06,
+     "method": "trotter2",
+     "n": 2,
+     "ok": true,
+     "reps": 75,
+     "t": 0.5
+    },
+    {
+     "eps": 0.01,
+     "err": 0.002460409611171015,
+     "method": "trotter2",
+     "n": 2,
+     "ok": true,
+     "reps": 19,
+     "t": 2.0
+    },
+    {
+     "eps": 0.001,
+     "err": 0.0002464581768548378,
+     "method": "trotter2",
+     "n": 2,
+     "ok": true,
+     "reps": 60,
+     "t": 2.0
+    },
+    {
+     "eps": 1e-05,
+     "err": 2.514323347229661e-06,
+     "method": "trotter2",
+     "n": 2,
+     "ok": true,
+     "reps": 594,
+     "t": 2.0
+    },
+    {
+     "eps": 0.01,
+     "err": 0.005464642506592867,
+     "method": "trotter2",
+     "n": 3,
+     "ok": true,
+     "reps": 3,
+     "t": 0.5
+    },
+    {
+     "eps": 0.001,
+     "err": 0.0006050848660081417,
+     "method": "trotter2",
+     "n": 3,
+     "ok": true,
+     "reps": 9,
+     "t": 0.5
+    },
+    {
+     "eps": 1e-05,
+     "err": 7.111477118621818e-06,
+     "method": "trotter2",
+     "n": 3,
+     "ok": true,
+     "reps": 83,
+     "t": 0.5
+    },
+    {
+     "eps": 0.01,
+     "err": 0.002939622709128632,
+     "method": "trotter2",
+     "n": 3,
+     "ok": true,
+     "reps": 21,
+     "t": 2.0
+    },
+    {
+     "eps": 0.001,
+     "err": 0.0002972719621394953,
+     "method": "trotter2",
+     "n": 3,
+     "ok": true,
+     "reps": 66,
+     "t": 2.0
+    },
+    {
+     "eps": 1e-05,
+     "err": 2.9904433888323747e-06,
+     "method": "trotter2",
+     "n": 3,
+     "ok": true,
+     "reps": 658,
+     "t": 2.0
+    }
+   ],
+   "worst_ratio": 0.7136588653415014
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "12/12 cases within eps; worst error/eps = 0.71"
+ }
+}

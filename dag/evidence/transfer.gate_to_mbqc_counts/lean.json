@@ -1,0 +1,64 @@
+{
+ "input_hash": "4f1af6c4bfdf2f4d",
+ "inputs": {
+  "check_code": {
+   "verification/truth/lean/check.py": "7d80b6820748d5428f83693c97f8a28bf2a0343a469ad283155dbdaf1a514af1",
+   "verification/truth/lean/leanrun.py": "35ab14f3e9257049664a31c26dc295f2d47ce7c67f78b326a8a8c281ff5fca66"
+  },
+  "check_params": "44136fa355b3678a",
+  "code": {},
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.jcz_construction": "392cb6fd4770bc56",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "lean_sources": "aad561f2c225afa88fe054415bc7c2f411c664e6910d244562d67f5de520a53d",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
+  "parents": {
+   "def.jcz_construction": "392cb6fd4770bc56:b8ffd8b5"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "34befe39e1070a89"
+ },
+ "kind": "lean",
+ "name": "lean",
+ "node": "transfer.gate_to_mbqc_counts",
+ "params": {},
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:21:35+00:00",
+  "quick": false,
+  "seconds": 0.01,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "all values in the statement",
+  "evidence": {
+   "assumption_axioms": [],
+   "assumption_nodes": [],
+   "axioms": [
+    "Quot.sound",
+    "propext"
+   ],
+   "decl": "MBQC.Transfer.compile_counts",
+   "module": "MBQC.Transfer.Counts",
+   "node_deps": [
+    "def.jcz_construction"
+   ]
+  },
+  "frontier": [],
+  "grants": "proved",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "proved in Lean; axioms: Quot.sound, propext"
+ }
+}

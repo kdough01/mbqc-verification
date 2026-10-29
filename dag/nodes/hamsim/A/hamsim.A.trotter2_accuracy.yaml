@@ -1,0 +1,16 @@
+id: hamsim.A.trotter2_accuracy
+kind: theorem
+layer: A
+title: Second-order Trotter reaches accuracy ε
+statement: |
+  For the Ising chain, t > 0 and 0 < ε < 1, order-2 Trotter with r = ⌈√(t³ (‖[B,[B,A]]‖/12 + ‖[A,[A,B]]‖/24) / ε)⌉ steps satisfies ‖S2(t/r)^r − e^{−iHt}‖ ≤ ε.
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/qsp_angles.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: radians, endian: little, input: zero, phase: exact, degree: trotter_steps}
+depends_on:
+- {node: def.hamsim.ising_chain, kind: uses}
+- {node: hamsim.A.trotter_circuit_matches_formula, kind: uses}
+- {node: assume.trotter_commutator_bound, kind: assumes}
+checks:
+- kind: numerical
+  params: {which: accuracy, method: trotter2}
+tags: [hamsim, trotter, accuracy]

@@ -1,0 +1,25 @@
+id: def.jcz_construction
+kind: definition
+title: Graphix's J-∧z pattern construction
+statement: |
+  Given a circuit's J/CZ instruction stream on w qubits: start with vertices 0..w−1, one current vertex per qubit. J on qubit q adds a new vertex, joins it to q's current vertex, measures the old one and makes the new one current. CZ on qubits a, b toggles the edge between their current vertices. N = vertices, E = final edges, M = measured vertices.
+description: |
+  How Graphix 0.4.1 builds an unoptimized pattern (Circuit.transpile_to_causalflow). Lean reimplements it (lean/MBQC/Defs/JCZ.lean); the differential check compares the two on real circuits. Note the toggle: a CZ can remove an edge, so E is #J + #CZ only when no CZ cancels.
+lean_decl: [MBQC.Defs.Instr, MBQC.Defs.JczGraph, MBQC.Defs.edgeKey, MBQC.Defs.toggle, MBQC.Defs.compileJcz,
+  MBQC.Defs.countJ, MBQC.Defs.countCZ]
+code: [src/mbqc_verify/compile/qiskit_to_mbqc.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped}
+depends_on:
+- {node: def.pattern, kind: uses}
+- {node: def.resource_counts, kind: uses}
+checks:
+- kind: differential
+  params:
+    instances:
+    - {method: trotter2, n: 2, k: 1}
+    - {method: trotter2, n: 5, k: 4}
+    - {method: qsvt, n: 2, k: 3}
+    - {method: qsvt, n: 3, k: 5}
+    - {method: gqsp, n: 2, k: 1}
+    - {method: gqsp, n: 4, k: 3}
+tags: [mbqc, vocabulary, graphix]

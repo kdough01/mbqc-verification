@@ -1,0 +1,16 @@
+id: hamsim.A.gqsp_accuracy
+kind: theorem
+layer: A
+title: GQSP reaches accuracy ε
+statement: |
+  Let d be the smallest Laurent degree with Σ_{|k|>d} |J_k(αt)| ≤ 0.1ε, and scale the polynomial by β = 1 − 0.1ε. The GQSP circuit on the walk operator W = Z_{a0}·U (2d controlled walk calls), post-selected on its ancillas, applies U' with ‖U' − e^{−iHt}‖ ≤ ε.
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/qsp_angles.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: radians, endian: little, input: zero, phase: exact, degree: gqsp_laurent_degree}
+depends_on:
+- {node: def.hamsim.ising_chain, kind: uses}
+- {node: hamsim.A.block_encoding, kind: instantiates}
+- {node: assume.jacobi_anger_truncation, kind: assumes}
+checks:
+- kind: numerical
+  params: {which: accuracy, method: gqsp}
+tags: [hamsim, gqsp, accuracy]

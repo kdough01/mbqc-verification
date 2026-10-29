@@ -1,0 +1,23 @@
+id: hamsim.C.slide.d_ge_g.M
+kind: theorem
+layer: C
+title: 'Slide''s claim: d ≥ g ⇒ QSVT uses more measurements'
+statement: |
+  With the slide's formulas (M = N − n), for all n ≥ 2 and odd d ≥ g ≥ 3: M_Q(n, d) > M_G(n, g).
+statement_tex: \forall n\ge 2,\; d \ge g \ge 3 \text{ odd}:\; M_Q(n,d) > M_G(n,g)
+description: Pure algebra on the slide's formulas as printed. Proved in Lean by writing the difference
+  as a sum of products of nonnegative factors; sympy finds the same certificate independently.\n
+lean_decl: MBQC.Results.HamSim.slide_d_ge_g_M
+code: [src/mbqc_verify/hamsim/slide.py]
+conventions: {degree: slide_polynomial_degree}
+depends_on:
+- {node: def.hamsim.slide_formulas, kind: uses}
+- {node: hamsim.C.slide.d_ge_g.N, kind: uses, note: M = N − n on both sides}
+checks:
+- kind: symbolic
+  params: {certificate: slide_d_ge_g, quantity: M}
+- {kind: lean}
+- {kind: vocabulary}
+- kind: nonvacuity
+  params: {witness: MBQC.Results.HamSim.slide_d_ge_g_nonvacuous}
+tags: [hamsim, slide, consequence]

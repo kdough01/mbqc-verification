@@ -1,0 +1,24 @@
+id: hamsim.B.gqsp.N.opt
+kind: theorem
+layer: B
+title: GQSP N formula (optimized)
+statement: |
+  Compiling the GQSP circuit for n ≥ 2 data qubits after standardizing and removing Pauli measurements (optimized), with d ≥ 1, gives a pattern with N = (80n − 40)d + 8n + 2 vertices.
+statement_tex: N = (80n - 40)d + 8n + 2
+description: |
+  Optimization trades vertices for memory: peak live qubits rise from about 10–22 to 55–991 on the grid.
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: gqsp_laurent_degree}
+depends_on:
+- {node: transfer.gate_to_mbqc, kind: instantiates}
+- {node: def.resource_counts, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: gqsp
+    optimize: true
+    quantity: N
+    coef: [80, -40, 8, 2]
+- kind: mutation
+  params: {target: scaling}
+tags: [hamsim, gqsp, resources, optimized]

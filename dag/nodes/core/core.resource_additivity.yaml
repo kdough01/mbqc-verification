@@ -1,0 +1,19 @@
+id: core.resource_additivity
+kind: core
+title: Resource counts add under composition
+statement: |
+  For patterns P1 and P2 composed by identifying the outputs of P1 with the inputs of P2: N(P2∘P1) = N(P1) + N(P2) − |O1|, E(P2∘P1) = E(P1) + E(P2), M(P2∘P1) = M(P1) + M(P2).
+statement_tex: N(P_2\circ P_1) = N(P_1)+N(P_2)-|O_1|,\; E(P_2\circ P_1)=E(P_1)+E(P_2),\; M(P_2\circ P_1)=M(P_1)+M(P_2)
+lean_decl: MBQC.Core.resource_additivity
+conventions: {angle: pi_units, input: plus, phase: global_dropped}
+depends_on:
+- {node: def.resource_counts, kind: uses}
+- {node: def.pattern, kind: uses}
+checks:
+- {kind: lean}
+- {kind: vocabulary}
+- kind: nonvacuity
+  params: {witness: MBQC.Core.resource_additivity_nonvacuous}
+tags: [mbqc, core, resources]
+notes: |
+  Human-reviewed core: reviewed once, then proved in Lean (design doc, M4-M5).

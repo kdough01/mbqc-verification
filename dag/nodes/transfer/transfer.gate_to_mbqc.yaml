@@ -1,0 +1,16 @@
+id: transfer.gate_to_mbqc
+kind: transfer
+title: Gate-to-MBQC transfer theorem
+statement: |
+  For any circuit C over the gate set {H, S, S†, T, T†, X, Y, Z, √X, √X†, Rx, Ry, Rz, U, CX, CZ, CY, SWAP, Rzz, CCX}, the pattern P(C) obtained by replacing each gate with its fixed Graphix pattern and composing implements C up to global phase, and N, E, M of P(C) are the input count plus the sums of fixed per-gate costs. Standardizing, shifting signals and removing Pauli measurements preserves the implemented map.
+description: |
+  Proved once, this turns every gate-level resource count into an MBQC one by instantiation: the per-theorem work shrinks to counting gates. Each compiled instance is also checked directly (hamsim.compiled_patterns_match).
+code: [src/mbqc_verify/compile/qiskit_to_mbqc.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped}
+depends_on:
+- {node: core.jalpha_byproduct, kind: uses}
+- {node: core.resource_additivity, kind: uses}
+- {node: core.standardization, kind: uses}
+- {node: core.pauli_removal, kind: uses}
+- {node: core.gflow_determinism, kind: uses}
+tags: [mbqc, transfer]

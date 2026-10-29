@@ -1,0 +1,169 @@
+{
+ "input_hash": "2c1db44f71a3dca0",
+ "inputs": {
+  "check_code": {
+   "verification/truth/numerical/check.py": "f283567880e456ab56867e2f4128390e417708e0ee723d77aab3a4d344e6deab",
+   "verification/truth/numerical/equal_accuracy.py": "bfc7eaaf151dce7c32b9a0522298ea8bb4860b093a944d61a08789e3e870cf0b",
+   "verification/truth/numerical/hamsim_accuracy.py": "24111e0d9dd4fb3cfc8e0477b3712a13fe579805c2562c556f59a9eac036428b"
+  },
+  "check_params": "7bdbddeba4f24fb2",
+  "code": {
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f",
+   "src/mbqc_verify/hamsim/qsp_angles.py": "ea2a2675f394feca697bbf445a2d5fb01c7468e9a3320010f236bf0fb59777ff"
+  },
+  "definitions": {
+   "def.hamsim.ising_chain": "b085def53b3f0f38"
+  },
+  "parents": {
+   "assume.jacobi_anger_truncation": "5793a1f38eaba2cb:e10808d4",
+   "def.hamsim.ising_chain": "b085def53b3f0f38:4f53cda1",
+   "hamsim.A.block_encoding": "553cab820819c4d6:4f53cda1"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "70ccbb305f13986b"
+ },
+ "kind": "numerical",
+ "name": "numerical",
+ "node": "hamsim.A.gqsp_accuracy",
+ "params": {
+  "method": "gqsp",
+  "which": "accuracy"
+ },
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:26:36+00:00",
+  "quick": false,
+  "seconds": 17.07,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "n in [2, 3], t in [0.5, 2.0], eps in [0.01, 0.001, 1e-05]",
+  "evidence": {
+   "rows": [
+    {
+     "eps": 0.01,
+     "err": 0.0012154272723116364,
+     "method": "gqsp",
+     "n": 2,
+     "ok": true,
+     "reps": 10,
+     "t": 0.5
+    },
+    {
+     "eps": 0.001,
+     "err": 0.00010756879536399013,
+     "method": "gqsp",
+     "n": 2,
+     "ok": true,
+     "reps": 12,
+     "t": 0.5
+    },
+    {
+     "eps": 1e-05,
+     "err": 1.1014842431687273e-06,
+     "method": "gqsp",
+     "n": 2,
+     "ok": true,
+     "reps": 16,
+     "t": 0.5
+    },
+    {
+     "eps": 0.01,
+     "err": 0.0012616687874206379,
+     "method": "gqsp",
+     "n": 2,
+     "ok": true,
+     "reps": 22,
+     "t": 2.0
+    },
+    {
+     "eps": 0.001,
+     "err": 0.0001459327793811748,
+     "method": "gqsp",
+     "n": 2,
+     "ok": true,
+     "reps": 24,
+     "t": 2.0
+    },
+    {
+     "eps": 1e-05,
+     "err": 1.3475639459081584e-06,
+     "method": "gqsp",
+     "n": 2,
+     "ok": true,
+     "reps": 30,
+     "t": 2.0
+    },
+    {
+     "eps": 0.01,
+     "err": 0.0011521280312278078,
+     "method": "gqsp",
+     "n": 3,
+     "ok": true,
+     "reps": 12,
+     "t": 0.5
+    },
+    {
+     "eps": 0.001,
+     "err": 0.0001361477806584396,
+     "method": "gqsp",
+     "n": 3,
+     "ok": true,
+     "reps": 14,
+     "t": 0.5
+    },
+    {
+     "eps": 1e-05,
+     "err": 1.3845622757245243e-06,
+     "method": "gqsp",
+     "n": 3,
+     "ok": true,
+     "reps": 18,
+     "t": 0.5
+    },
+    {
+     "eps": 0.01,
+     "err": 0.0013457939409237546,
+     "method": "gqsp",
+     "n": 3,
+     "ok": true,
+     "reps": 28,
+     "t": 2.0
+    },
+    {
+     "eps": 0.001,
+     "err": 0.00012648633275521515,
+     "method": "gqsp",
+     "n": 3,
+     "ok": true,
+     "reps": 32,
+     "t": 2.0
+    },
+    {
+     "eps": 1e-05,
+     "err": 1.2452283037118541e-06,
+     "method": "gqsp",
+     "n": 3,
+     "ok": true,
+     "reps": 38,
+     "t": 2.0
+    }
+   ],
+   "worst_ratio": 0.1459327793811748
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "12/12 cases within eps; worst error/eps = 0.15"
+ }
+}

@@ -1,0 +1,13 @@
+id: core.standardization
+kind: core
+title: Standardization and signal shifting preserve semantics
+statement: |
+  Every pattern can be rewritten into standard form (all N, then all E, then all M, then all corrections) by the measurement-calculus rewrite rules, and its signals shifted, without changing its semantics.
+description: |
+  Standard result: Danos, Kashefi & Panangaden, The measurement calculus, J. ACM 54(2), 2007.
+conventions: {angle: pi_units, input: plus, phase: global_dropped}
+depends_on:
+- {node: def.pattern, kind: uses}
+tags: [mbqc, core, optimization]
+notes: |
+  Human-reviewed core: reviewed once, then proved in Lean (design doc, M4-M5).

@@ -1,0 +1,129 @@
+# Runs on every push. Re-runs the checks your change made stale, commits the new
+# evidence back to the branch, publishes the theorem browser (main only), and
+# fails if a check failed or crashed, raised an unacknowledged warning, or a
+# claim got weaker than it was before the run (for example a formula that held
+# is now refuted).
+name: verify
+
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:
+    inputs:
+      rerun:
+        description: Which checks to run
+        type: choice
+        options: [stale, all]
+        default: stale
+  workflow_call:
+    inputs:
+      rerun:
+        type: string
+        default: stale
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    # One run per branch at a time, so evidence commits never race. Runs queue, they are not cancelled.
+    concurrency:
+      group: dag-${{ github.ref }}
+      cancel-in-progress: false
+    env:
+      BROWSER_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # the branch tip, not the pushed commit, so evidence committed by an earlier run is included
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+
+      - name: Tests
+        run: pytest -q
+
+      - name: Validate the DAG
+        run: dagtool validate
+
+      - name: Record status before the run
+        run: dagtool status --json > "$RUNNER_TEMP/before.json"
+
+      - name: Run checks
+        id: run
+        continue-on-error: true
+        env:
+          RERUN: ${{ inputs.rerun || 'stale' }}
+        run: |
+          if [ "$RERUN" = all ]; then
+            dagtool run --report "$RUNNER_TEMP/ran.json"
+          else
+            dagtool run --stale --report "$RUNNER_TEMP/ran.json"
+          fi
+
+      - name: Commit the new evidence
+        if: steps.run.outcome != 'skipped'
+        run: |
+          git add -A dag/evidence
+          if git diff --cached --quiet; then
+            echo "Evidence unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update DAG evidence for $(git rev-parse --short HEAD) [skip ci]"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+
+      - name: Render the theorem browser
+        if: always()
+        run: dagtool render --out site/index.html
+
+      - name: Write the run summary
+        if: always()
+        run: |
+          args=(--before "$RUNNER_TEMP/before.json" --ran "$RUNNER_TEMP/ran.json")
+          if [ "$GITHUB_REF" = refs/heads/main ]; then args+=(--browser-url "$BROWSER_URL"); fi
+          dagtool summary "${args[@]}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the theorem browser
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: theorem-browser
+          path: site/index.html
+
+      - name: Prepare the GitHub Pages site
+        if: always() && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Gate
+        env:
+          RUN_OUTCOME: ${{ steps.run.outcome }}
+        run: |
+          dagtool check --before "$RUNNER_TEMP/before.json"
+          if [ "$RUN_OUTCOME" != success ]; then
+            echo "::error::A check crashed while running; see the 'Run checks' step."
+            exit 1
+          fi
+
+  pages:
+    needs: verify
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    # Publishing needs Pages enabled once (Settings > Pages > Source: GitHub Actions).
+    # Until then this job fails without failing the run.
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

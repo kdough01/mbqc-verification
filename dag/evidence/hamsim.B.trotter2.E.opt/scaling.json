@@ -1,0 +1,277 @@
+{
+ "input_hash": "373831e029c3f126",
+ "inputs": {
+  "check_code": {
+   "verification/truth/scaling/check.py": "cea1af075f002980a1528feb620149e04347c3be90846afd321f349c76115c58",
+   "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
+  },
+  "check_params": "f71c80d51d2f0a7a",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "parents": {
+   "def.resource_counts": "b75d507a2b247ac8:4f53cda1",
+   "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "e235fee73fcce134"
+ },
+ "kind": "scaling",
+ "name": "scaling",
+ "node": "hamsim.B.trotter2.E.opt",
+ "params": {
+  "claim": "not_bilinear",
+  "method": "trotter2",
+  "optimize": true,
+  "quantity": "E"
+ },
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:27:03+00:00",
+  "quick": false,
+  "seconds": 0.36,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "n in [2, 3, 4, 5], k in [1, 2, 3, 4] (training) + held-out [(7, 6), (9, 3)]",
+  "evidence": {
+   "counts": [
+    {
+     "E": 14,
+     "k": 1,
+     "n": 2,
+     "space": 5
+    },
+    {
+     "E": 22,
+     "k": 2,
+     "n": 2,
+     "space": 6
+    },
+    {
+     "E": 30,
+     "k": 3,
+     "n": 2,
+     "space": 6
+    },
+    {
+     "E": 38,
+     "k": 4,
+     "n": 2,
+     "space": 6
+    },
+    {
+     "E": 20,
+     "k": 1,
+     "n": 3,
+     "space": 8
+    },
+    {
+     "E": 32,
+     "k": 2,
+     "n": 3,
+     "space": 8
+    },
+    {
+     "E": 63,
+     "k": 3,
+     "n": 3,
+     "space": 11
+    },
+    {
+     "E": 93,
+     "k": 4,
+     "n": 3,
+     "space": 11
+    },
+    {
+     "E": 41,
+     "k": 1,
+     "n": 4,
+     "space": 8
+    },
+    {
+     "E": 62,
+     "k": 2,
+     "n": 4,
+     "space": 12
+    },
+    {
+     "E": 105,
+     "k": 3,
+     "n": 4,
+     "space": 15
+    },
+    {
+     "E": 148,
+     "k": 4,
+     "n": 4,
+     "space": 22
+    },
+    {
+     "E": 33,
+     "k": 1,
+     "n": 5,
+     "space": 8
+    },
+    {
+     "E": 85,
+     "k": 2,
+     "n": 5,
+     "space": 16
+    },
+    {
+     "E": 126,
+     "k": 3,
+     "n": 5,
+     "space": 22
+    },
+    {
+     "E": 159,
+     "k": 4,
+     "n": 5,
+     "space": 16
+    },
+    {
+     "E": 491,
+     "k": 6,
+     "n": 7,
+     "space": 31
+    },
+    {
+     "E": 177,
+     "k": 3,
+     "n": 9,
+     "space": 23
+    }
+   ],
+   "interpolated": [
+    "34/3",
+    "-44/3",
+    "-5",
+    "16"
+   ],
+   "interpolated_through": [
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     4
+    ],
+    [
+     5,
+     1
+    ],
+    [
+     5,
+     4
+    ]
+   ],
+   "least_squares_fit": [
+    "113/10",
+    "-47/4",
+    "-15/7",
+    "49/10"
+   ],
+   "method": "trotter2",
+   "mismatches": [
+    {
+     "count": 20,
+     "formula": "61/3",
+     "k": 1,
+     "n": 3
+    },
+    {
+     "count": 32,
+     "formula": "119/3",
+     "k": 2,
+     "n": 3
+    },
+    {
+     "count": 63,
+     "formula": "59",
+     "k": 3,
+     "n": 3
+    },
+    {
+     "count": 93,
+     "formula": "235/3",
+     "k": 4,
+     "n": 3
+    },
+    {
+     "count": 41,
+     "formula": "80/3",
+     "k": 1,
+     "n": 4
+    },
+    {
+     "count": 62,
+     "formula": "172/3",
+     "k": 2,
+     "n": 4
+    },
+    {
+     "count": 105,
+     "formula": "88",
+     "k": 3,
+     "n": 4
+    },
+    {
+     "count": 148,
+     "formula": "356/3",
+     "k": 4,
+     "n": 4
+    },
+    {
+     "count": 85,
+     "formula": "75",
+     "k": 2,
+     "n": 5
+    },
+    {
+     "count": 126,
+     "formula": "117",
+     "k": 3,
+     "n": 5
+    },
+    {
+     "count": 491,
+     "formula": "369",
+     "k": 6,
+     "n": 7
+    },
+    {
+     "count": 177,
+     "formula": "233",
+     "k": 3,
+     "n": 9
+    }
+   ],
+   "optimize": true,
+   "quantity": "E"
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "no bilinear formula fits: the one through the 4 corners misses 12 of 18 points"
+ }
+}

@@ -1,0 +1,227 @@
+{
+ "input_hash": "edeb2146e87d4abf",
+ "inputs": {
+  "check_code": {
+   "verification/faithfulness/differential/check.py": "de20c4cbe92ef720ed4bdc04054eabbdc3524a686c5ee9a6735b93e1018c197d",
+   "verification/truth/lean/check.py": "7d80b6820748d5428f83693c97f8a28bf2a0343a469ad283155dbdaf1a514af1",
+   "verification/truth/lean/leanrun.py": "35ab14f3e9257049664a31c26dc295f2d47ce7c67f78b326a8a8c281ff5fca66",
+   "verification/truth/scaling/check.py": "cea1af075f002980a1528feb620149e04347c3be90846afd321f349c76115c58",
+   "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
+  },
+  "check_params": "291ff7fe66e2a597",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.jcz_construction": "392cb6fd4770bc56",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "lean_sources": "aad561f2c225afa88fe054415bc7c2f411c664e6910d244562d67f5de520a53d",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
+  "parents": {
+   "def.jcz_construction": "392cb6fd4770bc56:b8ffd8b5",
+   "def.resource_counts": "b75d507a2b247ac8:4f53cda1",
+   "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1",
+   "transfer.gate_to_mbqc_counts": "34befe39e1070a89:964b423a"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "359cf094c663574f"
+ },
+ "kind": "differential",
+ "name": "differential",
+ "node": "hamsim.B.qsvt.E.unopt",
+ "params": {
+  "method": "qsvt"
+ },
+ "provenance": {
+  "commit": null,
+  "dirty": null,
+  "finished": "2026-10-29T13:27:18+00:00",
+  "quick": false,
+  "seconds": 5.08,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.3",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": null,
+  "evidence": {
+   "rows": [
+    {
+     "agree": true,
+     "graphix": [
+      2026,
+      2533,
+      2017
+     ],
+     "k": 3,
+     "lean": [
+      2026,
+      2533,
+      2017
+     ],
+     "method": "qsvt",
+     "n": 2
+    },
+    {
+     "agree": true,
+     "graphix": [
+      2914,
+      3685,
+      2905
+     ],
+     "k": 5,
+     "lean": [
+      2914,
+      3685,
+      2905
+     ],
+     "method": "qsvt",
+     "n": 2
+    },
+    {
+     "agree": true,
+     "graphix": [
+      3802,
+      4837,
+      3793
+     ],
+     "k": 7,
+     "lean": [
+      3802,
+      4837,
+      3793
+     ],
+     "method": "qsvt",
+     "n": 2
+    },
+    {
+     "agree": true,
+     "graphix": [
+      3270,
+      4085,
+      3257
+     ],
+     "k": 3,
+     "lean": [
+      3270,
+      4085,
+      3257
+     ],
+     "method": "qsvt",
+     "n": 3
+    },
+    {
+     "agree": true,
+     "graphix": [
+      4746,
+      5993,
+      4733
+     ],
+     "k": 5,
+     "lean": [
+      4746,
+      5993,
+      4733
+     ],
+     "method": "qsvt",
+     "n": 3
+    },
+    {
+     "agree": true,
+     "graphix": [
+      6222,
+      7901,
+      6209
+     ],
+     "k": 7,
+     "lean": [
+      6222,
+      7901,
+      6209
+     ],
+     "method": "qsvt",
+     "n": 3
+    },
+    {
+     "agree": true,
+     "graphix": [
+      4514,
+      5637,
+      4497
+     ],
+     "k": 3,
+     "lean": [
+      4514,
+      5637,
+      4497
+     ],
+     "method": "qsvt",
+     "n": 4
+    },
+    {
+     "agree": true,
+     "graphix": [
+      6578,
+      8301,
+      6561
+     ],
+     "k": 5,
+     "lean": [
+      6578,
+      8301,
+      6561
+     ],
+     "method": "qsvt",
+     "n": 4
+    },
+    {
+     "agree": true,
+     "graphix": [
+      8642,
+      10965,
+      8625
+     ],
+     "k": 7,
+     "lean": [
+      8642,
+      10965,
+      8625
+     ],
+     "method": "qsvt",
+     "n": 4
+    },
+    {
+     "agree": true,
+     "graphix": [
+      13714,
+      17449,
+      13693
+     ],
+     "k": 9,
+     "lean": [
+      13714,
+      17449,
+      13693
+     ],
+     "method": "qsvt",
+     "n": 5
+    }
+   ]
+  },
+  "frontier": [],
+  "grants": null,
+  "outcome": "pass",
+  "seed": null,
+  "summary": "Lean and Graphix agree on N, E, M for all 10 instances"
+ }
+}

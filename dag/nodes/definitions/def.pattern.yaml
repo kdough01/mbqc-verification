@@ -1,0 +1,13 @@
+id: def.pattern
+kind: definition
+title: Measurement pattern and its semantics
+statement: |
+  A pattern is a sequence of commands over qubits with designated inputs I and outputs O: N_i (prepare |+⟩ on i), E_ij (apply CZ to i, j), M_i^α (measure i in the XY plane at angle α, in units of π, with angle signals from earlier outcomes), and X_i^s, Z_i^s (Pauli corrections conditioned on outcome signals s). Its semantics is the map it induces from the input qubits to the output qubits, up to global phase.
+description: |
+  Measurement calculus of Danos, Kashefi and Panangaden. In code this is graphix.pattern.Pattern, which compile/qiskit_to_mbqc.py produces.
+lean_decl: [MBQC.Defs.Plane, MBQC.Defs.Cmd, MBQC.Defs.Pattern]
+code: [src/mbqc_verify/compile/qiskit_to_mbqc.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped}
+depends_on:
+- {node: def.graph_state, kind: uses}
+tags: [mbqc, vocabulary]
