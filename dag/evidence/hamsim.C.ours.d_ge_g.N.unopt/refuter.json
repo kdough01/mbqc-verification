@@ -1,9 +1,9 @@
 {
- "input_hash": "e0cce976f5c050e6",
+ "input_hash": "1bba9020afba774e",
  "inputs": {
   "check_code": {
    "verification/truth/refuter/check.py": "e7edbbee36a5ac1e3a1d9e43d0b6533c234189c1299fdea3547e56994aa7d39a",
-   "verification/truth/scaling/check.py": "cea1af075f002980a1528feb620149e04347c3be90846afd321f349c76115c58",
+   "verification/truth/scaling/check.py": "ef885ffc8ea324e15bae0281a893be69bfe6a0979819878f65123841873c8455",
    "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
   },
   "check_params": "c8f7ec5cb9f86a56",
@@ -37,15 +37,15 @@
   "source": "formula"
  },
  "provenance": {
-  "commit": null,
-  "dirty": null,
-  "finished": "2026-10-29T13:28:03+00:00",
+  "commit": "f15d921491b600ed59c6b4b1b802295fc0d1b7ca",
+  "dirty": true,
+  "finished": "2026-10-29T15:10:32+00:00",
   "quick": false,
   "seconds": 0.01,
   "versions": {
    "graphix": "0.4.1",
-   "numpy": "2.5.3",
-   "python": "3.13.18",
+   "numpy": "2.5.4",
+   "python": "3.13.17",
    "qiskit": "2.5.0",
    "scipy": "1.18.1",
    "sympy": "1.14.0"

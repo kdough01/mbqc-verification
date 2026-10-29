@@ -1,8 +1,8 @@
 {
- "input_hash": "4a8b312fa7045759",
+ "input_hash": "8137eaf7cd86be91",
  "inputs": {
   "check_code": {
-   "verification/truth/scaling/check.py": "cea1af075f002980a1528feb620149e04347c3be90846afd321f349c76115c58",
+   "verification/truth/scaling/check.py": "ef885ffc8ea324e15bae0281a893be69bfe6a0979819878f65123841873c8455",
    "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
   },
   "check_params": "db34a775a2234e54",
@@ -39,15 +39,15 @@
   "quantity": "N"
  },
  "provenance": {
-  "commit": null,
-  "dirty": null,
-  "finished": "2026-10-29T13:26:18+00:00",
+  "commit": "f15d921491b600ed59c6b4b1b802295fc0d1b7ca",
+  "dirty": false,
+  "finished": "2026-10-29T15:10:05+00:00",
   "quick": false,
-  "seconds": 266.99,
+  "seconds": 178.89,
   "versions": {
    "graphix": "0.4.1",
-   "numpy": "2.5.3",
-   "python": "3.13.18",
+   "numpy": "2.5.4",
+   "python": "3.13.17",
    "qiskit": "2.5.0",
    "scipy": "1.18.1",
    "sympy": "1.14.0"
@@ -118,6 +118,12 @@
      "space": 991
     }
    ],
+   "holdout": [
+    [
+     5,
+     9
+    ]
+   ],
    "least_squares_fit": [
     "36",
     "-18",
@@ -127,7 +133,45 @@
    "method": "qsvt",
    "mismatches": [],
    "optimize": true,
-   "quantity": "N"
+   "quantity": "N",
+   "training": [
+    [
+     2,
+     3
+    ],
+    [
+     2,
+     5
+    ],
+    [
+     2,
+     7
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     3,
+     5
+    ],
+    [
+     3,
+     7
+    ],
+    [
+     4,
+     3
+    ],
+    [
+     4,
+     5
+    ],
+    [
+     4,
+     7
+    ]
+   ]
   },
   "frontier": [],
   "grants": "empirical",

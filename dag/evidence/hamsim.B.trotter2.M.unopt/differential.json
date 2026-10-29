@@ -1,11 +1,11 @@
 {
- "input_hash": "dda31256f16961e0",
+ "input_hash": "1630968d7ad09b53",
  "inputs": {
   "check_code": {
    "verification/faithfulness/differential/check.py": "de20c4cbe92ef720ed4bdc04054eabbdc3524a686c5ee9a6735b93e1018c197d",
    "verification/truth/lean/check.py": "7d80b6820748d5428f83693c97f8a28bf2a0343a469ad283155dbdaf1a514af1",
    "verification/truth/lean/leanrun.py": "35ab14f3e9257049664a31c26dc295f2d47ce7c67f78b326a8a8c281ff5fca66",
-   "verification/truth/scaling/check.py": "cea1af075f002980a1528feb620149e04347c3be90846afd321f349c76115c58",
+   "verification/truth/scaling/check.py": "ef885ffc8ea324e15bae0281a893be69bfe6a0979819878f65123841873c8455",
    "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
   },
   "check_params": "8452372514c94344",
@@ -38,15 +38,15 @@
   "method": "trotter2"
  },
  "provenance": {
-  "commit": null,
-  "dirty": null,
-  "finished": "2026-10-29T13:27:23+00:00",
+  "commit": "f15d921491b600ed59c6b4b1b802295fc0d1b7ca",
+  "dirty": true,
+  "finished": "2026-10-29T15:10:32+00:00",
   "quick": false,
-  "seconds": 0.01,
+  "seconds": 0.02,
   "versions": {
    "graphix": "0.4.1",
-   "numpy": "2.5.3",
-   "python": "3.13.18",
+   "numpy": "2.5.4",
+   "python": "3.13.17",
    "qiskit": "2.5.0",
    "scipy": "1.18.1",
    "sympy": "1.14.0"
