@@ -23,7 +23,7 @@ dag/
 tools/dagtool/            CLI: validate, run, status, show, queue, review, repro, render, check
 experiments/hamsim/       the full report (run_all.py), plots, results/hamsim_results.json, figures/
 docs/                     write-ups and images
-.github/                  CI: verify (every push), review (by hand), repro (weekly), shared setup action
+.github/                  CI: verify (every push), papers (pull site theorems), review (by hand), repro (weekly), setup action
 tests/                    unit tests for the status rules and check logic
 ```
 
@@ -77,8 +77,28 @@ cd lean && lake build && cd ..                          # needs elan
 dagtool run --stale && dagtool status && dagtool check
 ```
 
-Other commands: `dagtool show <id>`, `dagtool queue`, `dagtool render`, `dagtool summary`, `dagtool repro`.
+Other commands: `dagtool show <id>`, `dagtool queue`, `dagtool render`, `dagtool summary`, `dagtool repro`,
+`dagtool pull-papers`, `dagtool export`, `dagtool push`.
 `python experiments/hamsim/run_all.py` prints the full Hamiltonian-simulation report.
+
+## Papers from the Thrust 2 review site
+
+The team's review site ([genesis-thrust2-review.fly.dev](https://genesis-thrust2-review.fly.dev), code in
+`doe-genesis-ai-quantum/thrusts/2-theorem-transfer/review-site`) splits each uploaded paper into modules. Every theorem
+module becomes a DAG theorem, and the site's **Theorem DAG** tab shows this DAG.
+
+- **In:** the `papers` workflow (every three hours, or Actions → **papers** → Run workflow) runs
+  `dagtool pull-papers`, which writes each open paper theorem as `dag/nodes/papers/<paper>/<id>.yaml` with a `paper:`
+  field and no checks, so it starts as `conjecture` (shown as *open*). It never overwrites a node file, so add
+  `depends_on` edges into the core and the `checks` that should run by editing that file. Then it runs `verify`.
+- **Out:** `verify` ends with `dagtool push` on main, which sends `dagtool export` (nodes, edges, computed status,
+  evidence summaries and a verdict per node) to the site.
+- **Verdict** (`tools/dagtool/verdict.py`): *rejected* if refuted or broken, *verified* if effective truth is at least
+  `empirical` (listing the check kinds that passed), otherwise *open*. `core_support` counts the definition, core and
+  transfer nodes a claim rests on.
+
+Setup: add the repository secret `MODULUS_DAG_TOKEN` with the same value as the site's Fly secret. Without it the push
+step is skipped. `MODULUS_URL` (repository variable) overrides the site address.
 
 ## How status works
 

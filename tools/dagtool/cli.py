@@ -12,6 +12,9 @@ dagtool — validate, run and inspect the theorem DAG.
     dagtool render [--out PATH]          the theorem browser (self-contained HTML)
     dagtool summary [--before F] [--ran F] [--browser-url U]   Markdown report for CI
     dagtool check                        CI gate: exit 1 on stale evidence, failures or bad edges
+    dagtool pull-papers [--server URL]   add open theorems from the review site as dag/nodes/papers/
+    dagtool export [--out PATH]          computed DAG as JSON (nodes, edges, status, verdicts)
+    dagtool push [--server URL]          export and send it to the review site ($MODULUS_DAG_TOKEN)
 
 Run from the repository root (or pass --root).
 """
@@ -202,6 +205,44 @@ def cmd_check(dag, args):
     return 1 if problems else 0
 
 
+def cmd_pull_papers(dag, args):
+    import urllib.error
+
+    from .papers import pull
+    try:
+        written = pull(dag, args.server, dry_run=args.dry_run)
+    except (urllib.error.URLError, OSError, ValueError) as e:
+        print(f"could not read open theorems from {args.server}: {e}", file=sys.stderr)
+        return 1
+    for p in written:
+        print(("would add " if args.dry_run else "added ") + p.relative_to(dag.root).as_posix())
+    print(f"{len(written)} new paper theorem(s)")
+    return 0
+
+
+def cmd_export(dag, args):
+    from .papers import export
+    text = json.dumps(export(dag, circuits=not args.no_circuits), ensure_ascii=False, default=str)
+    if args.out:
+        Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out}")
+    else:
+        print(text)
+    return 0
+
+
+def cmd_push(dag, args):
+    from .papers import push
+    try:
+        res = push(dag, args.server, circuits=not args.no_circuits)
+    except Exception as e:   # noqa: BLE001 - report and let CI decide whether this is fatal
+        print(f"push failed: {e}", file=sys.stderr)
+        return 1
+    print(f"pushed {res.get('nodes')} nodes, {res.get('edges')} edges for commit {res.get('commit') or '?'}")
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="dagtool", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--root", default=".", help="repository root (default: current directory)")
@@ -239,6 +280,16 @@ def main(argv=None) -> int:
     p = sub.add_parser("check")  # acknowledged warnings are information and pass
     p.add_argument("--allow-convention-warnings", action="store_true")
     p.add_argument("--before", help="`dagtool status --json` saved before the run; a node whose truth got weaker fails")
+    from .papers import DEFAULT_SERVER
+    p = sub.add_parser("pull-papers", help="add open theorems from the review site")
+    p.add_argument("--server", default=DEFAULT_SERVER)
+    p.add_argument("--dry-run", action="store_true")
+    p = sub.add_parser("export", help="computed DAG as JSON")
+    p.add_argument("--out")
+    p.add_argument("--no-circuits", action="store_true")
+    p = sub.add_parser("push", help="send the computed DAG to the review site")
+    p.add_argument("--server", default=DEFAULT_SERVER)
+    p.add_argument("--no-circuits", action="store_true")
     args = ap.parse_args(argv)
 
     root = Path(args.root).resolve()
@@ -248,7 +299,7 @@ def main(argv=None) -> int:
     except DagError as e:
         print(f"invalid DAG:\n{e}", file=sys.stderr)
         return 2
-    return globals()[f"cmd_{args.cmd}"](dag, args)
+    return globals()[f"cmd_{args.cmd.replace('-', '_')}"](dag, args)
 
 
 if __name__ == "__main__":
