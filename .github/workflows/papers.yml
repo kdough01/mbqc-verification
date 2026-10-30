@@ -1,0 +1,64 @@
+# Adds theorems from papers uploaded to the Thrust 2 review site as open DAG nodes, then verifies.
+# A paper uploaded to the site is split into modules; each theorem module becomes a theorem with a
+# stable id. This workflow writes the ones the DAG does not have yet to dag/nodes/papers/ (no checks,
+# so they start open), commits them, and runs the verify workflow, which pushes the result back.
+name: papers
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"    # every three hours
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: dag-${{ github.ref }}
+      cancel-in-progress: false
+    outputs:
+      added: ${{ steps.pull.outputs.added }}
+    env:
+      MODULUS_URL: ${{ vars.MODULUS_URL || 'https://genesis-thrust2-review.fly.dev' }}
+      MODULUS_DAG_TOKEN: ${{ secrets.MODULUS_DAG_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+        with:
+          packages: light
+          lean: "false"
+
+      - name: Pull open paper theorems
+        id: pull
+        run: |
+          dagtool pull-papers --server "$MODULUS_URL" | tee "$RUNNER_TEMP/pull.txt"
+          dagtool validate
+          git add -A dag/nodes/papers
+          if git diff --cached --quiet; then
+            echo "added=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          n=$(git diff --cached --name-only | wc -l)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Add $n paper theorem(s) from the review site [skip ci]"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+          echo "added=$n" >> "$GITHUB_OUTPUT"
+
+  verify:
+    needs: pull
+    if: needs.pull.outputs.added != '0'
+    uses: ./.github/workflows/verify.yml
+    with:
+      rerun: stale
+    secrets: inherit

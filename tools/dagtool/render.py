@@ -21,6 +21,7 @@ from verification.kinds import CHECK_KINDS
 from .evidence import git_commit, now_utc
 from .model import Dag
 from .status import compute, summary_counts
+from .verdict import verdict
 
 TEMPLATE = Path(__file__).with_name("browser.html")
 COL_W, ROW_H, NODE_W, NODE_H = 260, 46, 216, 34
@@ -154,6 +155,8 @@ def build_data(dag: Dag, circuits: bool = True) -> dict:
             "lean_decl": n.lean_decl, "code": n.code, "conventions": n.conventions.as_dict(),
             "assumptions": n.assumptions, "source": n.source, "tags": n.tags,
             "path": n.path.relative_to(dag.root).as_posix(), "x": x, "y": y, "col": c,
+            "paper": n.raw.get("paper"), "checks": [{"kind": ck.kind, "name": ck.name} for ck in n.checks],
+            "verdict": verdict(dag, i, st),
             "status": {
                 "truth": s.display_truth, "own_truth": s.own_truth, "domain": s.own_domain,
                 "faith": s.eff_faith, "own_faith": s.own_faith, "frontier": s.frontier,

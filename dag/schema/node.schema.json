@@ -196,6 +196,39 @@
         }
       }
     },
+    "paper": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "theorem_id"
+      ],
+      "description": "The review-site theorem this node was created from (dagtool pull-papers). Not hashed.",
+      "properties": {
+        "server": {
+          "type": "string"
+        },
+        "theorem_id": {
+          "type": "string",
+          "pattern": "^paper\\.[a-z0-9_]+\\.[a-z0-9_]+$"
+        },
+        "paper_id": {
+          "type": "string"
+        },
+        "module_id": {
+          "type": "string"
+        },
+        "paper_title": {
+          "type": "string"
+        },
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
     "tags": {
       "type": "array",
       "items": {
