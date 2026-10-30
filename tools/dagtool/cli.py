@@ -14,7 +14,6 @@ dagtool — validate, run and inspect the theorem DAG.
     dagtool check                        CI gate: exit 1 on stale evidence, failures or bad edges
     dagtool pull-papers [--server URL]   add open theorems from the review site as dag/nodes/papers/
     dagtool export [--out PATH]          computed DAG as JSON (nodes, edges, status, verdicts)
-    dagtool push [--server URL]          export and send it to the review site ($MODULUS_DAG_TOKEN)
 
 Run from the repository root (or pass --root).
 """
@@ -232,17 +231,6 @@ def cmd_export(dag, args):
     return 0
 
 
-def cmd_push(dag, args):
-    from .papers import push
-    try:
-        res = push(dag, args.server, circuits=not args.no_circuits)
-    except Exception as e:   # noqa: BLE001 - report and let CI decide whether this is fatal
-        print(f"push failed: {e}", file=sys.stderr)
-        return 1
-    print(f"pushed {res.get('nodes')} nodes, {res.get('edges')} edges for commit {res.get('commit') or '?'}")
-    return 0
-
-
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="dagtool", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--root", default=".", help="repository root (default: current directory)")
@@ -286,9 +274,6 @@ def main(argv=None) -> int:
     p.add_argument("--dry-run", action="store_true")
     p = sub.add_parser("export", help="computed DAG as JSON")
     p.add_argument("--out")
-    p.add_argument("--no-circuits", action="store_true")
-    p = sub.add_parser("push", help="send the computed DAG to the review site")
-    p.add_argument("--server", default=DEFAULT_SERVER)
     p.add_argument("--no-circuits", action="store_true")
     args = ap.parse_args(argv)
 

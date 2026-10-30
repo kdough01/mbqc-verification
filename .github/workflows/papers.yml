@@ -1,7 +1,8 @@
 # Adds theorems from papers uploaded to the Thrust 2 review site as open DAG nodes, then verifies.
 # A paper uploaded to the site is split into modules; each theorem module becomes a theorem with a
 # stable id. This workflow writes the ones the DAG does not have yet to dag/nodes/papers/ (no checks,
-# so they start open), commits them, and runs the verify workflow, which pushes the result back.
+# so they start open), commits them, and runs the verify workflow, which publishes dag.json on Pages
+# for the site to read. No secrets: the site's theorem list and this repository's Pages are public.
 name: papers
 
 on:
@@ -25,7 +26,6 @@ jobs:
       added: ${{ steps.pull.outputs.added }}
     env:
       MODULUS_URL: ${{ vars.MODULUS_URL || 'https://genesis-thrust2-review.fly.dev' }}
-      MODULUS_DAG_TOKEN: ${{ secrets.MODULUS_DAG_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:

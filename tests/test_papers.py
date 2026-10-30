@@ -129,8 +129,3 @@ def test_export_carries_verdict_paper_and_checks(repo):
     assert by_id["t.other"]["checks"] == [{"kind": "numerical", "name": "numerical"}]
     assert data["meta"]["format"] == "mbqc-dag-v1" and "branch" in data["meta"]
 
-
-def test_push_needs_a_token(repo, monkeypatch):
-    monkeypatch.delenv("MODULUS_DAG_TOKEN", raising=False)
-    with pytest.raises(RuntimeError, match="MODULUS_DAG_TOKEN"):
-        papers.push(load_dag(repo), SERVER, circuits=False)

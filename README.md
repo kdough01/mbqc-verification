@@ -78,7 +78,7 @@ dagtool run --stale && dagtool status && dagtool check
 ```
 
 Other commands: `dagtool show <id>`, `dagtool queue`, `dagtool render`, `dagtool summary`, `dagtool repro`,
-`dagtool pull-papers`, `dagtool export`, `dagtool push`.
+`dagtool pull-papers`, `dagtool export`.
 `python experiments/hamsim/run_all.py` prints the full Hamiltonian-simulation report.
 
 ## Papers from the Thrust 2 review site
@@ -91,14 +91,15 @@ module becomes a DAG theorem, and the site's **Theorem DAG** tab shows this DAG.
   `dagtool pull-papers`, which writes each open paper theorem as `dag/nodes/papers/<paper>/<id>.yaml` with a `paper:`
   field and no checks, so it starts as `conjecture` (shown as *open*). It never overwrites a node file, so add
   `depends_on` edges into the core and the `checks` that should run by editing that file. Then it runs `verify`.
-- **Out:** `verify` ends with `dagtool push` on main, which sends `dagtool export` (nodes, edges, computed status,
-  evidence summaries and a verdict per node) to the site.
+- **Out:** `verify` writes `dagtool export` (nodes, edges, computed status, evidence summaries and a verdict per
+  node) to `site/dag.json`; on main it is published with the browser at
+  `https://kdough01.github.io/mbqc-verification/dag.json`, and the site reads it from there.
 - **Verdict** (`tools/dagtool/verdict.py`): *rejected* if refuted or broken, *verified* if effective truth is at least
   `empirical` (listing the check kinds that passed), otherwise *open*. `core_support` counts the definition, core and
   transfer nodes a claim rests on.
 
-Setup: add the repository secret `MODULUS_DAG_TOKEN` with the same value as the site's Fly secret. Without it the push
-step is skipped. `MODULUS_URL` (repository variable) overrides the site address.
+No secrets: this repository and its Pages site are public, and so is the site's theorem list. Pages must be on
+(Settings → Pages → Source: **GitHub Actions**). `MODULUS_URL` (repository variable) overrides the site address.
 
 ## How status works
 

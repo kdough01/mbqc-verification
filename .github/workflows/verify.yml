@@ -36,11 +36,6 @@ jobs:
       cancel-in-progress: false
     env:
       BROWSER_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
-      # The Thrust 2 review site shows this DAG in its Theorem DAG tab. Set the repository secret
-      # MODULUS_DAG_TOKEN (and the same value as the site's Fly secret) to turn the push on;
-      # override the address with the repository variable MODULUS_URL.
-      MODULUS_URL: ${{ vars.MODULUS_URL || 'https://genesis-thrust2-review.fly.dev' }}
-      HAS_DAG_TOKEN: ${{ secrets.MODULUS_DAG_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -89,13 +84,10 @@ jobs:
         if: always()
         run: dagtool render --out site/index.html
 
-      - name: Push the DAG to the review site
-        # main only; a site that is down or asleep never fails the run
-        if: always() && github.ref == 'refs/heads/main' && env.HAS_DAG_TOKEN == 'true'
-        continue-on-error: true
-        env:
-          MODULUS_DAG_TOKEN: ${{ secrets.MODULUS_DAG_TOKEN }}
-        run: dagtool push --server "$MODULUS_URL" || echo "::warning::Could not push the DAG to $MODULUS_URL"
+      - name: Export the DAG for the review site
+        # Published next to the browser as dag.json; the Thrust 2 review site reads it from GitHub Pages.
+        if: always()
+        run: dagtool export --out site/dag.json
 
       - name: Write the run summary
         if: always()

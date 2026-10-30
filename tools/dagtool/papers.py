@@ -3,16 +3,13 @@ papers.py — the link to the Thrust 2 review site (Modulus, genesis-thrust2-rev
 
     dagtool pull-papers --server URL   add every open paper theorem as dag/nodes/papers/<paper>/<id>.yaml
     dagtool export [--out FILE]        the computed DAG as JSON: what the site's Theorem DAG tab shows
-    dagtool push --server URL          export and POST it to URL/api/dag
 
 When a paper is uploaded to the site it is split into modules; every theorem module becomes a theorem
 with a stable id (paper.<paper id>.<title slug>). `pull-papers` adds the ones this DAG does not have yet
 as nodes with no checks, so they start as `conjecture` (shown as *open*). A person or agent then adds
-`depends_on` edges into the core and the checks that should run; CI computes the status, and `push`
-sends it back. Existing node files are never overwritten, so edits made here are kept.
-
-The token (MODULUS_DAG_TOKEN) is read from the environment only; it is sent as a bearer token and
-never printed.
+`depends_on` edges into the core and the checks that should run; CI computes the status and publishes
+`export` as dag.json on GitHub Pages, which the site reads. Existing node files are never overwritten,
+so edits made here are kept. Neither direction needs a secret.
 """
 
 from __future__ import annotations
@@ -21,7 +18,6 @@ import json
 import os
 import re
 import subprocess
-import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -33,17 +29,8 @@ DEFAULT_SERVER = "https://genesis-thrust2-review.fly.dev"
 STATEMENT_LIMIT = 6000
 
 
-def _token() -> str:
-    return os.environ.get("MODULUS_DAG_TOKEN", "").strip()
-
-
-def _request(url: str, data: bytes | None = None, timeout: float = 60) -> bytes:
-    headers = {"Accept": "application/json", "User-Agent": "dagtool"}
-    if data is not None:
-        headers["Content-Type"] = "application/json"
-    if _token():
-        headers["Authorization"] = f"Bearer {_token()}"
-    req = urllib.request.Request(url, data=data, headers=headers, method="POST" if data is not None else "GET")
+def _request(url: str, timeout: float = 60) -> bytes:
+    req = urllib.request.Request(url, headers={"Accept": "application/json", "User-Agent": "dagtool"})
     with urllib.request.urlopen(req, timeout=timeout) as resp:   # noqa: S310 (https URL given by the operator)
         return resp.read()
 
@@ -134,14 +121,3 @@ def export(dag: Dag, circuits: bool = True) -> dict:
     meta["branch"] = os.environ.get("GITHUB_REF_NAME") or _git(dag.root, "rev-parse", "--abbrev-ref", "HEAD")
     meta["format"] = "mbqc-dag-v1"
     return data
-
-
-def push(dag: Dag, server: str, circuits: bool = True) -> dict:
-    if not _token():
-        raise RuntimeError("MODULUS_DAG_TOKEN is not set")
-    body = json.dumps(export(dag, circuits=circuits), ensure_ascii=False, default=str).encode("utf-8")
-    try:
-        return json.loads(_request(server.rstrip("/") + "/api/dag", data=body, timeout=120))
-    except urllib.error.HTTPError as e:
-        detail = e.read().decode("utf-8", "replace")[:500]
-        raise RuntimeError(f"{e.code} from {server}: {detail}") from None
