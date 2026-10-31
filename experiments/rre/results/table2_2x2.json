@@ -1,0 +1,82 @@
+{
+ "lattice": "2x2",
+ "rel_tol": 0.01,
+ "quantities": {
+  "n_logical": {
+   "paper": 36.0,
+   "ours": 87.0,
+   "ratio": 2.4167,
+   "match": false,
+   "reading": "Parameter 2, \u00f1_logical"
+  },
+  "bus_patches": {
+   "paper": 280.0,
+   "ours": 348.0,
+   "ratio": 1.2429,
+   "match": false,
+   "reading": "memory + auxiliary bus patches over all modules (our reading)"
+  },
+  "t_patches": {
+   "paper": 4050.0,
+   "ours": 3975.0,
+   "ratio": 0.9815,
+   "match": false,
+   "reading": "T-transfer bus + T-factory patches per module (our reading)"
+  },
+  "phys_qubits": {
+   "paper": 1320000.0,
+   "ours": 1659600.0,
+   "ratio": 1.2573,
+   "match": false,
+   "reading": "Parameter 35"
+  },
+  "modules": {
+   "paper": 2.0,
+   "ours": 2.0,
+   "ratio": 1.0,
+   "match": true,
+   "reading": "Parameter 12"
+  },
+  "time_s": {
+   "paper": 4.09,
+   "ours": 0.8528479999999999,
+   "ratio": 0.2085,
+   "match": false,
+   "reading": "Parameter 47-48, total wall time"
+  },
+  "p4k_w": {
+   "paper": 840.0,
+   "ours": 840.0,
+   "ratio": 1.0,
+   "match": true,
+   "reading": "Parameter 40 (RRE reports kW)"
+  },
+  "p20mk_w": {
+   "paper": 1.68e-07,
+   "ours": 1.68e-07,
+   "ratio": 1.0,
+   "match": true,
+   "reading": "Parameter 41 (RRE's column is in W despite its name)"
+  },
+  "energy_wh": {
+   "paper": 668.0,
+   "ours": 139.3221968888889,
+   "ratio": 0.2086,
+   "match": false,
+   "reading": "Parameter 49 energy (RRE reports kWh)"
+  }
+ },
+ "matched": [
+  "modules",
+  "p20mk_w",
+  "p4k_w"
+ ],
+ "not_matched": [
+  "bus_patches",
+  "energy_wh",
+  "n_logical",
+  "phys_qubits",
+  "t_patches",
+  "time_s"
+ ]
+}

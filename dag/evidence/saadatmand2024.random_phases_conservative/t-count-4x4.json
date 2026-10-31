@@ -1,0 +1,66 @@
+{
+ "input_hash": "de9b2fa268720bf4",
+ "inputs": {
+  "check_code": {
+   "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
+  },
+  "check_params": "29ed8a1c9a728837",
+  "code": {
+   "experiments/rre/phases.py": "c403b263c1f838839f960cf950783e80df7674653e99853b7af1b8a5aba13c7a",
+   "experiments/rre/results/phases.json": "a871f4e0796db8b5268d6965bda1630cdc90aa8139c18b18c7d7022189fd4199"
+  },
+  "definitions": {
+   "def.fermi_hubbard_square": "99b6bd7d9917ffdd"
+  },
+  "parents": {
+   "def.fermi_hubbard_square": "99b6bd7d9917ffdd:4f53cda1"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "c049be05bc43f4e8"
+ },
+ "kind": "reproduction",
+ "name": "t-count-4x4",
+ "node": "saadatmand2024.random_phases_conservative",
+ "params": {
+  "domain": "FH 4x4, pyLIQTR 1.3.3 estimate_resources",
+  "expect": {
+   "path": "instances.4x4.optimization.T"
+  },
+  "op": "ge",
+  "path": "instances.4x4.random.T",
+  "results": "experiments/rre/results/phases.json"
+ },
+ "provenance": {
+  "commit": "1b64d17ff7f53878d9ed4db619578f2f3f409001",
+  "dirty": true,
+  "finished": "2026-10-31T21:35:25+00:00",
+  "quick": false,
+  "seconds": 1.62,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "FH 4x4, pyLIQTR 1.3.3 estimate_resources",
+  "evidence": {
+   "expect": 355211.0,
+   "expect_from": "experiments/rre/results/phases.json:instances.4x4.optimization.T",
+   "op": "ge",
+   "path": "instances.4x4.random.T",
+   "provenance": null,
+   "rel_tol": null,
+   "results": "experiments/rre/results/phases.json",
+   "value": 353410.0
+  },
+  "frontier": [],
+  "grants": "refuted",
+  "outcome": "fail",
+  "seed": null,
+  "summary": "not reproduced: instances.4x4.random.T = 353410 vs 355211 (experiments/rre/results/phases.json:instances.4x4.optimization.T): <"
+ }
+}

@@ -13,3 +13,6 @@ dag/build/
 
 # Lean build output
 lean/.lake/
+
+# experiments/rre build environment (environment.sh)
+.rre/

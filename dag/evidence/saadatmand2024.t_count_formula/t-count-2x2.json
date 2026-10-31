@@ -1,0 +1,65 @@
+{
+ "input_hash": "d904010649b2a2f9",
+ "inputs": {
+  "check_code": {
+   "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
+  },
+  "check_params": "521c1da8f968ef25",
+  "code": {
+   "experiments/rre/rederive.py": "c17ba9ccaaab9989ac7726ac2f813daba68af0440ac7bb1423611267660a760a",
+   "experiments/rre/results/rederive_2x2.json": "ec4f185cd095c3aa9141460d85f1e5646ba3b6c37229e6b19f2b13d029d71ca3",
+   "experiments/rre/results/rederive_4x4.json": "5339106778f42fc412d5f6e0966df2760a7094626d6ff71e235167aff5c894f8"
+  },
+  "definitions": {},
+  "parents": {
+   "saadatmand2024.config": "d800ae63e2cdfdc0:e10808d4"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "1a458689f12734d3"
+ },
+ "kind": "reproduction",
+ "name": "t-count-2x2",
+ "node": "saadatmand2024.t_count_formula",
+ "params": {
+  "domain": "FH 2x2, RRE outputs",
+  "expect": {
+   "path": "quantities.t_count.reported"
+  },
+  "op": "eq",
+  "path": "quantities.t_count.rederived",
+  "results": "experiments/rre/results/rederive_2x2.json"
+ },
+ "provenance": {
+  "commit": "1b64d17ff7f53878d9ed4db619578f2f3f409001",
+  "dirty": true,
+  "finished": "2026-10-31T21:35:27+00:00",
+  "quick": false,
+  "seconds": 1.62,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "FH 2x2, RRE outputs",
+  "evidence": {
+   "expect": 21536.0,
+   "expect_from": "experiments/rre/results/rederive_2x2.json:quantities.t_count.reported",
+   "op": "eq",
+   "path": "quantities.t_count.rederived",
+   "provenance": null,
+   "rel_tol": null,
+   "results": "experiments/rre/results/rederive_2x2.json",
+   "value": 21536.0
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "reproduced: quantities.t_count.rederived = 21536 vs 21536 (experiments/rre/results/rederive_2x2.json:quantities.t_count.reported): equal"
+ }
+}

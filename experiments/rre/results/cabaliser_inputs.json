@@ -1,0 +1,68 @@
+{
+ "circuits": "RRE test_unitariness_verif_cabaliser_qft3toffoli3 (paper Appendix C)",
+ "table_mode": "actual",
+ "rz_angles": [
+  0.303
+ ],
+ "inputs": 11,
+ "worst_fidelity": 1.0,
+ "all_pass": true,
+ "failures": [],
+ "rows": [
+  {
+   "kind": "basis",
+   "input": "|000\u27e9",
+   "fidelity": 1.0
+  },
+  {
+   "kind": "basis",
+   "input": "|001\u27e9",
+   "fidelity": 1.0
+  },
+  {
+   "kind": "basis",
+   "input": "|010\u27e9",
+   "fidelity": 1.0
+  },
+  {
+   "kind": "basis",
+   "input": "|011\u27e9",
+   "fidelity": 1.0
+  },
+  {
+   "kind": "basis",
+   "input": "|100\u27e9",
+   "fidelity": 1.0
+  },
+  {
+   "kind": "basis",
+   "input": "|101\u27e9",
+   "fidelity": 1.0
+  },
+  {
+   "kind": "basis",
+   "input": "|110\u27e9",
+   "fidelity": 1.0
+  },
+  {
+   "kind": "basis",
+   "input": "|111\u27e9",
+   "fidelity": 1.0
+  },
+  {
+   "kind": "haar",
+   "input": "random #0",
+   "fidelity": 1.0
+  },
+  {
+   "kind": "haar",
+   "input": "random #1",
+   "fidelity": 1.0
+  },
+  {
+   "kind": "haar",
+   "input": "random #2",
+   "fidelity": 1.0
+  }
+ ]
+}

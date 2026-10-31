@@ -1,0 +1,60 @@
+{
+ "input_hash": "8609039abe73bdd2",
+ "inputs": {
+  "check_code": {
+   "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
+  },
+  "check_params": "59c86ff6b901137a",
+  "code": {
+   "experiments/rre/cabaliser_inputs.py": "367acfc7303d3d06628dd4e8aaf8a5d03dd4a3ab4ec731040478d12bb112c057",
+   "experiments/rre/results/cabaliser_inputs_rre_test_table.json": "151ff0d98db3395bd594944f24176bd4a8471915c95814de3487008987331415"
+  },
+  "definitions": {},
+  "parents": {},
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "3cf1f92e2c780e1a"
+ },
+ "kind": "reproduction",
+ "name": "published-table-random-inputs",
+ "node": "saadatmand2024.appendix_c_test_general",
+ "params": {
+  "domain": "the published test's gate table, 8 basis + 3 random inputs",
+  "expect": 0.999999999,
+  "op": "ge",
+  "path": "worst_fidelity",
+  "results": "experiments/rre/results/cabaliser_inputs_rre_test_table.json"
+ },
+ "provenance": {
+  "commit": "1b64d17ff7f53878d9ed4db619578f2f3f409001",
+  "dirty": true,
+  "finished": "2026-10-31T21:34:27+00:00",
+  "quick": false,
+  "seconds": 1.98,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "the published test's gate table, 8 basis + 3 random inputs",
+  "evidence": {
+   "expect": 0.999999999,
+   "expect_from": "the claim",
+   "op": "ge",
+   "path": "worst_fidelity",
+   "provenance": null,
+   "rel_tol": null,
+   "results": "experiments/rre/results/cabaliser_inputs_rre_test_table.json",
+   "value": 0.012995659824
+  },
+  "frontier": [],
+  "grants": "refuted",
+  "outcome": "fail",
+  "seed": null,
+  "summary": "not reproduced: worst_fidelity = 0.0129957 vs 1 (the claim): <"
+ }
+}

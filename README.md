@@ -14,7 +14,7 @@ src/mbqc_verify/          the objects: circuits, QSP angles, circuit -> MBQC com
 lean/                     Lean 4 project (core Lean, no Mathlib): definitions, proofs, assumption axioms
 verification/             the checks, sorted by the question each answers
   faithfulness/           does the statement mean what we intend?   vocabulary, differential, mutation, nonvacuity, review
-  truth/                  is it true?   lean, symbolic, translation, numerical, scaling, refuter, literature
+  truth/                  is it true?   lean, symbolic, translation, numerical, scaling, refuter, literature, reproduction
   graph/                  properties of the DAG: conventions, Lean-extracted edges, propagation, staleness, repro
 dag/
   nodes/<area>/<id>.yaml  one claim per file, hand-written (schema: dag/schema/node.schema.json)
@@ -22,8 +22,9 @@ dag/
   evidence/<id>/*.json    written by checks, committed
 tools/dagtool/            CLI: validate, run, status, show, queue, review, repro, render, check
 experiments/hamsim/       the full report (run_all.py), plots, results/hamsim_results.json, figures/
+experiments/rre/          reproduction of Saadatmand et al. (arXiv:2406.06015) with their pinned pipeline
 docs/                     write-ups and images
-.github/                  CI: verify (every push), papers (pull + formalize site theorems), review, repro (weekly), setup
+.github/                  CI: verify (every push), papers (pull + formalize site theorems), reproduce (manual), review, repro (weekly), setup
 tests/                    unit tests for the status rules and check logic
 ```
 
@@ -110,6 +111,17 @@ module becomes a DAG theorem, and the site's **Theorem DAG** tab shows this DAG.
 
 No secrets: this repository and its Pages site are public, and so is the site's theorem list. Pages must be on
 (Settings → Pages → Source: **GitHub Actions**). `MODULUS_URL` (repository variable) overrides the site address.
+
+## Reproducing published results
+
+Numerical claims from papers (resource counts, runtimes) are checked by re-running the authors' own pipeline,
+pinned, outside `dagtool run`, and committing the results with provenance. A `reproduction` check reads one
+recorded value and compares it with the claim (`approx` within `rel_tol`, or `eq`/`ge`/`le`); agreement grants
+`empirical` on the stated domain, disagreement refutes the node there, and a results file that does not exist
+yet is a skip. The first case is the Fermi–Hubbard rows of Table II of Saadatmand et al. (arXiv:2406.06015v3):
+see [experiments/rre/README.md](experiments/rre/README.md) for the protocol, the findings and how to run the
+larger lattices on a bigger machine, and `dag/nodes/reproductions/saadatmand2024/` for the nodes. The
+`reproduce` workflow (manual) rebuilds the environment, reruns the small lattices and commits the results.
 
 ## How status works
 

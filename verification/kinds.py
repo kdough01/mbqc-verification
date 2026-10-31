@@ -54,6 +54,8 @@ CHECK_KINDS: dict[str, KindMeta] = {
                              "Counterexample search; finds one (refuted) or records what was searched"),
     "literature":   KindMeta("truth", "assumed", "truth/literature",
                              "Imported result: citation, exact form, convention map"),
+    "reproduction": KindMeta("truth", "empirical", "truth/reproduction",
+                             "A recorded run of a pinned pipeline agrees with the claimed value"),
 }
 
 # Other check folders whose code a kind's verdict also depends on (hashed into its evidence).

@@ -1,0 +1,64 @@
+{
+ "input_hash": "15348271943ffa07",
+ "inputs": {
+  "check_code": {
+   "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
+  },
+  "check_params": "7f3b27159ad83221",
+  "code": {
+   "experiments/rre/rederive.py": "c17ba9ccaaab9989ac7726ac2f813daba68af0440ac7bb1423611267660a760a",
+   "experiments/rre/results/rederive_2x2.json": "ec4f185cd095c3aa9141460d85f1e5646ba3b6c37229e6b19f2b13d029d71ca3",
+   "experiments/rre/results/rederive_4x4.json": "5339106778f42fc412d5f6e0966df2760a7094626d6ff71e235167aff5c894f8"
+  },
+  "definitions": {},
+  "parents": {},
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "9a8f334848bbf641"
+ },
+ "kind": "reproduction",
+ "name": "modules-times-param14-2x2",
+ "node": "saadatmand2024.physical_qubit_accounting",
+ "params": {
+  "domain": "FH 2x2, RRE outputs",
+  "expect": {
+   "path": "quantities.param35_equals_modules_times_param14.reported"
+  },
+  "op": "approx",
+  "path": "quantities.param35_equals_modules_times_param14.rederived",
+  "rel_tol": 0.001,
+  "results": "experiments/rre/results/rederive_2x2.json"
+ },
+ "provenance": {
+  "commit": "1b64d17ff7f53878d9ed4db619578f2f3f409001",
+  "dirty": true,
+  "finished": "2026-10-31T21:35:20+00:00",
+  "quick": false,
+  "seconds": 1.62,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "FH 2x2, RRE outputs",
+  "evidence": {
+   "expect": 1659600.0,
+   "expect_from": "experiments/rre/results/rederive_2x2.json:quantities.param35_equals_modules_times_param14.reported",
+   "op": "approx",
+   "path": "quantities.param35_equals_modules_times_param14.rederived",
+   "provenance": null,
+   "rel_tol": 0.001,
+   "results": "experiments/rre/results/rederive_2x2.json",
+   "value": 1293600.0
+  },
+  "frontier": [],
+  "grants": "refuted",
+  "outcome": "fail",
+  "seed": null,
+  "summary": "not reproduced: quantities.param35_equals_modules_times_param14.rederived = 1.2936e+06 vs 1.6596e+06 (experiments/rre/results/rederive_2x2.json:quantities.param35_equals_modules_times_param14.reported): off by -22.1%"
+ }
+}

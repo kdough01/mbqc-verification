@@ -1,0 +1,25 @@
+id: saadatmand2024.config
+kind: assumption
+title: The paper's architecture configuration
+statement: Physical error rate p = 1e-3; per-cycle logical error p_C = κ (p/p_th)^((d+1)/2) with κ = 0.009, p_th
+  = 0.016 (MWPM fit); mixed-fallback gate synthesis L_ε = ⌈0.57 log2(1/ε) + 8.83⌉; 1,000,000 physical qubits per
+  module; inter-module handover and decoder timescales 1 µs; the T-factory lookup of Table I; ε_qsp = 0.025.
+description: 'experiments/rre/config_paper_v3.yaml. Not stated in the paper: the characteristic gate time t (200
+  ns used, RRE''s default), the reading of the failure budget in Eq. (27) (0.95 used), the widgetization settings
+  and ancilla allocation. experiments/rre/results/sensitivity.json shows how much each moves the results.'
+code:
+- experiments/rre/config_paper_v3.yaml
+source:
+  citation: 'S. N. Saadatmand et al., Superconducting qubits in the millions: the potential and limitations of modularity,
+    arXiv:2406.06015v3'
+  url: https://arxiv.org/abs/2406.06015v3
+  exact_form: §II.3–II.4.7, Eqs. (1)–(22), Table I, Appendix A (Parameters 16, 27–29), Appendix D (κ = 0.009, p_th
+    = 0.016), §III.2.3 Eq. (27)
+  convention_map: 'RRE params.yaml keys: error_scaling_coeffs.k/p_th, phys_gate_error_rate, 1q_unitary_decomp_method=mixed_fallback,
+    ftqc.inter_handover_timescale_sec, decoder_char_timescale_sec, ftqc.processor.num_qubits, distill_widget_table
+    (Table I footprints W×L, Q, C, p_out).'
+checks:
+- kind: literature
+tags:
+- config
+- saadatmand2024

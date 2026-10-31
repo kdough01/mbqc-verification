@@ -1,0 +1,45 @@
+id: saadatmand2024.physical_qubit_accounting
+kind: lemma
+title: Appendix A's two physical-qubit totals agree
+statement: The total allocated physical qubits (Parameter 35) equals the number of modules times the allocated physical
+  qubits per module (Parameter 14).
+description: Parameter 14 prices each T-factory at its own qubit count Q (Table I); Parameter 35 prices it at its
+  footprint in 2d² patches, ⌈L_length/(√2d)⌉⌈L_width/(√2d)⌉. For FH 2×2 that is 1.29M against RRE's reported 1.66M;
+  the paper's Table II prints 1.32M.
+code:
+- experiments/rre/rederive.py
+- experiments/rre/results/rederive_2x2.json
+- experiments/rre/results/rederive_4x4.json
+source:
+  citation: 'S. N. Saadatmand et al., Superconducting qubits in the millions: the potential and limitations of modularity,
+    arXiv:2406.06015v3'
+  url: https://arxiv.org/abs/2406.06015v3
+  exact_form: Appendix A, Parameters 14 and 35
+checks:
+- kind: reproduction
+  name: modules-times-param14-2x2
+  params:
+    results: experiments/rre/results/rederive_2x2.json
+    path: quantities.param35_equals_modules_times_param14.rederived
+    expect:
+      path: quantities.param35_equals_modules_times_param14.reported
+    op: approx
+    rel_tol: 0.001
+    domain: FH 2x2, RRE outputs
+- kind: reproduction
+  name: modules-times-param14-4x4
+  params:
+    results: experiments/rre/results/rederive_4x4.json
+    path: quantities.param35_equals_modules_times_param14.rederived
+    expect:
+      path: quantities.param35_equals_modules_times_param14.reported
+    op: approx
+    rel_tol: 0.001
+    domain: FH 4x4, RRE outputs
+acknowledged:
+- code: refuted
+  reason: Recorded inconsistency between Parameters 14 and 35 (factory accounting). Kept to show which formula Table
+    II follows is unresolved.
+tags:
+- accounting
+- saadatmand2024

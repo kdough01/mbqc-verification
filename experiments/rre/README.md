@@ -1,0 +1,146 @@
+# Reproducing Saadatmand et al. (arXiv:2406.06015v3): Fermi–Hubbard
+
+*Superconducting qubits in the millions: the potential and limitations of modularity* estimates the resources
+for QSP Hamiltonian simulation on a modular superconducting FTQC architecture, compiled to graph states
+(MBQC) with Rigetti's resource estimator (RRE) and Cabaliser. This folder re-runs their Fermi–Hubbard rows of
+Table II **with their own public pipeline and their stated configuration**, and records in the DAG what
+agrees, what does not, and what we found while checking. It is the template for verifying other numerical
+claims: a pinned pipeline writes results with provenance, and `reproduction` checks in the DAG compare them
+with the claim.
+
+## Protocol
+
+1. **Reproduce.** Pin the code the paper used (RRE 0.26.33 at `9383b4d`, Cabaliser at its submodule commit,
+   pyLIQTR 1.3.3), transcribe the paper's configuration (`config_paper_v3.yaml`) and table
+   (`paper_v3_table2.yaml`, with the printed text kept), and run the instances. Anything the paper does not
+   state is written down as an assumption, and `sensitivity.py` measures how much it matters.
+2. **Re-derive.** Recompute the reported quantities from RRE's intermediate outputs with the formulas in the
+   paper's Appendix A (`rederive.py`), so a mismatch can be placed in the formulas or in the compiled circuit.
+3. **Test beyond the paper's tests.** The paper's correctness check (Appendix C) simulates compiled graph states
+   from one input. `cabaliser_inputs.py` checks every basis input and random inputs.
+4. **Check the claims in the text** (here: that random QSP phases give a conservative estimate, `phases.py`).
+5. **Record.** Each quantity is a `reproduction` check on a DAG node (`dag/nodes/reproductions/saadatmand2024/`).
+   Agreement grants `empirical` on the stated domain; disagreement refutes the node on that domain, which for
+   a reported number means "not reproduced by this pipeline and configuration". Expected refutations carry an
+   `acknowledged:` reason, so CI stays green while the finding stays visible.
+
+The pipeline: pyLIQTR builds the QSVT circuit for `FermiHubbard(shape=(N, N), J=-1, U=2)` (pyLIQTR's sign
+convention; the paper's J = 1) with the FermiHubbardSquare block encoding, t = 1 and ε_qsp = 0.025 using random
+phases (as the paper did) → RRE's CirqWidgetizer (≤ 10,000 gates, ≤ 100 qubits per widget) → transpile → Cabaliser
+graph states and Pauli tracking → RRE's substrate scheduler and FT resource model.
+
+## Running the small instances
+
+```bash
+bash experiments/rre/environment.sh            # once: builds .rre/ (git-ignored), runs RRE's own tests
+source .rre/venv/bin/activate
+bash experiments/rre/run.sh                    # 2x2 and 4x4 plus the side studies -> results/
+dagtool run --stale && dagtool check           # in the verifier's own environment
+```
+
+Needs Linux x86-64 with AVX2, gcc/make, git, [uv](https://docs.astral.sh/uv/) and Rust (installed from
+conda-forge if missing). `CABALISER_SAMPLES` sets the number of random inputs (default 20; each takes seconds).
+On GitHub, the **reproduce** workflow (Actions → reproduce → Run workflow) does the same and commits the
+results, then runs the verifier.
+
+## What reproduces (2x2 and 4x4)
+
+| Table II column | 2x2 paper | 2x2 ours | 4x4 paper | 4x4 ours |
+|---|---|---|---|---|
+| ñ_logical (bus width) | 36 | 87 | 74 | 159 |
+| logical bus patches | 280 | 348 | 332 | 636 |
+| T patches | 4.05k | 3,975 | 3.32k | 2,576 |
+| allocated physical qubits | 1.32M | 1.66M | 1.21M | 1.67M |
+| modules | 2 | **2** | 2 | **2** |
+| hardware time | 4.09 s | 0.85 s | 35.1 s | 9.39 s |
+| P_diss,4K | 840 W | **840 W** | 840 W | **840 W** |
+| P_diss,20mK | 168 nW | **168 nW** | 168 nW | **168 nW** |
+| energy | 668 Wh | 139 Wh | 5.73 kWh | 1.53 kWh |
+
+Bold: within 1%. The power columns and the module count reproduce. The compiled register is about twice the
+paper's width, and the time and energy about a quarter; everything downstream of the register differs with it.
+Whether the paper's numbers came from different widgetization, ancilla reuse or a later RRE is not stated:
+reusing ancillas (`--qubit-manager greedy`) brings ñ from 87 to 76 at 2x2, and no widget size we tried
+reaches 36. Asking the authors for their run configuration (the paper offers data on request) is the
+quickest way to close this.
+
+## Findings beyond the table
+
+* **Random phases are not conservative here.** §III.3 says random QSP phases give "a conservative
+  overestimate". With pyLIQTR 1.3.3 the random mode uses the cosine sequence's phase count for the sine sequence
+  too (23/23 instead of 23/24 at 2x2), so it builds a slightly *smaller* circuit: 62,170 T against 63,575 with
+  optimized phases at 2x2, 353,410 against 355,211 at 4x4 (`results/phases.json`). Small, but the stated
+  direction does not hold.
+* **The Appendix C test cannot see wrong rotations.** RRE's published unitarity test (the paper's Appendix C
+  protocol) maps the arbitrary-rotation tag to T and uses Cabaliser's `local_simulator.Tdag = S @ T`, which is
+  T³ rather than T†. Both are diagonal, so from |000⟩ the test passes; on random inputs the same table gives
+  fidelity 0.013–0.24. With the circuit's real angle and the correct T†, the compiled graphs are right on every
+  input (fidelity 1.0 on 8 basis and random inputs). So the compiled graphs pass, and the test needs inputs
+  beyond |0…0⟩ (and the angles recorded) to mean anything. Worth reporting upstream.
+* **Two physical-qubit totals in Appendix A disagree.** Parameter 35 prices each T-factory by its footprint in
+  2d² patches; Parameter 14 prices it by its own qubit count Q from Table I. RRE reports Parameter 35
+  (1.66M at 2x2); modules × Parameter 14 is 1.29M, close to the paper's 1.32M. Which one Table II used is open.
+* **The other Appendix A formulas match RRE**, including the gate-synthesis T-count
+  (L_ε = 24, N_T = 356·24 + 12,992 = 21,536 at 2x2).
+
+## Configuration reconstruction (assumptions)
+
+| Setting | Used | Why |
+|---|---|---|
+| error model κ, p_th | 0.009, 0.016 | Appendix D fit; RRE's default params.yaml has 0.3, 0.0143 |
+| T-factory table | the paper's Table I | RRE's table differs in dimensions (and one p_out: 2.7e-11 vs 2.7e-12) |
+| failure budget, Eq. (27) | target_p_algo = 0.95 | ambiguous; 0.05 raises d from 10 to 14 and runtime by 47% at 2x2 |
+| gate time t | 200 ns | not stated; RRE default (50 ns cuts runtime by 10%) |
+| widgetization, ancilla allocation | ≤10k gates, ≤100 qubits, fresh ancillas | not stated; RRE defaults |
+| P_diss,20mK units | RRE's `power_dissip_mxc_kW` read as W | the column holds watts despite its name (168e-9 = 168 nW) |
+
+RRE's substrate scheduler is slightly nondeterministic (about 0.1% in runtime between runs), so comparisons
+use a 1% tolerance.
+
+## Larger instances (for the bigger machine; not run here)
+
+Table II also lists 8x8, 16x16 and 20x20 (and 50x50, 100x100). Their DAG nodes exist
+(`saadatmand2024.fh.8x8` etc.); their checks **skip** until the results files are committed. To run them:
+
+```bash
+git clone https://github.com/kdough01/mbqc-verification && cd mbqc-verification
+git checkout -b rre-large
+bash experiments/rre/environment.sh /scratch/rre          # any DIR; Linux x86-64 with AVX2
+source /scratch/rre/venv/bin/activate
+export RRE_COMMIT=9383b4d
+# one lattice at a time; each writes fh_NxN.json, table2_NxN.json, rederive_NxN.json under results/
+/usr/bin/time -v bash experiments/rre/run.sh --only 8
+/usr/bin/time -v bash experiments/rre/run.sh --only 16
+/usr/bin/time -v bash experiments/rre/run.sh --only 20
+git add experiments/rre/results && git commit -m "RRE: Fermi–Hubbard 8x8–20x20 results" && git push -u origin rre-large
+```
+
+Pushing the branch runs the verifier, which picks up the new results files (they are listed under each node's
+`code:`), runs the checks and commits the evidence. Notes:
+
+* Start with 8x8 and look at the time and peak memory from `/usr/bin/time -v` before the larger ones. We have
+  not measured them: 2x2 and 4x4 take about a second of pipeline time each, but the Hamiltonian's term count
+  grows as N² and the number of QSP phases with α (23 phases at 2x2, 99 at 4x4), so the circuit, the number of
+  widgets and RRE's scheduling all grow quickly.
+* Run lattices in separate processes (as above) so memory is released between them. Use `--set key=value`
+  on `fh.py` for the sensitivity variants, and `fh.py --qubit-manager greedy` for ancilla reuse.
+* `provenance.seconds` and `provenance.machine` in each `fh_NxN.json` record what the run took and where.
+* Alternatively register the machine as a GitHub self-hosted runner and start the **reproduce** workflow with
+  `runner` set to its label and `sizes` to `8 16 20`.
+* 50x50 and 100x100 are in `paper_v3_table2.yaml` for completeness; there are no nodes for them yet.
+
+## Files
+
+| File | What it does |
+|---|---|
+| `environment.sh`, `requirements-rre.txt` | pinned environment (RRE, Cabaliser, pyLIQTR 1.3.3, Python 3.11) |
+| `config_paper_v3.yaml` | the paper's configuration as an overlay on RRE's params.yaml |
+| `paper_v3_table2.yaml` | Table II, Fermi–Hubbard rows, as printed |
+| `fh.py` | builds the instance and runs RRE; writes every output plus provenance |
+| `compare.py` | maps RRE's outputs onto Table II's columns and compares |
+| `rederive.py` | recomputes Appendix A parameters from RRE's intermediate outputs |
+| `phases.py` | random vs optimized QSP phases |
+| `cabaliser_inputs.py` | compiled graph states vs the circuit unitary on basis and random inputs |
+| `sensitivity.py` | one unstated setting at a time |
+| `run.sh` | runs all of the above for a set of lattices |
+| `results/` | the committed results the DAG checks read |

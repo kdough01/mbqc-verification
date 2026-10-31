@@ -1,0 +1,39 @@
+id: saadatmand2024.t_count_formula
+kind: lemma
+title: T-count from gate synthesis (Parameter 17)
+statement: 'N_T = n_Rz · ⌈0.57 log2(1/ε) + 8.83⌉ + n_T: the T-count is the input T gates plus the synthesized length
+  of every arbitrary-angle Rz at diamond-norm precision ε.'
+code:
+- experiments/rre/rederive.py
+- experiments/rre/results/rederive_2x2.json
+- experiments/rre/results/rederive_4x4.json
+depends_on:
+- node: saadatmand2024.config
+  kind: assumes
+source:
+  citation: 'S. N. Saadatmand et al., Superconducting qubits in the millions: the potential and limitations of modularity,
+    arXiv:2406.06015v3'
+  url: https://arxiv.org/abs/2406.06015v3
+  exact_form: Appendix A, Parameters 16–17
+checks:
+- kind: reproduction
+  name: t-count-2x2
+  params:
+    results: experiments/rre/results/rederive_2x2.json
+    path: quantities.t_count.rederived
+    expect:
+      path: quantities.t_count.reported
+    op: eq
+    domain: FH 2x2, RRE outputs
+- kind: reproduction
+  name: t-count-4x4
+  params:
+    results: experiments/rre/results/rederive_4x4.json
+    path: quantities.t_count.rederived
+    expect:
+      path: quantities.t_count.reported
+    op: eq
+    domain: FH 4x4, RRE outputs
+tags:
+- synthesis
+- saadatmand2024

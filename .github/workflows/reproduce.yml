@@ -1,0 +1,93 @@
+# Re-runs the Saadatmand et al. reproduction (experiments/rre) with the paper's pinned pipeline, commits the
+# results, then runs the verifier so the `reproduction` checks re-evaluate. Manual only: the build takes a while
+# and the results change only when the pipeline or the configuration does.
+#
+# Small lattices run on GitHub's runners. For the larger ones, register the bigger machine as a self-hosted
+# runner and pass its label as `runner` (see experiments/rre/README.md, "Larger instances").
+name: reproduce
+
+on:
+  workflow_dispatch:
+    inputs:
+      sizes:
+        description: "Lattice sizes N (N x N), space separated"
+        default: "2 4"
+      extras:
+        description: "Also rerun the side studies (phases, sensitivity, Cabaliser inputs; small lattices)"
+        type: boolean
+        default: true
+      runner:
+        description: "Runner label (ubuntu-latest, or a self-hosted label for 8 and above)"
+        default: ubuntu-latest
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  reproduce:
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 360
+    concurrency:
+      group: dag-${{ github.ref }}
+      cancel-in-progress: false
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Cache the RRE environment
+        uses: actions/cache@v4
+        with:
+          path: .rre
+          key: rre-${{ runner.os }}-${{ hashFiles('experiments/rre/environment.sh', 'experiments/rre/requirements-rre.txt') }}
+
+      - name: Build the environment (RRE 0.26.33, Cabaliser, pyLIQTR 1.3.3)
+        env:
+          RUSTFLAGS: --cap-lints=warn
+        run: bash experiments/rre/environment.sh .rre
+
+      - name: Run
+        env:
+          SIZES: ${{ inputs.sizes }}
+          EXTRAS: ${{ inputs.extras }}
+          PYTHON: ${{ github.workspace }}/.rre/venv/bin/python
+          RRE_COMMIT: 9383b4d
+        run: |
+          if [ "$EXTRAS" = true ]; then bash experiments/rre/run.sh $SIZES; else bash experiments/rre/run.sh --only $SIZES; fi
+          {
+            echo "### Fermi–Hubbard reproduction ($SIZES)"
+            for n in $SIZES; do
+              f="experiments/rre/results/table2_${n}x${n}.json"
+              python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(f\"- {d['lattice']}: matched {', '.join(d['matched']) or 'none'}; not matched {', '.join(d['not_matched']) or 'none'}\")" "$f"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit the results
+        id: commit
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          git add experiments/rre/results
+          if git diff --cached --quiet; then echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Reproduce Saadatmand et al. Fermi–Hubbard (${{ inputs.sizes }}) [skip ci]"
+          remote="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git pull --rebase "$remote" "$GITHUB_REF_NAME"
+          git push "$remote" "HEAD:$GITHUB_REF_NAME"
+
+  verify:
+    needs: reproduce
+    if: needs.reproduce.outputs.changed == 'true'
+    uses: ./.github/workflows/verify.yml
+    with:
+      rerun: stale

@@ -1,0 +1,94 @@
+{
+ "lattice": "4x4",
+ "L_eps": 26,
+ "quantities": {
+  "t_count": {
+   "rederived": 175928,
+   "reported": 175928,
+   "formula": "Param 17: n_Rz\u00b7\u2308c0 log2(1/\u03b5)+c1\u2309 + n_T",
+   "match": true
+  },
+  "memory_logical_qubits_per_module": {
+   "rederived": 159,
+   "reported": 159,
+   "formula": "Param 4",
+   "match": true
+  },
+  "memory_physical_qubits_per_module": {
+   "rederived": 45792,
+   "reported": 45792,
+   "formula": "Param 5",
+   "match": true
+  },
+  "ancilla_physical_qubits_per_module": {
+   "rederived": 45792,
+   "reported": 45792,
+   "formula": "Param 7",
+   "match": true
+  },
+  "t_buffer_physical_qubits_per_module": {
+   "rederived": 211968,
+   "reported": 211968,
+   "formula": "Param 9",
+   "match": true
+  },
+  "t_distillery_physical_qubits_per_module": {
+   "rederived": 346400,
+   "reported": 346400,
+   "formula": "Param 11",
+   "match": true
+  },
+  "num_alloc_physical_qubits_per_module": {
+   "rederived": 649952,
+   "reported": 649952,
+   "formula": "Param 14",
+   "match": true
+  },
+  "total_allocated_physical_qubits": {
+   "rederived": 1666944,
+   "reported": 1666944,
+   "formula": "Param 35",
+   "match": true
+  },
+  "param35_equals_modules_times_param14": {
+   "rederived": 1299904,
+   "reported": 1666944,
+   "formula": "consistency: modules \u00d7 Param 14 = Param 35",
+   "match": false
+  },
+  "avail_logical_qubits_per_module": {
+   "rederived": 3364,
+   "reported": 3364,
+   "formula": "Param 31",
+   "match": true
+  },
+  "total_avail_physical_qubits": {
+   "rederived": 2000000,
+   "reported": 2000000,
+   "formula": "Param 30",
+   "match": true
+  },
+  "quantum_tock": {
+   "rederived": 1.9200000000000003e-05,
+   "reported": 1.9200000000000003e-05,
+   "formula": "Param 28: 8 d t",
+   "match": true
+  },
+  "t_state_tock": {
+   "rederived": 0.00020800000000000001,
+   "reported": 0.000208,
+   "formula": "Param 29: 8 C t",
+   "match": true
+  },
+  "decoder_tock": {
+   "rederived": 1.2e-05,
+   "reported": 1.2e-05,
+   "formula": "Param 27: d t_decoder",
+   "match": true
+  }
+ },
+ "all_match": false,
+ "mismatches": [
+  "param35_equals_modules_times_param14"
+ ]
+}

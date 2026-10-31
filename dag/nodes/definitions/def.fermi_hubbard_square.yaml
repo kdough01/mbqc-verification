@@ -1,0 +1,14 @@
+id: def.fermi_hubbard_square
+kind: definition
+title: Fermi–Hubbard model on an N×N square lattice
+statement: H = −J Σ_{⟨j,k⟩,σ} (c†_{jσ} c_{kσ} + h.c.) + U Σ_j n_{j↑} n_{j↓} on an N×N square lattice (nearest neighbours,
+  open boundaries as in pyLIQTR's SquareLattice), with J = 1, U = 2 and evolution time t = 1 (Eq. 25 of arXiv:2406.06015v3
+  with J′ = h_z = μ = 0).
+description: 'Instances are built with pyLIQTR 1.3.3 FermiHubbard(shape=(N, N), J=-1.0, U=2.0): pyLIQTR writes the
+  hopping term as +J Σ c†c, so its J = -1 is the paper''s J = 1.'
+code:
+- experiments/rre/fh.py
+tags:
+- fermi-hubbard
+- model
+- saadatmand2024

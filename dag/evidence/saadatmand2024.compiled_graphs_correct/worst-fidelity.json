@@ -1,0 +1,60 @@
+{
+ "input_hash": "c98e7ed403861cb5",
+ "inputs": {
+  "check_code": {
+   "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
+  },
+  "check_params": "6773c5c08db72b09",
+  "code": {
+   "experiments/rre/cabaliser_inputs.py": "367acfc7303d3d06628dd4e8aaf8a5d03dd4a3ab4ec731040478d12bb112c057",
+   "experiments/rre/results/cabaliser_inputs.json": "00e52d47eba49681dc6cf0e8a817603a159725e6ba87b12ff90d9b722d251537"
+  },
+  "definitions": {},
+  "parents": {},
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "4e668bd9da3987e0"
+ },
+ "kind": "reproduction",
+ "name": "worst-fidelity",
+ "node": "saadatmand2024.compiled_graphs_correct",
+ "params": {
+  "domain": "Appendix C circuits (QFT3/Toffoli-style, 2 widgets), 8 basis + 3 random inputs, post-selected branch",
+  "expect": 0.999999999,
+  "op": "ge",
+  "path": "worst_fidelity",
+  "results": "experiments/rre/results/cabaliser_inputs.json"
+ },
+ "provenance": {
+  "commit": "1b64d17ff7f53878d9ed4db619578f2f3f409001",
+  "dirty": true,
+  "finished": "2026-10-31T21:34:28+00:00",
+  "quick": false,
+  "seconds": 1.61,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "Appendix C circuits (QFT3/Toffoli-style, 2 widgets), 8 basis + 3 random inputs, post-selected branch",
+  "evidence": {
+   "expect": 0.999999999,
+   "expect_from": "the claim",
+   "op": "ge",
+   "path": "worst_fidelity",
+   "provenance": null,
+   "rel_tol": null,
+   "results": "experiments/rre/results/cabaliser_inputs.json",
+   "value": 1.0
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "reproduced: worst_fidelity = 1 vs 1 (the claim): \u2265"
+ }
+}

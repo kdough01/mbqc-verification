@@ -1,0 +1,120 @@
+id: saadatmand2024.fh.20x20
+kind: theorem
+title: 'Fermi–Hubbard 20×20: Table II resources'
+statement: 'QSP Hamiltonian simulation of the 20×20 Fermi–Hubbard model (t = 1, ε_qsp = 0.025) on the paper''s modular
+  superconducting architecture needs: ñ_logical 878; logical bus patches 3.52k; T patches 1.4k; allocated physical
+  qubits 4.96M; modules 6; hardware time 37.8 h; P_diss,4K 2.52 kW; P_diss,20mK 504 nW; energy 66.7 MWh (Table II
+  of arXiv:2406.06015v3).'
+description: Too large for CI; run on the larger machine (experiments/rre/README.md, 'Larger instances'). Until
+  then its checks skip.
+code:
+- experiments/rre/fh.py
+- experiments/rre/compare.py
+- experiments/rre/paper_v3_table2.yaml
+- experiments/rre/config_paper_v3.yaml
+depends_on:
+- node: def.fermi_hubbard_square
+  kind: uses
+- node: saadatmand2024.config
+  kind: assumes
+source:
+  citation: 'S. N. Saadatmand et al., Superconducting qubits in the millions: the potential and limitations of modularity,
+    arXiv:2406.06015v3'
+  url: https://arxiv.org/abs/2406.06015v3
+  exact_form: Table II, Fermi Hubbard row 20x20
+checks:
+- kind: reproduction
+  name: reproduction-n-logical
+  params:
+    results: experiments/rre/results/table2_20x20.json
+    path: quantities.n_logical.ours
+    expect:
+      path: quantities.n_logical.paper
+    op: approx
+    rel_tol: 0.01
+    domain: FH 20x20, RRE 0.26.33 @ 9383b4d, pyLIQTR 1.3.3, config_paper_v3.yaml, default widgetization
+- kind: reproduction
+  name: reproduction-bus-patches
+  params:
+    results: experiments/rre/results/table2_20x20.json
+    path: quantities.bus_patches.ours
+    expect:
+      path: quantities.bus_patches.paper
+    op: approx
+    rel_tol: 0.01
+    domain: FH 20x20, RRE 0.26.33 @ 9383b4d, pyLIQTR 1.3.3, config_paper_v3.yaml, default widgetization
+- kind: reproduction
+  name: reproduction-t-patches
+  params:
+    results: experiments/rre/results/table2_20x20.json
+    path: quantities.t_patches.ours
+    expect:
+      path: quantities.t_patches.paper
+    op: approx
+    rel_tol: 0.01
+    domain: FH 20x20, RRE 0.26.33 @ 9383b4d, pyLIQTR 1.3.3, config_paper_v3.yaml, default widgetization
+- kind: reproduction
+  name: reproduction-phys-qubits
+  params:
+    results: experiments/rre/results/table2_20x20.json
+    path: quantities.phys_qubits.ours
+    expect:
+      path: quantities.phys_qubits.paper
+    op: approx
+    rel_tol: 0.01
+    domain: FH 20x20, RRE 0.26.33 @ 9383b4d, pyLIQTR 1.3.3, config_paper_v3.yaml, default widgetization
+- kind: reproduction
+  name: reproduction-modules
+  params:
+    results: experiments/rre/results/table2_20x20.json
+    path: quantities.modules.ours
+    expect:
+      path: quantities.modules.paper
+    op: approx
+    rel_tol: 0.01
+    domain: FH 20x20, RRE 0.26.33 @ 9383b4d, pyLIQTR 1.3.3, config_paper_v3.yaml, default widgetization
+- kind: reproduction
+  name: reproduction-time-s
+  params:
+    results: experiments/rre/results/table2_20x20.json
+    path: quantities.time_s.ours
+    expect:
+      path: quantities.time_s.paper
+    op: approx
+    rel_tol: 0.01
+    domain: FH 20x20, RRE 0.26.33 @ 9383b4d, pyLIQTR 1.3.3, config_paper_v3.yaml, default widgetization
+- kind: reproduction
+  name: reproduction-p4k-w
+  params:
+    results: experiments/rre/results/table2_20x20.json
+    path: quantities.p4k_w.ours
+    expect:
+      path: quantities.p4k_w.paper
+    op: approx
+    rel_tol: 0.01
+    domain: FH 20x20, RRE 0.26.33 @ 9383b4d, pyLIQTR 1.3.3, config_paper_v3.yaml, default widgetization
+- kind: reproduction
+  name: reproduction-p20mk-w
+  params:
+    results: experiments/rre/results/table2_20x20.json
+    path: quantities.p20mk_w.ours
+    expect:
+      path: quantities.p20mk_w.paper
+    op: approx
+    rel_tol: 0.01
+    domain: FH 20x20, RRE 0.26.33 @ 9383b4d, pyLIQTR 1.3.3, config_paper_v3.yaml, default widgetization
+- kind: reproduction
+  name: reproduction-energy-wh
+  params:
+    results: experiments/rre/results/table2_20x20.json
+    path: quantities.energy_wh.ours
+    expect:
+      path: quantities.energy_wh.paper
+    op: approx
+    rel_tol: 0.01
+    domain: FH 20x20, RRE 0.26.33 @ 9383b4d, pyLIQTR 1.3.3, config_paper_v3.yaml, default widgetization
+tags:
+- fermi-hubbard
+- table-ii
+- saadatmand2024
+- reproduction

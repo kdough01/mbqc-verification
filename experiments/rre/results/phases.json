@@ -1,0 +1,49 @@
+{
+ "claim": "random phases give a conservative overestimate (\u00a7III.3)",
+ "instances": {
+  "2x2": {
+   "random": {
+    "num_phases": [
+     23,
+     23
+    ],
+    "logical_qubits": 20,
+    "T": 62170,
+    "Clifford": 140135
+   },
+   "optimization": {
+    "num_phases": [
+     23,
+     24
+    ],
+    "logical_qubits": 20,
+    "T": 63575,
+    "Clifford": 143296
+   },
+   "random_minus_optimized_T": -1405,
+   "random_is_conservative": false
+  },
+  "4x4": {
+   "random": {
+    "num_phases": [
+     99,
+     99
+    ],
+    "logical_qubits": 48,
+    "T": 353410,
+    "Clifford": 927815
+   },
+   "optimization": {
+    "num_phases": [
+     99,
+     100
+    ],
+    "logical_qubits": 48,
+    "T": 355211,
+    "Clifford": 932542
+   },
+   "random_minus_optimized_T": -1801,
+   "random_is_conservative": false
+  }
+ }
+}

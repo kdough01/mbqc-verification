@@ -1,0 +1,35 @@
+# The paper's configuration (Saadatmand et al., arXiv:2406.06015v3), as an overlay on RRE's default params.yaml
+# (RRE commit 9383b4d). Every value cites where it comes from. Values the paper does not state are marked
+# NOT STATED and keep RRE's default; experiments/rre/README.md records how each one was settled.
+
+phys_gate_error_rate: 0.001                 # §II.4.7: p = 1e-3
+
+error_scaling_coeffs:                        # Eq. (1) with the MWPM fit of Appendix D / Fig. 16
+  k: 0.009                                   # RRE default 0.3
+  p_th: 0.016                                # RRE default 0.0142857
+
+1q_unitary_decomp_method: mixed_fallback     # Parameter 16: c0 = 0.57, c1 = 8.83 (RRE default)
+decoder_char_timescale_sec: 1.0e-6           # Parameter 27: t_decoder = 1 µs (RRE default)
+
+# Eq. (27) sets 1 − 2ε_qsp = p_algo-fail = 0.95, while Algorithm 1 uses p_algo-fail as the failure budget,
+# J = log(1/(1 − p_algo-fail)). The two readings give 0.95 or 0.05; README.md: "Failure budget".
+target_p_algo: 0.95
+
+ftqc:
+  inter_handover_timescale_sec: 1.0e-6       # §II.3: t_inter = 1 µs (RRE default)
+  qcycle_char_timescale_ns: 200              # NOT STATED (characteristic gate time t of Eq. 19); RRE params.yaml
+                                             # has 200, RRE's demo notebook says 50. README.md: "Gate time".
+  processor:
+    num_qubits: 1000000                      # §II.4.7: n_phys = 1,000,000 per module (RRE default)
+
+# Table I of the paper. RRE's default table has different footprints (and one different p_out) for the same
+# factories; README.md: "T-factory table". p_out is blank in the paper for two rows: RRE's values are kept there.
+distill_widget_table:
+  widgets:
+    - {name: 15to1_17_7_7, qubits: 4620, cycles: 42.6, p_out: 4.5e-8, cond_20to4: false, width: 64, length: 72}
+    - {name: 15to1u6_15_5_5_cross_20to4_23_11_13, qubits: 43300, cycles: 130, p_out: 1.4e-10, cond_20to4: true, width: 387, length: 155}
+    - {name: 15to1u4_13_5_5_cross_20to4_27_13_15, qubits: 46800, cycles: 157, p_out: 2.6e-11, cond_20to4: true, width: 382, length: 142}
+    - {name: 15to1u6_11_5_5_cross_15to1_25_11_11, qubits: 30700, cycles: 82.5, p_out: 2.7e-12, cond_20to4: false, width: 279, length: 117}
+    - {name: 15to1u6_13_5_5_cross_15to1_29_11_13, qubits: 39100, cycles: 97.5, p_out: 3.3e-14, cond_20to4: false, width: 292, length: 138}
+    - {name: 15to1u6_17_7_7_cross_15to1_41_17_17, qubits: 73400, cycles: 128, p_out: 4.5e-20, cond_20to4: false, width: 426, length: 181}
+    - {name: 15to1u8_23_9_9_cross_15to1_49_19_21, qubits: 133842, cycles: 157.5, p_out: 9.0e-23, cond_20to4: false, width: 696, length: 234}

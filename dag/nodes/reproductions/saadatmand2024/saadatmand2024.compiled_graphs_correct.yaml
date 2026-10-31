@@ -1,0 +1,28 @@
+id: saadatmand2024.compiled_graphs_correct
+kind: lemma
+title: Compiled graph states implement their widgets
+statement: For the paper's Appendix C test circuits, the graph states, schedules and measurement bases that RRE
+  + Cabaliser produce implement the widgets' unitary on every input (post-selected branch).
+description: 'experiments/rre/cabaliser_inputs.py: all 8 basis states and random Haar states, compared with the
+  circuit''s unitary, using the circuit''s own Rz angle and the correct T†. The paper''s protocol checks only |000⟩.'
+code:
+- experiments/rre/cabaliser_inputs.py
+- experiments/rre/results/cabaliser_inputs.json
+source:
+  citation: 'S. N. Saadatmand et al., Superconducting qubits in the millions: the potential and limitations of modularity,
+    arXiv:2406.06015v3'
+  url: https://arxiv.org/abs/2406.06015v3
+  exact_form: Appendix C
+checks:
+- kind: reproduction
+  name: worst-fidelity
+  params:
+    results: experiments/rre/results/cabaliser_inputs.json
+    path: worst_fidelity
+    expect: 0.999999999
+    op: ge
+    domain: Appendix C circuits (QFT3/Toffoli-style, 2 widgets), 8 basis + 3 random inputs, post-selected branch
+tags:
+- cabaliser
+- compilation
+- saadatmand2024

@@ -1,0 +1,34 @@
+id: saadatmand2024.appendix_c_test_general
+kind: lemma
+title: The published Appendix C test checks general inputs
+statement: RRE's published unitarity test (tests/verify_n_validate/test_unitary_verif_cabaliser.py, the paper's
+  Appendix C protocol) would detect a compiled graph that implements the wrong unitary.
+description: Its reference table maps the arbitrary-rotation tag (77) to T and uses Cabaliser's local_simulator
+  Tdag = S @ T, which is T^3, not T†. Both are diagonal, so from |000⟩ the test still passes; on random inputs the
+  same table gives fidelity as low as 0.013 (results/cabaliser_inputs_rre_test_table.json), while the compiled graphs
+  are in fact correct (saadatmand2024.compiled_graphs_correct).
+code:
+- experiments/rre/cabaliser_inputs.py
+- experiments/rre/results/cabaliser_inputs_rre_test_table.json
+source:
+  citation: 'S. N. Saadatmand et al., Superconducting qubits in the millions: the potential and limitations of modularity,
+    arXiv:2406.06015v3'
+  url: https://arxiv.org/abs/2406.06015v3
+  exact_form: Appendix C; RRE tests/verify_n_validate/test_unitary_verif_cabaliser.py
+checks:
+- kind: reproduction
+  name: published-table-random-inputs
+  params:
+    results: experiments/rre/results/cabaliser_inputs_rre_test_table.json
+    path: worst_fidelity
+    expect: 0.999999999
+    op: ge
+    domain: the published test's gate table, 8 basis + 3 random inputs
+acknowledged:
+- code: refuted
+  reason: 'Expected: the published reference table is wrong for non-zero inputs (rotation angle not recorded; Tdag
+    = S @ T). Reported to keep the limitation visible.'
+tags:
+- cabaliser
+- verification
+- saadatmand2024
