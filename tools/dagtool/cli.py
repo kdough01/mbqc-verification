@@ -14,6 +14,8 @@ dagtool — validate, run and inspect the theorem DAG.
     dagtool check                        CI gate: exit 1 on stale evidence, failures or bad edges
     dagtool pull-papers [--server URL]   add open theorems from the review site as dag/nodes/papers/
     dagtool export [--out PATH]          computed DAG as JSON (nodes, edges, status, verdicts)
+    dagtool formalize --list|--run --out DIR|--apply DIR    agent formalization of paper theorems
+    dagtool lean-check FILE              compile one agent Lean file (scan first, no secrets in env)
 
 Run from the repository root (or pass --root).
 """
@@ -231,6 +233,48 @@ def cmd_export(dag, args):
     return 0
 
 
+def cmd_formalize(dag, args):
+    from . import formalize as fz
+    todo = fz.pending(dag, only=set(args.node or []) or None)
+    if args.list or args.count:
+        print(len(todo) if args.count else "\n".join(n.id for n in todo) or "nothing pending")
+        return 0
+    if args.apply:
+        rows = fz.apply(dag.root, Path(args.apply), run_checks=not args.no_checks)
+        if args.report:
+            Path(args.report).write_text(json.dumps(rows, indent=1) + "\n", encoding="utf-8")
+        print(f"{sum(r['outcome'] == 'formalized' for r in rows)} formalized, {len(rows)} attempted")
+        return 0
+    if not args.run or not args.out:
+        print("use --list, --run --out DIR, or --apply DIR", file=sys.stderr)
+        return 2
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    for i, node in enumerate(todo[: args.max]):
+        print(f"[{i + 1}/{min(len(todo), args.max)}] {node.id} ...", flush=True)
+        try:
+            res = fz.run_agent(dag, node, out, budget=args.budget, model=args.model, timeout=args.timeout)
+        except RuntimeError as e:
+            print(f"cannot run the agent: {e}", file=sys.stderr)
+            return 1
+        got = sorted(p.name for p in (out / node.id).iterdir() if p.name != "result.json")
+        print(f"   exit {res.get('exit_code')}, {res.get('seconds')}s, cost {res.get('cost_usd')}, wrote {got or 'nothing'}")
+        if i == 0 and not got and res.get("exit_code") not in (0, None):
+            # nothing written and the CLI failed: a setup problem (credentials, CLI), not this theorem
+            import shutil
+            shutil.rmtree(out / node.id, ignore_errors=True)
+            print("the agent failed before writing anything; not marking any node:\n" + str(res.get("log"))[-2000:], file=sys.stderr)
+            return 1
+    return 0
+
+
+def cmd_lean_check(dag, args):
+    from .formalize import lean_check
+    ok, out = lean_check(dag.root, args.file)
+    print(out)
+    return 0 if ok else 1
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="dagtool", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--root", default=".", help="repository root (default: current directory)")
@@ -275,6 +319,21 @@ def main(argv=None) -> int:
     p = sub.add_parser("export", help="computed DAG as JSON")
     p.add_argument("--out")
     p.add_argument("--no-circuits", action="store_true")
+    p = sub.add_parser("formalize", help="agent formalization of open paper theorems")
+    p.add_argument("--list", action="store_true")
+    p.add_argument("--count", action="store_true")
+    p.add_argument("--run", action="store_true", help="run the agent; its output goes to --out only")
+    p.add_argument("--out")
+    p.add_argument("--apply", help="check and apply agent output from this folder")
+    p.add_argument("--report")
+    p.add_argument("--no-checks", action="store_true", help="with --apply: do not run the node's checks")
+    p.add_argument("--node", action="append")
+    p.add_argument("--max", type=int, default=3)
+    p.add_argument("--budget", type=float, default=5.0, help="USD cap per theorem")
+    p.add_argument("--model")
+    p.add_argument("--timeout", type=int, default=1500, help="seconds per theorem")
+    p = sub.add_parser("lean-check", help="compile one agent Lean file")
+    p.add_argument("file")
     args = ap.parse_args(argv)
 
     root = Path(args.root).resolve()

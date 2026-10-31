@@ -23,7 +23,7 @@ dag/
 tools/dagtool/            CLI: validate, run, status, show, queue, review, repro, render, check
 experiments/hamsim/       the full report (run_all.py), plots, results/hamsim_results.json, figures/
 docs/                     write-ups and images
-.github/                  CI: verify (every push), papers (pull site theorems), review (by hand), repro (weekly), setup action
+.github/                  CI: verify (every push), papers (pull + formalize site theorems), review, repro (weekly), setup
 tests/                    unit tests for the status rules and check logic
 ```
 
@@ -78,7 +78,7 @@ dagtool run --stale && dagtool status && dagtool check
 ```
 
 Other commands: `dagtool show <id>`, `dagtool queue`, `dagtool render`, `dagtool summary`, `dagtool repro`,
-`dagtool pull-papers`, `dagtool export`.
+`dagtool pull-papers`, `dagtool export`, `dagtool formalize`, `dagtool lean-check`.
 `python experiments/hamsim/run_all.py` prints the full Hamiltonian-simulation report.
 
 ## Papers from the Thrust 2 review site
@@ -87,10 +87,20 @@ The team's review site ([genesis-thrust2-review.fly.dev](https://genesis-thrust2
 `doe-genesis-ai-quantum/thrusts/2-theorem-transfer/review-site`) splits each uploaded paper into modules. Every theorem
 module becomes a DAG theorem, and the site's **Theorem DAG** tab shows this DAG.
 
-- **In:** the `papers` workflow (every three hours, or Actions → **papers** → Run workflow) runs
+- **In:** the `papers` workflow (every 15 minutes, or Actions → **papers** → Run workflow) runs
   `dagtool pull-papers`, which writes each open paper theorem as `dag/nodes/papers/<paper>/<id>.yaml` with a `paper:`
-  field and no checks, so it starts as `conjecture` (shown as *open*). It never overwrites a node file, so add
-  `depends_on` edges into the core and the `checks` that should run by editing that file. Then it runs `verify`.
+  field and no checks, so it starts as `conjecture` (shown as *open*). It never overwrites a node file.
+- **Automatic formalization** (`dagtool formalize`, same workflow): an agent (Claude Code) writes each new theorem's Lean
+  statement, a proof from the core results, and a non-vacuity witness, and proposes its `depends_on` edges. It runs
+  with read-only access and no shell beyond `dagtool lean-check`; its output leaves the job as an artifact. A second job
+  with no model checks that output (no axioms, `sorry`, IO or metaprogramming; statement untouched), adds it to the
+  node, and runs the node's `lean`, `vocabulary` and `nonvacuity` checks. Anything that fails is rolled back and tagged
+  `formalize-failed`; honest non-results are tagged `unproved`, `not-formalizable` or `counterexample-suspected`, with
+  the agent's reason in the node's notes. Tagged nodes are not retried; remove the tag to retry. Formalizations go
+  straight to the branch; the statement's faithfulness stays below human-reviewed until someone approves it.
+  Setup: a repository secret `CLAUDE_CODE_OAUTH_TOKEN` (`claude setup-token`, uses your Claude plan) or
+  `ANTHROPIC_API_KEY`; optional variables `FORMALIZE_MAX` (theorems per run, 3), `FORMALIZE_BUDGET` (USD per theorem, 5)
+  and `FORMALIZE_MODEL`. Without a secret, theorems are still pulled and stay open.
 - **Out:** `verify` writes `dagtool export` (nodes, edges, computed status, evidence summaries and a verdict per
   node) to `site/dag.json`; on main it is published with the browser at
   `https://kdough01.github.io/mbqc-verification/dag.json`, and the site reads it from there.

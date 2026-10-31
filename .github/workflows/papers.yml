@@ -1,14 +1,29 @@
-# Adds theorems from papers uploaded to the Thrust 2 review site as open DAG nodes, then verifies.
-# A paper uploaded to the site is split into modules; each theorem module becomes a theorem with a
-# stable id. This workflow writes the ones the DAG does not have yet to dag/nodes/papers/ (no checks,
-# so they start open), commits them, and runs the verify workflow, which publishes dag.json on Pages
-# for the site to read. No secrets: the site's theorem list and this repository's Pages are public.
+# Theorems from papers uploaded to the Thrust 2 review site, verified automatically.
+#
+#   pull       every 15 minutes: add new paper theorems as open nodes (dagtool pull-papers)
+#   formalize  an agent writes each one's Lean statement, proof and witness (dagtool formalize --run).
+#              Read-only access, no git credentials; its only shell command is `dagtool lean-check`.
+#              Its output leaves the job as an artifact, nothing else.
+#   apply      ordinary code checks that output, adds it to the node and runs the node's checks
+#              (dagtool formalize --apply); anything that fails is rolled back and marked
+#              formalize-failed, so it is not retried. Commits to the branch.
+#   verify     the usual verify run, which publishes dag.json for the site.
+#
+# The agent needs one repository secret: CLAUDE_CODE_OAUTH_TOKEN (from `claude setup-token`, uses a
+# Claude subscription) or ANTHROPIC_API_KEY (billed per use). Without it, theorems are still pulled
+# and stay open. Repository variables: MODULUS_URL (site address), FORMALIZE_MAX (theorems per run,
+# default 3), FORMALIZE_BUDGET (USD cap per theorem, default 5), FORMALIZE_MODEL (optional).
 name: papers
 
 on:
   schedule:
-    - cron: "17 */3 * * *"    # every three hours
+    - cron: "*/15 * * * *"
   workflow_dispatch:
+
+# one run at a time, so two runs never formalize the same theorem
+concurrency:
+  group: papers-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -24,6 +39,8 @@ jobs:
       cancel-in-progress: false
     outputs:
       added: ${{ steps.pull.outputs.added }}
+      pending: ${{ steps.pending.outputs.pending }}
+      agent: ${{ steps.pending.outputs.agent }}
     env:
       MODULUS_URL: ${{ vars.MODULUS_URL || 'https://genesis-thrust2-review.fly.dev' }}
     steps:
@@ -40,7 +57,7 @@ jobs:
       - name: Pull open paper theorems
         id: pull
         run: |
-          dagtool pull-papers --server "$MODULUS_URL" | tee "$RUNNER_TEMP/pull.txt"
+          dagtool pull-papers --server "$MODULUS_URL"
           dagtool validate
           git add -A dag/nodes/papers
           if git diff --cached --quiet; then
@@ -55,10 +72,104 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
           echo "added=$n" >> "$GITHUB_OUTPUT"
 
-  verify:
+      - name: Count theorems waiting for a formalization
+        id: pending
+        env:
+          HAS_AGENT: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' || secrets.ANTHROPIC_API_KEY != '' }}
+        run: |
+          echo "pending=$(dagtool formalize --count)" >> "$GITHUB_OUTPUT"
+          echo "agent=$HAS_AGENT" >> "$GITHUB_OUTPUT"
+          if [ "$HAS_AGENT" != true ]; then
+            echo "::notice::No CLAUDE_CODE_OAUTH_TOKEN or ANTHROPIC_API_KEY secret: paper theorems stay open."
+          fi
+
+  formalize:
     needs: pull
-    if: needs.pull.outputs.added != '0'
+    if: needs.pull.outputs.pending != '0' && needs.pull.outputs.agent == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Let the agent formalize
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FORMALIZE_MAX: ${{ vars.FORMALIZE_MAX || '3' }}
+          FORMALIZE_BUDGET: ${{ vars.FORMALIZE_BUDGET || '5' }}
+          FORMALIZE_MODEL: ${{ vars.FORMALIZE_MODEL }}
+        run: |
+          args=(--run --out "$RUNNER_TEMP/formalized" --max "$FORMALIZE_MAX" --budget "$FORMALIZE_BUDGET")
+          if [ -n "$FORMALIZE_MODEL" ]; then args+=(--model "$FORMALIZE_MODEL"); fi
+          dagtool formalize "${args[@]}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: formalized
+          path: ${{ runner.temp }}/formalized
+          if-no-files-found: error
+
+  apply:
+    needs: formalize
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency:
+      group: dag-${{ github.ref }}
+      cancel-in-progress: false
+    outputs:
+      changed: ${{ steps.apply.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: false   # the agent's Lean is compiled here; no token on disk while it builds
+
+      - uses: ./.github/actions/setup
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: formalized
+          path: ${{ runner.temp }}/formalized
+
+      - name: Check and apply the agent's output
+        id: apply
+        run: |
+          dagtool formalize --apply "$RUNNER_TEMP/formalized" --report "$RUNNER_TEMP/applied.json"
+          echo "### Automatic formalization" >> "$GITHUB_STEP_SUMMARY"
+          python -c "import json,sys; [print(f\"- \`{r['node']}\`: **{r['outcome']}** {r.get('reason','')}\") for r in json.load(open(sys.argv[1]))]" "$RUNNER_TEMP/applied.json" >> "$GITHUB_STEP_SUMMARY"
+          git add -A dag/nodes/papers dag/evidence lean/MBQC.lean lean/MBQC/Papers
+          if git diff --cached --quiet; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Commit
+        if: steps.apply.outputs.changed == 'true'
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Formalize paper theorems automatically [skip ci]"
+          remote="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git pull --rebase "$remote" "$GITHUB_REF_NAME"
+          git push "$remote" "HEAD:$GITHUB_REF_NAME"
+
+  verify:
+    needs: [pull, apply]
+    if: ${{ !cancelled() && (needs.pull.outputs.added != '0' || needs.apply.outputs.changed == 'true') }}
     uses: ./.github/workflows/verify.yml
     with:
       rerun: stale
-    secrets: inherit
