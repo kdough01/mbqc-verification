@@ -10,6 +10,7 @@ dagtool — validate, run and inspect the theorem DAG.
     dagtool review ID --reviewer NAME --decision approve|reject [--notes TEXT]
     dagtool repro [--node ID]... [--kind K]...   re-run checks, compare verdicts
     dagtool render [--out PATH]          the theorem browser (self-contained HTML)
+    dagtool report [--out DIR] [--id ID] per-paper verification reports (dag/reports/*.yaml + live evidence)
     dagtool summary [--before F] [--ran F] [--browser-url U]   Markdown report for CI
     dagtool check                        CI gate: exit 1 on stale evidence, failures or bad edges
     dagtool pull-papers [--server URL]   add open theorems from the review site as dag/nodes/papers/
@@ -175,6 +176,18 @@ def cmd_summary(dag, args):
     return 0
 
 
+def cmd_report(dag, args):
+    from .report import ReportError, write_reports
+    out = Path(args.out) if args.out else dag.root / "dag" / "build" / "reports"
+    try:
+        for path in write_reports(dag, out, args.id):
+            print(f"wrote {path}")
+    except ReportError as e:
+        print(f"report: {e}", file=sys.stderr)
+        return 2
+    return 0
+
+
 def cmd_render(dag, args):
     from .render import render
     out = Path(args.out) if args.out else dag.root / "dag" / "build" / "index.html"
@@ -309,6 +322,9 @@ def main(argv=None) -> int:
     p.add_argument("--browser-url", help="where the rendered theorem browser is published")
     p = sub.add_parser("render")
     p.add_argument("--out")
+    p = sub.add_parser("report", help="per-paper verification reports")
+    p.add_argument("--out", help="output folder (default dag/build/reports)")
+    p.add_argument("--id", action="append", help="only this report (repeatable)")
     p = sub.add_parser("check")  # acknowledged warnings are information and pass
     p.add_argument("--allow-convention-warnings", action="store_true")
     p.add_argument("--before", help="`dagtool status --json` saved before the run; a node whose truth got weaker fails")
