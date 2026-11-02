@@ -84,6 +84,11 @@ jobs:
         if: always()
         run: dagtool render --out site/index.html
 
+      - name: Render the verification reports
+        # One page per dag/reports/<id>.yaml, published at reports/<id>.html next to the browser.
+        if: always()
+        run: dagtool report --out site/reports
+
       - name: Export the DAG for the review site
         # Published next to the browser as dag.json; the Thrust 2 review site reads it from GitHub Pages.
         if: always()
@@ -101,7 +106,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: theorem-browser
-          path: site/index.html
+          path: |
+            site/index.html
+            site/reports
 
       - name: Prepare the GitHub Pages site
         if: always() && github.ref == 'refs/heads/main'

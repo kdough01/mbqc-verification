@@ -57,6 +57,7 @@ header.top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px
   background: var(--panel); border-bottom: 1px solid var(--line); }
 .brand h1 { margin: 0; font: 600 var(--s-4)/1.2 var(--f-ui); letter-spacing: -0.01em; }
 .brand p { margin: 2px 0 0; font-size: var(--s-1); color: var(--ink-3); }
+.brand p.reports a { color: var(--accent); font-weight: 500; }
 .ladder { flex: 1 1 420px; min-width: 0; display: grid; gap: 6px; }
 .ladder-bar { display: flex; height: 10px; border-radius: 3px; overflow: hidden; background: var(--sunk); }
 .ladder-bar span { display: block; height: 100%; }
@@ -263,6 +264,7 @@ a { color: var(--accent); }
     <div class="brand">
       <h1>MBQC Theorem DAG</h1>
       <p id="meta"></p>
+      <p class="reports"><a href="reports/index.html">Verification reports</a> · what was checked for each paper</p>
     </div>
     <div class="ladder" aria-label="Effective truth status of all nodes">
       <div class="ladder-bar" id="ladderbar"></div>

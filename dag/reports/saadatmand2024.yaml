@@ -1,0 +1,341 @@
+# Narrative for the verification report page of Saadatmand et al. (arXiv:2406.06015v3).
+# `dagtool report` combines it with the live DAG: node statuses, every check's latest evidence, and the
+# committed results under experiments/rre/results. Text fields accept `code`, **bold** and [links](url).
+id: saadatmand2024
+title: "Superconducting qubits in the millions: Fermi–Hubbard resource estimates"
+paper:
+  citation: "S. N. Saadatmand, T. L. Wilson, M. J. Hodson, M. Field, S. J. Devitt et al., Superconducting qubits in the millions: the potential and limitations of modularity, arXiv:2406.06015v3"
+  url: https://arxiv.org/abs/2406.06015v3
+  html: https://arxiv.org/html/2406.06015v3
+kind_of_claim: "numerical estimate (reproduction of a resource-estimation table), not a theorem"
+summary: >-
+  Reference B of the Thrust 2 note *QSP Hamiltonian Simulation — Gate-Based to MBQC* compiles QSP circuits to
+  graph states with Cabaliser and estimates fault-tolerant resources with Rigetti's resource estimator (RRE).
+  We re-ran its Fermi–Hubbard rows of Table II with the authors' own public pipeline, pinned to the commit
+  their code release points to, and with the configuration the paper states. Each reported quantity is a
+  separate check in the DAG; we also re-derived the paper's formulas from intermediate outputs, tested the
+  compiled graphs on inputs the paper's own test does not use, and checked a claim from the text.
+headline: >-
+  Modules and both power columns reproduce. The compiled register is about twice the paper's width and runtime
+  and energy about a quarter of the paper's, so the remaining columns do not. The compiled graphs are correct on
+  every input we tried; the paper's own correctness test cannot show it, and one claim in the text (random
+  phases are conservative) does not hold with the pinned code.
+scope:
+  - label: Checked
+    text: "Table II, Fermi–Hubbard rows: ñ_logical, logical bus patches, T patches, allocated physical qubits, modules, runtime, P_diss,4K, P_diss,20mK, energy."
+  - label: Run
+    text: "2×2 and 4×4 lattices (the smallest the FermiHubbardSquare encoding supports, and the next)."
+  - label: Not run
+    text: "8×8, 16×16, 20×20: nodes exist and their checks skip until results are committed from the larger machine."
+  - label: Not checked
+    text: "Transverse-field Ising rows; lattices of 30×30 and above; the connectivity study of Fig. 11."
+links:
+  - label: Reproduction code and runbook
+    url: https://github.com/kdough01/mbqc-verification/tree/main/experiments/rre
+  - label: Committed results
+    url: https://github.com/kdough01/mbqc-verification/tree/main/experiments/rre/results
+  - label: DAG nodes
+    url: https://github.com/kdough01/mbqc-verification/tree/main/dag/nodes/reproductions/saadatmand2024
+  - label: Rigetti Resource Estimation
+    url: https://github.com/rigetti/rigetti-resource-estimation
+
+pipeline:
+  - name: QSP circuit
+    detail: "pyLIQTR 1.3.3 builds the QSVT circuit for H with random phases"
+    checked_by: [build, phases]
+  - name: Widgets
+    detail: "RRE's CirqWidgetizer splits it into ≤ 10k-gate, ≤ 100-qubit subcircuits"
+    checked_by: [explain]
+  - name: Clifford + T + Rz
+    detail: "transpiled; each Rz synthesized with L_ε T gates"
+    checked_by: [rederive]
+  - name: Graph states
+    detail: "Cabaliser: graph, measurement bases, Pauli frames"
+    checked_by: [inputs]
+  - name: Schedule
+    detail: "Substrate Scheduler: preparation and consumption"
+    checked_by: [run, rederive]
+  - name: FT estimate
+    detail: "surface code, factories, modules, time, power, energy"
+    checked_by: [compare, rederive, explain]
+
+steps:
+  - id: read
+    title: Read the claim and the method
+    what: >-
+      Started from the Thrust 2 known-results note, then the v3 PDF. Identified what is checkable: the
+      Fermi–Hubbard rows of Table II, the estimator formulas of Appendix A (Parameters 1–48), the
+      Appendix C unitarity test, and §VIII, which says the released code and sample configurations are
+      “required to reproduce similar results” and that full data are available on request.
+    outputs: ["paper_v3_table2.yaml: the table as printed, plus SI values"]
+    code: [experiments/rre/paper_v3_table2.yaml]
+  - id: build
+    title: Pin and build the authors' pipeline
+    what: >-
+      RRE 0.26.33 at commit `9383b4d`, Cabaliser at its submodule commit, pyLIQTR 1.3.3, gosc graph-state
+      generation. `environment.sh` builds everything from scratch into `.rre/` and runs RRE's own
+      verification tests as a smoke test (3 passed).
+    obstacles:
+      - "pyLIQTR 1.3.3 has no build for Python 3.13: the environment uses Python 3.11 (uv)."
+      - "pyLIQTR imports `set_matplotlib_formats`, removed in IPython 8: pinned `ipython<8`."
+      - "No Rust on the machine and rustup blocked: Rust installed from conda-forge with micromamba."
+      - "Cabaliser's pauli_tracker crate fails on Rust ≥ 1.90 (lint `dangerous_implicit_autorefs`): built with `RUSTFLAGS=--cap-lints=warn`; a stale target directory then needed a clean `make all`."
+      - "RRE's example script calls `get_all_non_trivial_op_labeller_list`, which no longer exists: used `GraphStateEquivalenceMapper()` defaults."
+    code: [experiments/rre/environment.sh, experiments/rre/requirements-rre.txt]
+  - id: config
+    title: Transcribe the configuration
+    what: >-
+      Wrote the paper's settings as an overlay on RRE's default `params.yaml`. Where the paper and RRE's
+      defaults differ, the paper wins; where the paper is silent, RRE's default is used and the setting is
+      marked as not stated (table below). The pyLIQTR sign convention was mapped explicitly (its J = −1 is the
+      paper's J = 1).
+    code: [experiments/rre/config_paper_v3.yaml]
+    nodes: [saadatmand2024.config, def.fermi_hubbard_square]
+  - id: run
+    title: Run the instances
+    what: >-
+      `fh.py` builds FermiHubbard(shape=(N, N), J=−1, U=2), evolution time t = 1 (τ = t·α), ε_qsp = 0.025, random
+      phases, FermiHubbardSquare encoding, then runs RRE's `estimation_pipeline` with the Cabaliser method and
+      writes every RRE output with provenance (versions, commit, config hash, timings). 2×2 and 4×4 take about a
+      second of pipeline time each.
+    obstacles:
+      - "FermiHubbardSquare only encodes square lattices (2×1 fails), so 2×2 is the smallest instance."
+      - "The Substrate Scheduler is slightly nondeterministic (preparation schedule 10,610 vs 10,608 between identical runs; ~0.1% in runtime), so all comparisons use a 1% tolerance."
+    code: [experiments/rre/fh.py, experiments/rre/run.sh]
+    results: [experiments/rre/results/fh_2x2.json, experiments/rre/results/fh_4x4.json]
+  - id: compare
+    title: Compare with Table II, column by column
+    what: >-
+      `compare.py` maps RRE's outputs onto the table's columns and records paper value, our value and ratio.
+      The mapping is our reading and is part of the record: bus patches = (memory + ancilla logical qubits per
+      module) × modules; T patches = T-buffer + T-distillery logical qubits per module; P_diss,20mK = RRE's
+      `power_dissip_mxc_kW`, which holds watts despite its name.
+    code: [experiments/rre/compare.py]
+    results: [experiments/rre/results/table2_2x2.json, experiments/rre/results/table2_4x4.json]
+    nodes: [saadatmand2024.fh.2x2, saadatmand2024.fh.4x4]
+  - id: explain
+    title: Look for the settings that explain the gap
+    what: >-
+      Varied the settings the paper does not state, one at a time: widget size (max qubits and gates per
+      widget), ancilla allocation during decomposition (fresh qubits or greedy reuse), the reading of the failure
+      budget in Eq. (27), and the characteristic gate time. Greedy ancilla reuse moves ñ from 87 to 76 at 2×2 (159 to 135 at 4×4);
+      smaller widgets give 125 at 4×4 and fail at 2×2; the failure budget moves the code distance (10 → 14) and the gate time moves
+      the runtime, but neither moves the register.
+    obstacles:
+      - "Widgets of ≤ 2000 gates make qualtran's addition decomposition fail at 2×2 (IndexError); recorded as an error for that variant."
+    code: [experiments/rre/sensitivity.py]
+    results: [experiments/rre/results/sensitivity.json]
+  - id: rederive
+    title: Re-derive the estimator formulas
+    what: >-
+      `rederive.py` recomputes Appendix A Parameters 4, 5, 7, 9, 11, 14, 17, 27–31 and 35 from RRE's intermediate
+      outputs and the configuration, so a mismatch can be placed in the formulas or in the compiled circuit.
+      All agree with RRE except one consistency relation: the total allocated physical qubits (Parameter 35)
+      is not modules × the per-module allocation (Parameter 14).
+    code: [experiments/rre/rederive.py]
+    results: [experiments/rre/results/rederive_2x2.json, experiments/rre/results/rederive_4x4.json]
+    nodes: [saadatmand2024.t_count_formula, saadatmand2024.physical_qubit_accounting]
+  - id: inputs
+    title: Test the compiled graphs beyond the paper's test
+    what: >-
+      The paper's Appendix C test (RRE's `test_unitary_verif_cabaliser.py`) simulates compiled graph states
+      from |000⟩ only. `cabaliser_inputs.py` compiles the same circuits and compares the post-selected output
+      with the circuit unitary on all 8 basis inputs and random Haar inputs, twice: with the circuit's real
+      rotation angle and a correct T†, and with the published test's gate table.
+    code: [experiments/rre/cabaliser_inputs.py]
+    results: [experiments/rre/results/cabaliser_inputs.json, experiments/rre/results/cabaliser_inputs_rre_test_table.json]
+    nodes: [saadatmand2024.compiled_graphs_correct, saadatmand2024.appendix_c_test_general]
+    obstacles:
+      - "Each random input takes seconds to simulate on a laptop-class VM: 3 random inputs locally, 20 by default in CI."
+  - id: phases
+    title: Check a claim from the text
+    what: >-
+      §III.3 says random QSP phases give a conservative overestimate. `phases.py` builds 2×2 and 4×4 with random
+      and with optimized phases and compares pyLIQTR's gate counts.
+    code: [experiments/rre/phases.py]
+    results: [experiments/rre/results/phases.json]
+    nodes: [saadatmand2024.random_phases_conservative]
+  - id: record
+    title: Record everything in the DAG
+    what: >-
+      Added the `reproduction` check kind (ceiling: empirical). It reads one committed value and compares it with
+      the claim; agreement grants empirical on the stated domain, disagreement refutes the node there, and a
+      missing results file is a skip. Expected refutations carry an `acknowledged` reason so CI stays green while
+      the finding stays visible. Results files are listed under each node's `code:`, so new results make the
+      evidence stale and CI re-runs exactly those checks.
+    code: [verification/truth/reproduction/check.py, .github/workflows/reproduce.yml]
+  - id: large
+    title: Prepare the larger lattices (not run)
+    what: >-
+      8×8, 16×16 and 20×20 have nodes whose checks skip until results exist. The runbook in the README runs them
+      one lattice at a time on the larger machine (`run.sh --only 8`, then 16, 20) or through the `reproduce`
+      workflow on a self-hosted runner, then commits `results/`; CI does the rest.
+    nodes: [saadatmand2024.fh.8x8, saadatmand2024.fh.16x16, saadatmand2024.fh.20x20]
+
+config:
+  - [Physical error rate p, "10⁻³", stated, "§II.4.7"]
+  - ["Logical-error fit κ, p_th", "0.009, 0.016", stated, "Appendix D (RRE default 0.3, 0.0143)"]
+  - [Rotation synthesis, "mixed fallback, L_ε = ⌈0.57 log₂(1/ε) + 8.83⌉", stated, "Appendix A, Parameters 16–17"]
+  - [Module capacity, "10⁶ physical qubits", stated, "§II.4.7"]
+  - [T-factory lookup, "the paper's Table I", stated, "Table I (RRE's shipped table differs; one p_out 2.7e-11 vs 2.7e-12)"]
+  - ["Inter-module handover, decoder timescale", "1 µs", stated, "§II.4.7"]
+  - ["ε_qsp, t, J, U", "0.025, 1, 1, 2", stated, "§III.2.3, Eq. (25)"]
+  - [Failure budget, "target_p_algo = 0.95", ambiguous, "Eq. (27): the budget can be read as 0.95 or 0.05"]
+  - [Characteristic gate time, "200 ns (RRE default)", not stated, "—"]
+  - [Widget size, "≤ 10,000 gates, ≤ 100 qubits (RRE defaults)", not stated, "—"]
+  - [Ancilla allocation, "fresh qubits (cirq default)", not stated, "—"]
+  - [QSP phases, "random, correct count", stated, "§III.3"]
+
+environment:
+  - [Rigetti Resource Estimation, "0.26.33 @ 9383b4d"]
+  - [Cabaliser, "submodule @ 10f5c4e"]
+  - [pyLIQTR, "1.3.3"]
+  - [gosc graph-state-generation, "@ 3a4f151"]
+  - [Python, "3.11"]
+  - [Verifier check environment, "Python 3.13, see requirements.txt"]
+
+figures:
+  - type: check_matrix
+    id: table2
+    title: "Table II, column by column"
+    caption: "Each cell is one `reproduction` check: our value against the paper's, within 1%. Columns without results are skipped until the larger machine runs them."
+    columns:
+      - {node: saadatmand2024.fh.2x2, label: "2×2"}
+      - {node: saadatmand2024.fh.4x4, label: "4×4"}
+      - {node: saadatmand2024.fh.8x8, label: "8×8"}
+      - {node: saadatmand2024.fh.16x16, label: "16×16"}
+      - {node: saadatmand2024.fh.20x20, label: "20×20"}
+    rows:
+      reproduction-n-logical: "ñ_logical"
+      reproduction-bus-patches: "Logical bus patches"
+      reproduction-t-patches: "T patches"
+      reproduction-phys-qubits: "Allocated physical qubits"
+      reproduction-modules: "Modules"
+      reproduction-time-s: "Runtime (s)"
+      reproduction-p4k-w: "P_diss,4K (W)"
+      reproduction-p20mk-w: "P_diss,20mK (W)"
+      reproduction-energy-wh: "Energy (Wh)"
+  - type: ratio_strip
+    id: ratios
+    of: table2
+    title: "How far off: ours ÷ paper"
+    caption: "Log scale; the band is the 1% tolerance. Above 1 we need more than the paper reports, below 1 less."
+  - type: bars
+    id: runtime
+    title: "Where our runtime goes"
+    caption: "RRE's runtime components. Inter-module handover dominates at both sizes; the paper's runtimes are 4.8× (2×2) and 3.7× (4×4) ours, and no single component accounts for that."
+    unit: s
+    groups:
+      - label: "2×2"
+        file: experiments/rre/results/fh_2x2.json
+        items:
+          - {label: "Consumption (measurements)", path: rre.total_consump_ops_sec}
+          - {label: "Inter-module handover", path: rre.total_handover_time_sec}
+          - {label: "Graph preparation delay", path: rre.total_graph_prep_delay_sec}
+          - {label: "T-distillation delay", path: rre.total_t_distill_delay_sec}
+          - {label: "Decoding delay", path: rre.overall_decoding_delay_sec}
+      - label: "4×4"
+        file: experiments/rre/results/fh_4x4.json
+        items:
+          - {label: "Consumption (measurements)", path: rre.total_consump_ops_sec}
+          - {label: "Inter-module handover", path: rre.total_handover_time_sec}
+          - {label: "Graph preparation delay", path: rre.total_graph_prep_delay_sec}
+          - {label: "T-distillation delay", path: rre.total_t_distill_delay_sec}
+          - {label: "Decoding delay", path: rre.overall_decoding_delay_sec}
+  - type: bars
+    id: sensitivity
+    title: "Unstated settings, one at a time"
+    caption: "Each bar is relative to the baseline configuration (1.0). Only ancilla reuse and smaller widgets move the register width, and neither gets near the paper's 36 and 74. Widgets of ≤ 2000 gates fail at 2×2."
+    relative: true
+    groups:
+      - label: "2×2: ñ_logical (paper: 36)"
+        file: experiments/rre/results/sensitivity.json
+        rows: {path: "2x2", label: variant, value: num_logical_qubits_per_busrail}
+      - label: "2×2: Allocated physical qubits (paper: 1.32M)"
+        file: experiments/rre/results/sensitivity.json
+        rows: {path: "2x2", label: variant, value: total_allocated_physical_qubits}
+      - label: "2×2: Runtime (paper: 4.09 s)"
+        file: experiments/rre/results/sensitivity.json
+        rows: {path: "2x2", label: variant, value: total_ft_algorithm_time_sec}
+      - label: "4×4: ñ_logical (paper: 74)"
+        file: experiments/rre/results/sensitivity.json
+        rows: {path: "4x4", label: variant, value: num_logical_qubits_per_busrail}
+      - label: "4×4: Allocated physical qubits (paper: 1.21M)"
+        file: experiments/rre/results/sensitivity.json
+        rows: {path: "4x4", label: variant, value: total_allocated_physical_qubits}
+      - label: "4×4: Runtime (paper: 35.1 s)"
+        file: experiments/rre/results/sensitivity.json
+        rows: {path: "4x4", label: variant, value: total_ft_algorithm_time_sec}
+  - type: bars
+    id: phases
+    title: "Random vs optimized QSP phases: T gates"
+    scale_per_group: true
+    caption: "§III.3 expects random phases to overestimate. With pyLIQTR 1.3.3 they underestimate slightly (1,405 and 1,801 fewer T gates), because the random mode uses one phase fewer. Each size has its own scale."
+    groups:
+      - label: "2×2"
+        file: experiments/rre/results/phases.json
+        items:
+          - {label: "Random phases", path: instances.2x2.random.T}
+          - {label: "Optimized phases", path: instances.2x2.optimization.T}
+      - label: "4×4"
+        file: experiments/rre/results/phases.json
+        items:
+          - {label: "Random phases", path: instances.4x4.random.T}
+          - {label: "Optimized phases", path: instances.4x4.optimization.T}
+  - type: bars
+    id: fidelity
+    title: "Compiled graphs on every input: fidelity with the circuit"
+    caption: "Same compiled graphs, two references. With the real rotation angle and a correct T† every input passes; the published test's table passes on basis inputs only."
+    scale: log
+    threshold: 0.999999999
+    groups:
+      - label: "Real angle, correct T†"
+        file: experiments/rre/results/cabaliser_inputs.json
+        rows: {path: rows, label: input, value: fidelity}
+      - label: "Published test table"
+        file: experiments/rre/results/cabaliser_inputs_rre_test_table.json
+        rows: {path: rows, label: input, value: fidelity}
+
+findings:
+  - title: The compiled register is about twice the paper's width
+    status: not reproduced
+    question: "Which compilation settings give ñ_logical = 36 at 2×2?"
+    read: "Table II; §II.4, graph-size paragraph"
+    example: "87 vs 36 at 2×2 and 159 vs 74 at 4×4. Greedy ancilla reuse gives 76 and 135, and widgets of ≤ 2000 gates give 125 at 4×4; none gets near the paper's values. Every column downstream of the register differs with it."
+    check: "Not stated in the paper; unresolved. The authors' run configuration would settle it."
+    nodes: [saadatmand2024.fh.2x2, saadatmand2024.fh.4x4]
+  - title: Random phases are not conservative with the pinned code
+    status: refuted
+    question: "Do random QSP phases overestimate the resources?"
+    read: "§III.3"
+    exact: "This provides a conservative overestimate of the resource estimations"
+    example: "62,170 T gates with random phases against 63,575 with optimized phases at 2×2; 353,410 against 355,211 at 4×4."
+    check: "pyLIQTR 1.3.3's random mode uses the cosine sequence's phase count for the sine sequence too (23/23 instead of 23/24), so the random circuit is slightly smaller. Small (0.5–2%), but the stated direction does not hold."
+    nodes: [saadatmand2024.random_phases_conservative]
+  - title: The published correctness test cannot detect wrong rotations
+    status: refuted
+    question: "Would the Appendix C test catch a compiled graph that implements the wrong unitary?"
+    read: "Appendix C, paragraph after Eq. (30); RRE tests/verify_n_validate/test_unitary_verif_cabaliser.py"
+    example: "The test's table maps the arbitrary-rotation tag (77) to T, and Cabaliser's simulator defines Tdag = S·T = T³. Both are diagonal, so from |000⟩ the test passes; on random inputs the same table gives fidelity 0.013–0.24."
+    check: "With the real angle and a correct T†, the compiled graphs are right on all 8 basis inputs and every random input (fidelity 1.0). The graphs pass; the test alone does not show it. Worth reporting to the RRE maintainers."
+    nodes: [saadatmand2024.compiled_graphs_correct, saadatmand2024.appendix_c_test_general]
+  - title: Appendix A's two physical-qubit totals disagree
+    status: refuted
+    question: "Is the total allocation (Parameter 35) equal to modules × the per-module allocation (Parameter 14)?"
+    read: "Appendix A, Parameters 14 and 35"
+    example: "Parameter 35 counts each T-factory by its footprint in 2d² patches (1.66M at 2×2, what RRE reports); modules × Parameter 14 counts it by its qubit count Q from Table I (1.29M), closer to the paper's 1.32M."
+    check: "Which total Table II uses is not stated."
+    nodes: [saadatmand2024.physical_qubit_accounting]
+  - title: The gate-synthesis T-count reproduces exactly
+    status: reproduced
+    question: "Does N_T = n_Rz·L_ε + n_T hold for RRE's outputs?"
+    read: "Appendix A, Parameters 16–17"
+    example: "L_ε = 24 and N_T = 356·24 + 12,992 = 21,536 at 2×2."
+    check: "Every other re-derived parameter matches RRE as well."
+    nodes: [saadatmand2024.t_count_formula]
+
+open:
+  - "Run 8×8, 16×16 and 20×20 on the larger machine (README, “Larger instances”); start with 8×8 and record time and peak memory."
+  - "Ask the authors for their run configuration: widgetization, ancilla allocation, gate time and the failure-budget reading (§VIII: data available upon reasonable request)."
+  - "Report the Appendix C test table (rotation tag mapped to T; Tdag = S·T) to the RRE maintainers."
+  - "Transverse-field Ising rows: the same pipeline with a new instance builder and table transcription."

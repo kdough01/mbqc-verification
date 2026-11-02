@@ -19,8 +19,9 @@ verification/             the checks, sorted by the question each answers
 dag/
   nodes/<area>/<id>.yaml  one claim per file, hand-written (schema: dag/schema/node.schema.json)
   reviews/<id>.yaml       human statement reviews, pinned to the statement hash
+  reports/<id>.yaml       narrative for a per-paper verification report (dagtool report)
   evidence/<id>/*.json    written by checks, committed
-tools/dagtool/            CLI: validate, run, status, show, queue, review, repro, render, check
+tools/dagtool/            CLI: validate, run, status, show, queue, review, repro, render, report, check
 experiments/hamsim/       the full report (run_all.py), plots, results/hamsim_results.json, figures/
 experiments/rre/          reproduction of Saadatmand et al. (arXiv:2406.06015) with their pinned pipeline
 docs/                     write-ups and images
@@ -122,6 +123,22 @@ yet is a skip. The first case is the Fermi–Hubbard rows of Table II of Saadatm
 see [experiments/rre/README.md](experiments/rre/README.md) for the protocol, the findings and how to run the
 larger lattices on a bigger machine, and `dag/nodes/reproductions/saadatmand2024/` for the nodes. The
 `reproduce` workflow (manual) rebuilds the environment, reruns the small lattices and commits the results.
+
+### Verification reports
+
+Each paper the verifier has checked gets a page that shows what was checked, how, and what came out:
+the scope, the pipeline under test, the approach step by step (including what got in the way), the
+configuration with what the paper states and what it leaves out, figures of the results, the findings, where
+the nodes sit in the DAG, and every check with its latest evidence. CI publishes them next to the theorem
+browser at `reports/` (linked from its header); the first is
+[reports/saadatmand2024.html](https://kdough01.github.io/mbqc-verification/reports/saadatmand2024.html).
+
+The narrative lives in `dag/reports/<id>.yaml` (scope, steps, configuration, findings, open items and figure
+specs). Numbers, outcomes and statuses are never written there: `dagtool report` reads them from the DAG, the
+evidence and the committed results when it renders, so the page cannot drift from the checks. To add a report
+for another paper, copy `dag/reports/saadatmand2024.yaml`, point it at that paper's nodes
+(`dag/nodes/reproductions/<id>/` are included automatically) and results, and run
+`dagtool report` (output in `dag/build/reports/`).
 
 ## How status works
 
