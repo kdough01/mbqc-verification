@@ -1,0 +1,67 @@
+{
+ "input_hash": "b41b7d0f29165ccb",
+ "inputs": {
+  "check_code": {
+   "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
+  },
+  "check_params": "f26f217eddf37b32",
+  "code": {
+   "experiments/rre/compare.py": "3e91ce5389e1478b27fdb70aeba78066716ac77167defe6d097199f282843d9d",
+   "experiments/rre/reproduce_table2.py": "b401e5994f8fa65d903b7a4f826c9786f3e3d42e9c9928f0499b46fc4dbad96b",
+   "experiments/rre/results/calibrated/table2_fh_4x4.json": "8223848b70ebd50e01ace8c8df0a7b90c31aedf11871cd97bed5f58200139ed0",
+   "experiments/rre/results/calibrated/table2_qft_N-10.json": "2b6eff6fe27474c8ba41af7dba19442aa4fa2302f95ffaa7d716ab704f774c56",
+   "experiments/rre/results/calibrated/table2_qft_N-100.json": "e0552669fcb8c7bc89fd3af990a2b77011a4188229304618f411d281e5bce3a4",
+   "experiments/rre/results/calibrated/table2_qft_N-4.json": "3c6b871c89e05d67a0ef779672d5cbdb42404c6763da07599b84ec56e9f18203"
+  },
+  "definitions": {},
+  "parents": {},
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "4f2d0c4fcc215b20"
+ },
+ "kind": "reproduction",
+ "name": "qft-n-10-phys-qubits",
+ "node": "saadatmand2024.column_readings",
+ "params": {
+  "domain": "qft_N-10, calibrated configuration",
+  "expect": {
+   "path": "quantities.phys_qubits.paper"
+  },
+  "op": "approx",
+  "path": "quantities.phys_qubits.ours",
+  "rel_tol": 0.01,
+  "results": "experiments/rre/results/calibrated/table2_qft_N-10.json"
+ },
+ "provenance": {
+  "commit": "74cf69002845257340c3fcd71b475e888aa6a37d",
+  "dirty": true,
+  "finished": "2026-11-03T19:06:17+00:00",
+  "quick": false,
+  "seconds": 1.1,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "qft_N-10, calibrated configuration",
+  "evidence": {
+   "expect": 1290000.0,
+   "expect_from": "experiments/rre/results/calibrated/table2_qft_N-10.json:quantities.phys_qubits.paper",
+   "op": "approx",
+   "path": "quantities.phys_qubits.ours",
+   "provenance": null,
+   "rel_tol": 0.01,
+   "results": "experiments/rre/results/calibrated/table2_qft_N-10.json",
+   "value": 1288384.0
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "reproduced: quantities.phys_qubits.ours = 1.28838e+06 vs 1.29e+06 (experiments/rre/results/calibrated/table2_qft_N-10.json:quantities.phys_qubits.paper): within 1%"
+ }
+}

@@ -1,0 +1,719 @@
+{
+ "note": "actual runs only; paper values where Table II prints them",
+ "machine": "x86_64",
+ "config": "config_calibrated.yaml",
+ "series": {
+  "qft": {
+   "settings": {
+    "max_gates": 1000000000,
+    "max_q": 10000,
+    "qubit_manager": "simple"
+   },
+   "points": [
+    {
+     "n": 4,
+     "label": "N-4",
+     "wall_seconds": 0.8,
+     "rre": {
+      "input_logical_qubits": 4,
+      "num_logical_qubits_per_busrail": 22,
+      "distance": 11,
+      "t_count": 243,
+      "N": 26,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 10,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 549886,
+      "total_ft_algorithm_time_sec": 0.0027984,
+      "total_consump_ops_sec": 0.0027984,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.0004048,
+      "total_t_distill_delay_sec": 0.0,
+      "total_ft_energy_kWh": 0.0004571497333333
+     },
+     "table2": {
+      "n_logical": 4,
+      "bus_patches": 88,
+      "t_patches": 6378,
+      "phys_qubits": 1099772,
+      "modules": 2,
+      "time_s": 0.0027984,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 0.4571497333333
+     },
+     "paper": {
+      "n_logical": 4.0,
+      "bus_patches": 88.0,
+      "t_patches": 6380.0,
+      "phys_qubits": 1100000.0,
+      "modules": 2.0,
+      "time_s": 0.0028,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 0.457
+     }
+    },
+    {
+     "n": 6,
+     "label": "N-6",
+     "wall_seconds": 0.1,
+     "rre": {
+      "input_logical_qubits": 6,
+      "num_logical_qubits_per_busrail": 51,
+      "distance": 11,
+      "t_count": 795,
+      "N": 57,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 10,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 563922,
+      "total_ft_algorithm_time_sec": 0.011408,
+      "total_consump_ops_sec": 0.011408,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.0009152,
+      "total_t_distill_delay_sec": 0.004368,
+      "total_ft_energy_kWh": 0.0018636235555555
+     },
+     "table2": {
+      "n_logical": 6,
+      "bus_patches": 204,
+      "t_patches": 6378,
+      "phys_qubits": 1127844,
+      "modules": 2,
+      "time_s": 0.011408,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 1.8636235555555
+     }
+    },
+    {
+     "n": 8,
+     "label": "N-8",
+     "wall_seconds": 0.1,
+     "rre": {
+      "input_logical_qubits": 8,
+      "num_logical_qubits_per_busrail": 56,
+      "distance": 11,
+      "t_count": 1659,
+      "N": 100,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 10,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 566342,
+      "total_ft_algorithm_time_sec": 0.0266672,
+      "total_consump_ops_sec": 0.0266672,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.0010032,
+      "total_t_distill_delay_sec": 0.01352,
+      "total_ft_energy_kWh": 0.0043563834222222
+     },
+     "table2": {
+      "n_logical": 8,
+      "bus_patches": 224,
+      "t_patches": 6378,
+      "phys_qubits": 1132684,
+      "modules": 2,
+      "time_s": 0.0266672,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 4.3563834222222
+     }
+    },
+    {
+     "n": 10,
+     "label": "N-10",
+     "wall_seconds": 0.1,
+     "rre": {
+      "input_logical_qubits": 10,
+      "num_logical_qubits_per_busrail": 62,
+      "distance": 12,
+      "t_count": 2835,
+      "N": 155,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 8,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 644192,
+      "total_ft_algorithm_time_sec": 0.0416767999999999,
+      "total_consump_ops_sec": 0.0416767999999999,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.0012288,
+      "total_t_distill_delay_sec": 0.019136,
+      "total_ft_energy_kWh": 0.0068083683555555
+     },
+     "table2": {
+      "n_logical": 10,
+      "bus_patches": 248,
+      "t_patches": 5500,
+      "phys_qubits": 1288384,
+      "modules": 2,
+      "time_s": 0.0416767999999999,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 6.8083683555555
+     },
+     "paper": {
+      "n_logical": 10.0,
+      "bus_patches": 248.0,
+      "t_patches": 5500.0,
+      "phys_qubits": 1290000.0,
+      "modules": 2.0,
+      "time_s": 0.0417,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 6.81
+     }
+    },
+    {
+     "n": 12,
+     "label": "N-12",
+     "wall_seconds": 0.1,
+     "rre": {
+      "input_logical_qubits": 12,
+      "num_logical_qubits_per_busrail": 68,
+      "distance": 12,
+      "t_count": 4323,
+      "N": 222,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 8,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 647648,
+      "total_ft_algorithm_time_sec": 0.0637279999999999,
+      "total_consump_ops_sec": 0.0637279999999999,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.0013632,
+      "total_t_distill_delay_sec": 0.030992,
+      "total_ft_energy_kWh": 0.0104106768888888
+     },
+     "table2": {
+      "n_logical": 12,
+      "bus_patches": 272,
+      "t_patches": 5500,
+      "phys_qubits": 1295296,
+      "modules": 2,
+      "time_s": 0.0637279999999999,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 10.4106768888888
+     }
+    },
+    {
+     "n": 16,
+     "label": "N-16",
+     "wall_seconds": 0.1,
+     "rre": {
+      "input_logical_qubits": 16,
+      "num_logical_qubits_per_busrail": 88,
+      "distance": 13,
+      "t_count": 8865,
+      "N": 392,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 8,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 673584,
+      "total_ft_algorithm_time_sec": 0.1458287999999998,
+      "total_consump_ops_sec": 0.1458287999999998,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.0018928,
+      "total_t_distill_delay_sec": 0.076336,
+      "total_ft_energy_kWh": 0.0238227547999999
+     },
+     "table2": {
+      "n_logical": 16,
+      "bus_patches": 352,
+      "t_patches": 4608,
+      "phys_qubits": 1347168,
+      "modules": 2,
+      "time_s": 0.1458287999999998,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 23.822754799999903
+     }
+    },
+    {
+     "n": 20,
+     "label": "N-20",
+     "wall_seconds": 0.1,
+     "rre": {
+      "input_logical_qubits": 20,
+      "num_logical_qubits_per_busrail": 108,
+      "distance": 13,
+      "t_count": 14421,
+      "N": 610,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 8,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 687104,
+      "total_ft_algorithm_time_sec": 0.2153839999999996,
+      "total_consump_ops_sec": 0.2153839999999996,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.002392,
+      "total_t_distill_delay_sec": 0.10504,
+      "total_ft_energy_kWh": 0.0351853695555555
+     },
+     "table2": {
+      "n_logical": 20,
+      "bus_patches": 432,
+      "t_patches": 4608,
+      "phys_qubits": 1374208,
+      "modules": 2,
+      "time_s": 0.2153839999999996,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 35.185369555555496
+     }
+    },
+    {
+     "n": 25,
+     "label": "N-25",
+     "wall_seconds": 0.2,
+     "rre": {
+      "input_logical_qubits": 25,
+      "num_logical_qubits_per_busrail": 143,
+      "distance": 14,
+      "t_count": 23256,
+      "N": 950,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 8,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 657424,
+      "total_ft_algorithm_time_sec": 0.4266703999999992,
+      "total_consump_ops_sec": 0.4266703999999992,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.0035392,
+      "total_t_distill_delay_sec": 0.2388912,
+      "total_ft_energy_kWh": 0.069701350622222
+     },
+     "table2": {
+      "n_logical": 25,
+      "bus_patches": 572,
+      "t_patches": 3752,
+      "phys_qubits": 1314848,
+      "modules": 2,
+      "time_s": 0.4266703999999992,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 69.70135062222201
+     },
+     "paper": {
+      "n_logical": 25.0,
+      "bus_patches": 2020.0,
+      "t_patches": 3750.0,
+      "phys_qubits": 1310000.0,
+      "modules": 2.0,
+      "time_s": 0.427,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 69.7
+     }
+    },
+    {
+     "n": 32,
+     "label": "N-32",
+     "wall_seconds": 0.3,
+     "rre": {
+      "input_logical_qubits": 32,
+      "num_logical_qubits_per_busrail": 208,
+      "distance": 14,
+      "t_count": 38313,
+      "N": 1522,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 8,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 649584,
+      "total_ft_algorithm_time_sec": 0.718635199999998,
+      "total_consump_ops_sec": 0.718635199999998,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.0049504,
+      "total_t_distill_delay_sec": 0.4137264,
+      "total_ft_energy_kWh": 0.1173970447555552
+     },
+     "table2": {
+      "n_logical": 32,
+      "bus_patches": 832,
+      "t_patches": 3452,
+      "phys_qubits": 1299168,
+      "modules": 2,
+      "time_s": 0.718635199999998,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 117.3970447555552
+     }
+    },
+    {
+     "n": 40,
+     "label": "N-40",
+     "wall_seconds": 0.4,
+     "rre": {
+      "input_logical_qubits": 40,
+      "num_logical_qubits_per_busrail": 288,
+      "distance": 15,
+      "t_count": 59787,
+      "N": 2186,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 6,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 762300,
+      "total_ft_algorithm_time_sec": 1.1807839999999996,
+      "total_consump_ops_sec": 1.1807839999999996,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.00708,
+      "total_t_distill_delay_sec": 0.6757280000000001,
+      "total_ft_energy_kWh": 0.1928941862222221
+     },
+     "table2": {
+      "n_logical": 40,
+      "bus_patches": 1152,
+      "t_patches": 2716,
+      "phys_qubits": 1524600,
+      "modules": 2,
+      "time_s": 1.1807839999999996,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 192.8941862222221
+     }
+    },
+    {
+     "n": 50,
+     "label": "N-50",
+     "wall_seconds": 0.8,
+     "rre": {
+      "input_logical_qubits": 50,
+      "num_logical_qubits_per_busrail": 382,
+      "distance": 15,
+      "t_count": 83217,
+      "N": 3016,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 6,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 762300,
+      "total_ft_algorithm_time_sec": 1.6432704000000136,
+      "total_consump_ops_sec": 1.6432704000000136,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.009144,
+      "total_t_distill_delay_sec": 0.9412464,
+      "total_ft_energy_kWh": 0.2684464784000022
+     },
+     "table2": {
+      "n_logical": 50,
+      "bus_patches": 1528,
+      "t_patches": 2340,
+      "phys_qubits": 1524600,
+      "modules": 2,
+      "time_s": 1.6432704000000136,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 268.4464784000022
+     }
+    },
+    {
+     "n": 64,
+     "label": "N-64",
+     "wall_seconds": 1.2,
+     "rre": {
+      "input_logical_qubits": 64,
+      "num_logical_qubits_per_busrail": 512,
+      "distance": 16,
+      "t_count": 123741,
+      "N": 4178,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 4,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 844528,
+      "total_ft_algorithm_time_sec": 6.055126400000022,
+      "total_consump_ops_sec": 6.055126400000022,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.0130816,
+      "total_t_distill_delay_sec": 4.812912,
+      "total_ft_energy_kWh": 0.9891721766222258
+     },
+     "table2": {
+      "n_logical": 64,
+      "bus_patches": 2048,
+      "t_patches": 1552,
+      "phys_qubits": 1689056,
+      "modules": 2,
+      "time_s": 6.055126400000022,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 989.1721766222258
+     }
+    },
+    {
+     "n": 80,
+     "label": "N-80",
+     "wall_seconds": 2.1,
+     "rre": {
+      "input_logical_qubits": 80,
+      "num_logical_qubits_per_busrail": 663,
+      "distance": 17,
+      "t_count": 163725,
+      "N": 5506,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 6,
+      "total_num_modules": 4,
+      "num_alloc_physical_qubits_per_module": 747286,
+      "total_ft_algorithm_time_sec": 5.80107999999999,
+      "total_consump_ops_sec": 5.80107999999999,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.0189856,
+      "total_t_distill_delay_sec": 4.237896000000001,
+      "total_ft_energy_kWh": 1.8951806077777744
+     },
+     "table2": {
+      "n_logical": 80,
+      "bus_patches": 2656,
+      "t_patches": 3484,
+      "phys_qubits": 2989144,
+      "modules": 4,
+      "time_s": 5.80107999999999,
+      "p4k_w": 1680.0,
+      "p20mk_w": 3.36e-07,
+      "energy_wh": 1895.1806077777744
+     }
+    },
+    {
+     "n": 100,
+     "label": "N-100",
+     "wall_seconds": 3.4,
+     "rre": {
+      "input_logical_qubits": 100,
+      "num_logical_qubits_per_busrail": 848,
+      "distance": 17,
+      "t_count": 213705,
+      "N": 7166,
+      "num_widget_steps": 1,
+      "num_t_factories_per_module": 4,
+      "total_num_modules": 4,
+      "num_alloc_physical_qubits_per_module": 795668,
+      "total_ft_algorithm_time_sec": 10.374475199999967,
+      "total_consump_ops_sec": 10.374475199999967,
+      "total_handover_time_sec": 0.0,
+      "total_graph_prep_delay_sec": 0.0235824,
+      "total_t_distill_delay_sec": 8.311056,
+      "total_ft_energy_kWh": 3.3892834118666566
+     },
+     "table2": {
+      "n_logical": 100,
+      "bus_patches": 3392,
+      "t_patches": 2760,
+      "phys_qubits": 3182672,
+      "modules": 4,
+      "time_s": 10.374475199999967,
+      "p4k_w": 1680.0,
+      "p20mk_w": 3.36e-07,
+      "energy_wh": 3389.2834118666565
+     },
+     "paper": {
+      "n_logical": 100.0,
+      "bus_patches": 3390.0,
+      "t_patches": 2760.0,
+      "phys_qubits": 3180000.0,
+      "modules": 4.0,
+      "time_s": 10.4,
+      "p4k_w": 1680.0,
+      "p20mk_w": 3.36e-07,
+      "energy_wh": 3390.0
+     }
+    }
+   ]
+  },
+  "fh": {
+   "settings": {
+    "max_gates": 10000,
+    "max_q": 100,
+    "qubit_manager": "greedy-fifo"
+   },
+   "points": [
+    {
+     "n": 2,
+     "label": "2x2",
+     "wall_seconds": 0.7,
+     "rre": {
+      "input_logical_qubits": 38,
+      "num_logical_qubits_per_busrail": 80,
+      "distance": 13,
+      "t_count": 22960,
+      "N": 29270,
+      "num_widget_steps": 140,
+      "num_t_factories_per_module": 10,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 611802,
+      "total_ft_algorithm_time_sec": 0.8696064000000001,
+      "total_consump_ops_sec": 0.3202784000000001,
+      "total_handover_time_sec": 0.549328,
+      "total_graph_prep_delay_sec": 0.0804544,
+      "total_t_distill_delay_sec": 0.009152,
+      "total_ft_energy_kWh": 0.1420598677333333
+     },
+     "table2": {
+      "n_logical": 38,
+      "bus_patches": 320,
+      "t_patches": 4518,
+      "phys_qubits": 1223604,
+      "modules": 2,
+      "time_s": 0.8696064000000001,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 142.05986773333328
+     },
+     "paper": {
+      "n_logical": 36.0,
+      "bus_patches": 280.0,
+      "t_patches": 4050.0,
+      "phys_qubits": 1320000.0,
+      "modules": 2.0,
+      "time_s": 4.09,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 668.0
+     }
+    },
+    {
+     "n": 3,
+     "label": "3x3",
+     "wall_seconds": 0.4,
+     "rre": {
+      "input_logical_qubits": 60,
+      "num_logical_qubits_per_busrail": 128,
+      "distance": 15,
+      "t_count": 119992,
+      "N": 129464,
+      "num_widget_steps": 332,
+      "num_t_factories_per_module": 8,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 694350,
+      "total_ft_algorithm_time_sec": 4.455590399999998,
+      "total_consump_ops_sec": 2.072390399999999,
+      "total_handover_time_sec": 2.3832,
+      "total_graph_prep_delay_sec": 0.334176,
+      "total_t_distill_delay_sec": 0.6511104000000001,
+      "total_ft_energy_kWh": 0.7278701983999998
+     },
+     "table2": {
+      "n_logical": 60,
+      "bus_patches": 512,
+      "t_patches": 3214,
+      "phys_qubits": 1388700,
+      "modules": 2,
+      "time_s": 4.455590399999998,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 727.8701983999998
+     }
+    },
+    {
+     "n": 4,
+     "label": "4x4",
+     "wall_seconds": 0.5,
+     "rre": {
+      "input_logical_qubits": 74,
+      "num_logical_qubits_per_busrail": 139,
+      "distance": 15,
+      "t_count": 182216,
+      "N": 268866,
+      "num_widget_steps": 596,
+      "num_t_factories_per_module": 8,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 683100,
+      "total_ft_algorithm_time_sec": 8.4168576,
+      "total_consump_ops_sec": 3.1332576,
+      "total_handover_time_sec": 5.2836,
+      "total_graph_prep_delay_sec": 0.658128,
+      "total_t_distill_delay_sec": 0.8862336000000002,
+      "total_ft_energy_kWh": 1.3749872095999998
+     },
+     "table2": {
+      "n_logical": 74,
+      "bus_patches": 556,
+      "t_patches": 3120,
+      "phys_qubits": 1366200,
+      "modules": 2,
+      "time_s": 8.4168576,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 1374.9872095999997
+     },
+     "paper": {
+      "n_logical": 74.0,
+      "bus_patches": 332.0,
+      "t_patches": 3320.0,
+      "phys_qubits": 1210000.0,
+      "modules": 2.0,
+      "time_s": 35.1,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 5730.0
+     }
+    },
+    {
+     "n": 5,
+     "label": "5x5",
+     "wall_seconds": 1.0,
+     "rre": {
+      "input_logical_qubits": 104,
+      "num_logical_qubits_per_busrail": 149,
+      "distance": 16,
+      "t_count": 532880,
+      "N": 875628,
+      "num_widget_steps": 1608,
+      "num_t_factories_per_module": 10,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 694104,
+      "total_ft_algorithm_time_sec": 29.767168,
+      "total_consump_ops_sec": 8.374784000000002,
+      "total_handover_time_sec": 21.392384,
+      "total_graph_prep_delay_sec": 0.8450048000000001,
+      "total_t_distill_delay_sec": 2.9952,
+      "total_ft_energy_kWh": 4.86279763911111
+     },
+     "table2": {
+      "n_logical": 104,
+      "bus_patches": 596,
+      "t_patches": 2868,
+      "phys_qubits": 1388208,
+      "modules": 2,
+      "time_s": 29.767168,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 4862.797639111111
+     }
+    },
+    {
+     "n": 6,
+     "label": "6x6",
+     "wall_seconds": 1.1,
+     "rre": {
+      "input_logical_qubits": 126,
+      "num_logical_qubits_per_busrail": 181,
+      "distance": 17,
+      "t_count": 859648,
+      "N": 1514814,
+      "num_widget_steps": 2348,
+      "num_t_factories_per_module": 8,
+      "total_num_modules": 2,
+      "num_alloc_physical_qubits_per_module": 701794,
+      "total_ft_algorithm_time_sec": 55.97200959999999,
+      "total_consump_ops_sec": 15.753817599999987,
+      "total_handover_time_sec": 40.218192,
+      "total_graph_prep_delay_sec": 1.2826432,
+      "total_t_distill_delay_sec": 6.497712000000001,
+      "total_ft_energy_kWh": 9.143649679377775
+     },
+     "table2": {
+      "n_logical": 126,
+      "bus_patches": 724,
+      "t_patches": 2350,
+      "phys_qubits": 1403588,
+      "modules": 2,
+      "time_s": 55.97200959999999,
+      "p4k_w": 840.0,
+      "p20mk_w": 1.68e-07,
+      "energy_wh": 9143.649679377775
+     }
+    }
+   ]
+  }
+ },
+ "finished": "2026-11-03T19:02:11Z"
+}

@@ -1,0 +1,126 @@
+id: saadatmand2024.column_readings
+kind: lemma
+title: What Table II's columns count
+statement: Table II's ñ_logical column is the input circuit's logical qubits (Parameter 15), not the graph memory
+  of Appendix A's Parameter 2; its T-patch column counts the T-transfer bus and factory patches over all modules;
+  and its physical-qubit column is modules × Parameter 14 (factories at their Q qubits), not Parameter 35, which
+  RRE reports as total_allocated_physical_qubits.
+description: 'Settled on the QFT rows, which have no circuit ambiguity: with these readings QFT N-4, N-10 and N-100
+  (two and four modules) reproduce exactly, and with any of the first-pass readings they do not. Fermi–Hubbard 4×4
+  gives ñ_logical = 74 with FIFO ancilla reuse.'
+code:
+- experiments/rre/compare.py
+- experiments/rre/reproduce_table2.py
+- experiments/rre/results/calibrated/table2_qft_N-4.json
+- experiments/rre/results/calibrated/table2_qft_N-10.json
+- experiments/rre/results/calibrated/table2_qft_N-100.json
+- experiments/rre/results/calibrated/table2_fh_4x4.json
+source:
+  citation: 'S. N. Saadatmand et al., Superconducting qubits in the millions: the potential and limitations of modularity,
+    arXiv:2406.06015v3'
+  url: https://arxiv.org/abs/2406.06015v3
+  exact_form: Table II header; Appendix A, Parameters 2, 14, 15, 35
+checks:
+- kind: reproduction
+  name: qft-n-4-n-logical
+  params:
+    results: experiments/rre/results/calibrated/table2_qft_N-4.json
+    path: quantities.n_logical.ours
+    expect:
+      path: quantities.n_logical.paper
+    op: eq
+    rel_tol: 0.01
+    domain: qft_N-4, calibrated configuration
+- kind: reproduction
+  name: qft-n-4-t-patches
+  params:
+    results: experiments/rre/results/calibrated/table2_qft_N-4.json
+    path: quantities.t_patches.ours
+    expect:
+      path: quantities.t_patches.paper
+    op: approx
+    rel_tol: 0.01
+    domain: qft_N-4, calibrated configuration
+- kind: reproduction
+  name: qft-n-4-phys-qubits
+  params:
+    results: experiments/rre/results/calibrated/table2_qft_N-4.json
+    path: quantities.phys_qubits.ours
+    expect:
+      path: quantities.phys_qubits.paper
+    op: approx
+    rel_tol: 0.01
+    domain: qft_N-4, calibrated configuration
+- kind: reproduction
+  name: qft-n-10-n-logical
+  params:
+    results: experiments/rre/results/calibrated/table2_qft_N-10.json
+    path: quantities.n_logical.ours
+    expect:
+      path: quantities.n_logical.paper
+    op: eq
+    rel_tol: 0.01
+    domain: qft_N-10, calibrated configuration
+- kind: reproduction
+  name: qft-n-10-t-patches
+  params:
+    results: experiments/rre/results/calibrated/table2_qft_N-10.json
+    path: quantities.t_patches.ours
+    expect:
+      path: quantities.t_patches.paper
+    op: approx
+    rel_tol: 0.01
+    domain: qft_N-10, calibrated configuration
+- kind: reproduction
+  name: qft-n-10-phys-qubits
+  params:
+    results: experiments/rre/results/calibrated/table2_qft_N-10.json
+    path: quantities.phys_qubits.ours
+    expect:
+      path: quantities.phys_qubits.paper
+    op: approx
+    rel_tol: 0.01
+    domain: qft_N-10, calibrated configuration
+- kind: reproduction
+  name: qft-n-100-n-logical
+  params:
+    results: experiments/rre/results/calibrated/table2_qft_N-100.json
+    path: quantities.n_logical.ours
+    expect:
+      path: quantities.n_logical.paper
+    op: eq
+    rel_tol: 0.01
+    domain: qft_N-100, calibrated configuration
+- kind: reproduction
+  name: qft-n-100-t-patches
+  params:
+    results: experiments/rre/results/calibrated/table2_qft_N-100.json
+    path: quantities.t_patches.ours
+    expect:
+      path: quantities.t_patches.paper
+    op: approx
+    rel_tol: 0.01
+    domain: qft_N-100, calibrated configuration
+- kind: reproduction
+  name: qft-n-100-phys-qubits
+  params:
+    results: experiments/rre/results/calibrated/table2_qft_N-100.json
+    path: quantities.phys_qubits.ours
+    expect:
+      path: quantities.phys_qubits.paper
+    op: approx
+    rel_tol: 0.01
+    domain: qft_N-100, calibrated configuration
+- kind: reproduction
+  name: fh-4x4-n-logical
+  params:
+    results: experiments/rre/results/calibrated/table2_fh_4x4.json
+    path: quantities.n_logical.ours
+    expect:
+      path: quantities.n_logical.paper
+    op: eq
+    rel_tol: 0.01
+    domain: fh_4x4, calibrated configuration
+tags:
+- accounting
+- saadatmand2024

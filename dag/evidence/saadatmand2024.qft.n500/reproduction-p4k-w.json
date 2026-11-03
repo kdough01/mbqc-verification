@@ -1,0 +1,62 @@
+{
+ "input_hash": "7242faf68ea29231",
+ "inputs": {
+  "check_code": {
+   "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
+  },
+  "check_params": "34172866ebcb53a8",
+  "code": {
+   "experiments/rre/compare.py": "3e91ce5389e1478b27fdb70aeba78066716ac77167defe6d097199f282843d9d",
+   "experiments/rre/config_calibrated.yaml": "9d69d8fec13a5daab7249c59567efa6b742a04ba4f574fce6c929f48062e9a52",
+   "experiments/rre/fh.py": "f6bd517a2ab7dd4d117cf6730a8809502efef74e3b8add1212228207fa43de33",
+   "experiments/rre/paper_v3_table2.yaml": "596921f3072ee8914373f4014c4fb72573fcb48641f60a7cef50c6821e06243c",
+   "experiments/rre/reproduce_table2.py": "b401e5994f8fa65d903b7a4f826c9786f3e3d42e9c9928f0499b46fc4dbad96b"
+  },
+  "definitions": {
+   "def.qft_cirq": "20fe25eb3a491a57"
+  },
+  "parents": {
+   "def.qft_cirq": "20fe25eb3a491a57:4f53cda1",
+   "saadatmand2024.config": "ad4d63c00249d009:e10808d4"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "ef01860a2328a7b8"
+ },
+ "kind": "reproduction",
+ "name": "reproduction-p4k-w",
+ "node": "saadatmand2024.qft.n500",
+ "params": {
+  "domain": "QFT N-500, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, one widget per circuit",
+  "expect": {
+   "path": "quantities.p4k_w.paper"
+  },
+  "op": "approx",
+  "path": "quantities.p4k_w.ours",
+  "rel_tol": 0.01,
+  "results": "experiments/rre/results/calibrated/table2_qft_N-500.json"
+ },
+ "provenance": {
+  "commit": "74cf69002845257340c3fcd71b475e888aa6a37d",
+  "dirty": true,
+  "finished": "2026-11-03T19:09:45+00:00",
+  "quick": false,
+  "seconds": 1.09,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": null,
+  "evidence": {},
+  "frontier": [],
+  "grants": null,
+  "outcome": "skip",
+  "seed": null,
+  "summary": "no results yet: experiments/rre/results/calibrated/table2_qft_N-500.json (run the experiment that writes it)"
+ }
+}

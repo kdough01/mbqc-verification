@@ -119,9 +119,11 @@ Numerical claims from papers (resource counts, runtimes) are checked by re-runni
 pinned, outside `dagtool run`, and committing the results with provenance. A `reproduction` check reads one
 recorded value and compares it with the claim (`approx` within `rel_tol`, or `eq`/`ge`/`le`); agreement grants
 `empirical` on the stated domain, disagreement refutes the node there, and a results file that does not exist
-yet is a skip. The first case is the Fermi–Hubbard rows of Table II of Saadatmand et al. (arXiv:2406.06015v3):
-see [experiments/rre/README.md](experiments/rre/README.md) for the protocol, the findings and how to run the
-larger lattices on a bigger machine, and `dag/nodes/reproductions/saadatmand2024/` for the nodes. The
+yet is a skip. The first case is Table II of Saadatmand et al. (arXiv:2406.06015v3): the settings the paper does
+not state are calibrated on its QFT rows (a grid of real runs; one point reproduces them), then Fermi–Hubbard and
+Ising are scored with those settings unchanged. See [experiments/rre/README.md](experiments/rre/README.md) for the
+protocol, the findings and how to run the larger instances on a bigger machine, and
+`dag/nodes/reproductions/saadatmand2024/` for the nodes. The
 `reproduce` workflow (manual) rebuilds the environment, reruns the small lattices and commits the results.
 
 ### Verification reports
@@ -131,7 +133,11 @@ the scope, the pipeline under test, the approach step by step (including what go
 configuration with what the paper states and what it leaves out, figures of the results, the findings, where
 the nodes sit in the DAG, and every check with its latest evidence. CI publishes them next to the theorem
 browser at `reports/` (linked from its header); the first is
-[reports/saadatmand2024.html](https://kdough01.github.io/mbqc-verification/reports/saadatmand2024.html).
+[reports/saadatmand2024.html](https://kdough01.github.io/mbqc-verification/reports/saadatmand2024.html). Every report
+also carries two shared sections, kept in `dag/reports/toolkit.yaml` and published on their own at
+[reports/toolkit.html](https://kdough01.github.io/mbqc-verification/reports/toolkit.html): strategies that carry over
+to future papers, and the verification tools a check can use depending on the kind of claim (with which are in the
+verifier, which were used in a reproduction, and which are candidates).
 
 The narrative lives in `dag/reports/<id>.yaml` (scope, steps, configuration, findings, open items and figure
 specs). Numbers, outcomes and statuses are never written there: `dagtool report` reads them from the DAG, the

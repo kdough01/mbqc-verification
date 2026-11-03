@@ -1,5 +1,5 @@
 {
- "input_hash": "d904010649b2a2f9",
+ "input_hash": "0fd3d9edc6a43954",
  "inputs": {
   "check_code": {
    "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
@@ -12,7 +12,7 @@
   },
   "definitions": {},
   "parents": {
-   "saadatmand2024.config": "d800ae63e2cdfdc0:e10808d4"
+   "saadatmand2024.config": "ad4d63c00249d009:e10808d4"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
   "statement": "1a458689f12734d3"
@@ -30,11 +30,11 @@
   "results": "experiments/rre/results/rederive_2x2.json"
  },
  "provenance": {
-  "commit": "1b64d17ff7f53878d9ed4db619578f2f3f409001",
+  "commit": "74cf69002845257340c3fcd71b475e888aa6a37d",
   "dirty": true,
-  "finished": "2026-10-31T21:35:27+00:00",
+  "finished": "2026-11-03T19:09:49+00:00",
   "quick": false,
-  "seconds": 1.62,
+  "seconds": 1.1,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",

@@ -75,7 +75,8 @@ def test_saadatmand_results_cover_every_reproduction_check():
                 continue
             res = REPO / c["params"]["results"]
             if not res.exists():
-                assert any(s in node["id"] for s in ("8x8", "16x16", "20x20")), f"{node['id']}: {res} missing"
+                large = ("8x8", "16x16", "20x20", "qft.n500", "qft.n1000", "ising.5x5")
+                assert any(s in node["id"] for s in large), f"{node['id']}: {res} missing"
                 continue
             ctx = SimpleNamespace(dag=SimpleNamespace(root=REPO))
             r = REGISTRY["reproduction"]().run(None, c["params"], ctx)

@@ -39,7 +39,8 @@ TRUTH_VAR = {"proved": "t-proved", "proved_modulo": "t-modulo", "defined": "t-de
 OUTCOME = {"pass": ("pass", "✓", "reproduced"), "fail": ("fail", "✗", "not reproduced"),
            "skip": ("skip", "–", "not run yet"), "error": ("error", "!", "error"),
            None: ("skip", "–", "no evidence yet")}
-CONFIG_BADGE = {"stated": "stated", "ambiguous": "ambiguous", "not stated": "not stated"}
+CONFIG_BADGE = {"stated": "stated", "ambiguous": "ambiguous", "not stated": "not stated",
+                "calibrated": "settled by calibration"}
 
 
 class ReportError(ValueError):
@@ -114,9 +115,21 @@ def load_spec(path: Path) -> dict:
     return spec
 
 
+TOOLKIT_FILE = "toolkit.yaml"
+
+
 def report_specs(root: Path) -> list[tuple[Path, dict]]:
     d = root.joinpath(*REPORTS_DIR)
-    return [(p, load_spec(p)) for p in sorted(d.glob("*.yaml"))] if d.exists() else []
+    if not d.exists():
+        return []
+    return [(p, load_spec(p)) for p in sorted(d.glob("*.yaml")) if p.name != TOOLKIT_FILE]
+
+
+def load_toolkit(root: Path) -> dict:
+    """dag/reports/toolkit.yaml: strategies that carry over between papers, and the verification tools we use or may
+    use, with when each applies. Shared by every report and the index."""
+    p = root.joinpath(*REPORTS_DIR, TOOLKIT_FILE)
+    return (yaml.safe_load(p.read_text(encoding="utf-8")) or {}) if p.exists() else {}
 
 
 # ---------------------------------------------------------------- the model a page is built from
@@ -252,15 +265,30 @@ MARKERS = ["circle", "square", "diamond", "triangle", "circle"]
 RAMP = ["--r2", "--r4", "--r3", "--r5", "--r1"]
 
 
-def fig_ratio_strip(ctx: Context, fig: dict, figures: dict) -> str:
+def ratio_points(ctx: Context, fig: dict, figures: dict):
+    """(columns, row labels, points) for a ratio strip. Points are (row label, column, ours/paper, ours, paper)."""
+    pts = []
+    if "series" in fig:              # comparison files written by experiments (quantities.<q>.ours / .paper)
+        cols, rows = fig["series"], fig["rows"]
+        for k, s in enumerate(cols):
+            data = ctx.file(s["file"]) or {}
+            for q, label in rows.items():
+                e = (data.get("quantities") or {}).get(q)
+                if e and e.get("paper"):
+                    pts.append((label, k, float(e["ours"]) / float(e["paper"]), float(e["ours"]), float(e["paper"])))
+        return cols, rows, pts
     base = figures[fig["of"]]
     cols, rows = base["columns"], base["rows"]
-    pts = []   # (row label, col index, ratio, value, expect)
     for name, label in rows.items():
         for k, c in enumerate(cols):
             value, expect = check_values(ctx.evidence[c["node"]].get(name))
             if value is not None and expect:
                 pts.append((label, k, value / expect, value, expect))
+    return cols, rows, pts
+
+
+def fig_ratio_strip(ctx: Context, fig: dict, figures: dict) -> str:
+    cols, rows, pts = ratio_points(ctx, fig, figures)
     if not pts:
         return '<p class="muted">No results yet.</p>'
     used = sorted({p[1] for p in pts})
@@ -268,7 +296,7 @@ def fig_ratio_strip(ctx: Context, fig: dict, figures: dict) -> str:
     hi = math.log10(max(2.0, max(p[2] for p in pts) * 1.15))
     x = lambda r: 100 * (math.log10(r) - lo) / (hi - lo)   # noqa: E731
     tol = float(fig.get("tolerance", 0.01))
-    ticks = [t for t in (0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20) if lo <= math.log10(t) <= hi]
+    ticks = [t for t in (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50) if lo <= math.log10(t) <= hi]
     grid = "".join(f'<span class="gl{" one" if t == 1 else ""}" style="left:{x(t):.2f}%"></span>' for t in ticks)
     band = f'<span class="band" style="left:{x(1 - tol):.2f}%;width:{x(1 + tol) - x(1 - tol):.2f}%"></span>'
     out = []
@@ -300,8 +328,13 @@ def bar_groups(ctx: Context, fig: dict):
         if "rows" in g:
             spec = g["rows"]
             for row in get_path(data, spec["path"]):
-                v = row.get(spec["value"])
-                items.append((row.get(spec["label"], "?"), v, row.get("error")))
+                try:
+                    v = get_path(row, spec["value"])
+                except (KeyError, IndexError, TypeError):
+                    v = None
+                lab = (spec["label"].format_map(defaultdict(lambda: "?", row)) if "{" in spec["label"]
+                       else row.get(spec["label"], "?"))
+                items.append((lab, v, row.get("error") or (None if v is not None else "no value")))
         else:
             for it in g["items"]:
                 try:
@@ -316,6 +349,7 @@ def fig_bars(ctx: Context, fig: dict) -> str:
     rel = bool(fig.get("relative"))
     log = fig.get("scale") == "log"
     thr = fig.get("threshold")
+    ref = fig.get("reference")
     unit = fig.get("unit", "")
     out, tv = [], []
     groups = bar_groups(ctx, fig)
@@ -326,6 +360,8 @@ def fig_bars(ctx: Context, fig: dict) -> str:
             allv += [(v / b0 if rel and b0 else v) for _, v, _ in items if v is not None]
     per_group = fig.get("scale_per_group", False)
     top = max(allv + [1.0 if rel else 0.0]) or 1.0
+    if ref is not None:
+        top = max(top, ref)
     lo = math.floor(math.log10(max(min([v for v in allv if v > 0] or [1e-3]), 1e-12))) if log else 0
     if log and lo >= math.log10(top):
         lo = math.log10(top) - 1
@@ -358,6 +394,7 @@ def fig_bars(ctx: Context, fig: dict) -> str:
                         f'<div class="btrack"><span class="bar{state}" style="width:{pos(v):.2f}%"></span>'
                         + (f'<span class="ref" style="left:{pos(1.0):.2f}%"></span>' if rel else "")
                         + (f'<span class="ref thr" style="left:{pos(thr):.2f}%"></span>' if thr is not None else "")
+                        + (f'<span class="ref" style="left:{pos(ref):.2f}%"></span>' if ref is not None else "")
                         + f'</div><div class="bval">{text}{mark}</div></div>')
             tv.append([esc(label), esc(lab), f"{num(raw)}{(' ' + unit) if unit else ''}" + (f" ({v:.3g}×)" if rel else "")])
         src = f'<a class="file" href="{esc(ctx.blob(f))}">{esc(f.split("/")[-1])}</a>'
@@ -367,7 +404,99 @@ def fig_bars(ctx: Context, fig: dict) -> str:
         note = '<p class="fnote">The thin mark is the baseline (1.0×).</p>'
     if thr is not None:
         note = f'<p class="fnote">The thin mark is the pass threshold ({thr:g}); log scale.</p>'
+    if ref is not None:
+        note = f'<p class="fnote">The thin mark is {esc(fig.get("reference_label", f"{ref:g}"))}{"; log scale" if log else ""}.</p>'
     return f'<div class="bgrid">{"".join(out)}</div>{note}' + details_table(["Group", "Item", "Value"], tv)
+
+
+def fig_ranking(ctx: Context, fig: dict) -> str:
+    """Grid points ranked by how many columns they reproduce (calibrate.py's summary)."""
+    data = ctx.file(fig["file"])
+    if data is None:
+        return f'<p class="muted">No results yet ({esc(fig["file"])}).</p>'
+    ranked = get_path(data, fig["path"])
+    total = get_path(data, fig["of"])
+    names = fig.get("names", {})
+    top = ranked[: int(fig.get("top", 10))]
+    rows, tv = [], []
+    for k, e in enumerate(top):
+        lab = ", ".join(f"{names.get(a, a)} {v}" for a, v in e["point"].items() if a in names)
+        w = 100 * e["matched"] / total if total else 0
+        cls = " ok" if k == 0 else ""
+        rows.append(f'<div class="brow rank" title="{esc(lab)}: {e["matched"]} of {total} columns within 1%">'
+                    f'<div class="blab">{"<b>" if k == 0 else ""}{esc(lab)}{"</b>" if k == 0 else ""}</div>'
+                    f'<div class="btrack"><span class="bar{cls}" style="width:{w:.2f}%"></span></div>'
+                    f'<div class="bval">{e["matched"]}/{total}</div></div>')
+        tv.append([str(k + 1), esc(lab), f'{e["matched"]}/{total}'])
+    axes = get_path(data, fig["axes"]) if fig.get("axes") else {}
+    axis_rows = [[esc(names.get(a, a)), esc(x["value"]), "—" if x["best"] is None else f'{x["best"]}/{total}']
+                 for a, vals in axes.items() if a in names for x in vals]
+    axis_tab = (f'<details class="tv"><summary>Best score for each setting value</summary>'
+                f'{table(["Setting", "Value", "Best over the grid"], axis_rows)}</details>') if axis_rows else ""
+    src = f'<a class="file" href="{esc(ctx.blob(fig["file"]))}">{esc(fig["file"].split("/")[-1])}</a>'
+    return (f'<div class="bgroup"><h4>Top {len(top)} of {len(ranked)} settings <span class="src">{src}</span></h4>'
+            f'{"".join(rows)}</div>{axis_tab}' + details_table(["Rank", "Settings", "Columns reproduced"], tv))
+
+
+def _ticks_log(lo: float, hi: float) -> list[float]:
+    out = []
+    for e in range(math.floor(math.log10(lo)), math.ceil(math.log10(hi)) + 1):
+        for m in (1, 2, 5):
+            v = m * 10 ** e
+            if lo <= v <= hi:
+                out.append(v)
+    if len(out) <= 7:
+        return out
+    return [v for v in out if abs(v / 10 ** math.floor(math.log10(v)) - 1) < 1e-9]
+
+
+def fig_scaling(ctx: Context, fig: dict) -> str:
+    """Small multiples of measured values against problem size: our runs (filled, joined) and the paper's printed
+    values (hollow) where Table II has them. Nothing is fitted or extrapolated."""
+    data = ctx.file(fig["file"])
+    if data is None:
+        return f'<p class="muted">No results yet ({esc(fig["file"])}).</p>'
+    pts = data["series"][fig["series"]]["points"]
+    panels, tv = [], []
+    W, H, L, R, T, B = 470, 250, 62, 14, 14, 36
+    xs = [p["n"] for p in pts]
+    xlo, xhi = min(xs), max(xs)
+    xlog = fig.get("xlog", False)
+    def X(n):
+        if xlog:
+            return L + (W - L - R) * (math.log10(n) - math.log10(xlo)) / ((math.log10(xhi) - math.log10(xlo)) or 1)
+        return L + (W - L - R) * (n - xlo) / ((xhi - xlo) or 1)
+    for pan in fig["panels"]:
+        ours = [(p["n"], get_path(p, pan["key"]), p["label"]) for p in pts]
+        paper = [(p["n"], p["paper"][pan["paper"]], p["label"]) for p in pts if p.get("paper") and pan.get("paper")]
+        vals = [v for _, v, _ in ours + paper if v]
+        lo, hi = min(vals) / 1.3, max(vals) * 1.3
+        def Y(v):
+            return T + (H - T - B) * (1 - (math.log10(v) - math.log10(lo)) / (math.log10(hi) - math.log10(lo)))
+        grid = "".join(f'<line class="g" x1="{L}" x2="{W - R}" y1="{Y(v):.1f}" y2="{Y(v):.1f}"/>'
+                       f'<text class="yt" x="{L - 6}" y="{Y(v) + 4:.1f}">{num(v)}</text>' for v in _ticks_log(lo, hi))
+        xt = sorted(set(fig.get("xticks", xs)))
+        xticks = "".join(f'<text class="xt" x="{X(n):.1f}" y="{H - B + 16}">{n}</text>' for n in xt if xlo <= n <= xhi)
+        line = " ".join(f"{X(n):.1f},{Y(v):.1f}" for n, v, _ in ours if v)
+        dots = "".join(f'<circle class="o" cx="{X(n):.1f}" cy="{Y(v):.1f}" r="4"><title>{esc(lab)}: {num(v)} {esc(pan.get("unit", ""))} (our run)</title></circle>'
+                       for n, v, lab in ours if v)
+        pdots = "".join(f'<rect class="p" x="{X(n) - 5:.1f}" y="{Y(v) - 5:.1f}" width="10" height="10" transform="rotate(45 {X(n):.1f} {Y(v):.1f})">'
+                        f'<title>{esc(lab)}: {num(v)} {esc(pan.get("unit", ""))} (paper, Table II)</title></rect>' for n, v, lab in paper)
+        panels.append(f'<figure class="pan"><figcaption>{esc(pan["label"])}{(" (" + esc(pan["unit"]) + ")") if pan.get("unit") else ""}</figcaption>'
+                      f'<svg class="sc" viewBox="0 0 {W} {H}" role="img" aria-label="{esc(pan["label"])} against {esc(fig.get("xlabel", "size"))}">'
+                      f'{grid}<line class="ax" x1="{L}" x2="{W - R}" y1="{H - B}" y2="{H - B}"/>{xticks}'
+                      f'<text class="xl" x="{(L + W - R) / 2:.0f}" y="{H - 4}">{esc(fig.get("xlabel", "size"))}</text>'
+                      f'<polyline class="ol" points="{line}"/>{dots}{pdots}</svg></figure>')
+        for (n, v, lab) in ours:
+            pv = next((pvv for pn, pvv, _ in paper if pn == n), None)
+            tv.append([esc(pan["label"]), esc(lab), num(v), num(pv) if pv is not None else "—",
+                       f"{v / pv:.3g}" if pv and v else "—"])
+    legend = ('<div class="legend"><span><svg width="14" height="14"><circle cx="7" cy="7" r="4" class="o"/></svg>our runs (each point is a run)</span>'
+              '<span><svg width="14" height="14"><rect x="2" y="2" width="9" height="9" class="p" transform="rotate(45 7 7)"/></svg>paper, where Table II prints it</span>'
+              '<span>log scale; no fitting or extrapolation</span></div>')
+    src = f'<p class="fnote">Source: <a class="file" href="{esc(ctx.blob(fig["file"]))}">{esc(fig["file"].split("/")[-1])}</a></p>'
+    return (f'{legend}<div class="scgrid">{"".join(panels)}</div>{src}'
+            + details_table(["Quantity", "Instance", "Ours", "Paper", "Ours ÷ paper"], tv))
 
 
 def figure(ctx: Context, fig: dict, figures: dict) -> str:
@@ -378,6 +507,10 @@ def figure(ctx: Context, fig: dict, figures: dict) -> str:
         body = fig_ratio_strip(ctx, fig, figures)
     elif kind == "bars":
         body = fig_bars(ctx, fig)
+    elif kind == "ranking":
+        body = fig_ranking(ctx, fig)
+    elif kind == "scaling":
+        body = fig_scaling(ctx, fig)
     else:
         raise ReportError(f"unknown figure type {kind!r}")
     cap = f'<p class="cap">{inline(fig["caption"])}</p>' if fig.get("caption") else ""
@@ -457,6 +590,48 @@ def tiles(ctx: Context) -> str:
         f'<div class="tile {c}"><div class="tn">{v}</div><div class="tl">{esc(k)}</div></div>' for k, v, c in items) + "</div>"
 
 
+STATUS_LABEL = {"verifier": "in the verifier", "used": "used in a reproduction", "candidate": "candidate"}
+
+
+def strategies_html(toolkit: dict) -> str:
+    cards = []
+    for k, s in enumerate(toolkit.get("strategies", []) or [], 1):
+        rows = "".join(f"<dt>{lab}</dt><dd>{inline(s[key])}</dd>" for key, lab in
+                       (("why", "Why"), ("example", "Here"), ("how", "In the verifier")) if s.get(key))
+        cards.append(f'<li class="step strat"><div class="sn">{k}</div><div class="sb"><h3>{esc(s["title"])}</h3>'
+                     f'<p>{inline(s.get("what", ""))}</p><dl class="sd">{rows}</dl></div></li>')
+    return f'<ol class="steps strats">{"".join(cards)}</ol>'
+
+
+def tools_html(toolkit: dict, used: list | None = None) -> str:
+    used = set(used or [])
+    tools = toolkit.get("tools", []) or []
+    cards = []
+    for tl in tools:
+        st = tl.get("status", "candidate")
+        here = '<span class="badge here">used for this paper</span>' if tl["id"] in used else ""
+        kinds = " ".join(f"<code>{esc(k)}</code>" for k in tl.get("check_kinds", []) or [])
+        name = f'<a href="{esc(tl["url"])}">{esc(tl["name"])}</a>' if tl.get("url") else esc(tl["name"])
+        rows = "".join(f"<dt>{lab}</dt><dd>{inline(tl[key])}</dd>" for key, lab in
+                       (("checks", "Checks"), ("applies", "Applies when"), ("limits", "Limits")) if tl.get(key))
+        if kinds:
+            rows += f"<dt>Check kinds</dt><dd>{kinds}</dd>"
+        cards.append(f'<article class="tool {esc(st)}" id="tool-{esc(tl["id"])}"><h3>{name} '
+                     f'<span class="badge st-{esc(st)}">{esc(STATUS_LABEL.get(st, st))}</span>{here}</h3>'
+                     f'<p class="cat">{esc(tl.get("category", ""))}</p><dl>{rows}</dl></article>')
+    by_id = {tl["id"]: tl for tl in tools}
+    matrix = []
+    for m in toolkit.get("applicability", []) or []:
+        chips = " ".join(f'<a class="tchip st-{esc(by_id[i].get("status", "candidate"))}" href="#tool-{esc(i)}">{esc(by_id[i]["name"])}</a>'
+                         for i in m.get("tools", []) if i in by_id)
+        matrix.append([f"<b>{esc(m['claim'])}</b><br><span class='muted'>{inline(m.get('example', ''))}</span>", chips,
+                       inline(m.get("method", ""))])
+    legend = ('<div class="legend">' + "".join(f'<span><span class="tchip st-{k}">{v}</span></span>' for k, v in STATUS_LABEL.items())
+              + "</div>")
+    return (f'<h3 class="sub">Which tool for which claim</h3>{table(["Claim in a paper", "Tools", "How the check runs"], matrix, "applic")}'
+            f'{legend}<h3 class="sub">The tools</h3><div class="tools">{"".join(cards)}</div>')
+
+
 def section(sid: str, title: str, body: str, lead: str = "") -> str:
     lead = f'<p class="lead">{lead}</p>' if lead else ""
     return f'<section id="{sid}"><h2>{esc(title)}</h2>{lead}{body}</section>'
@@ -481,9 +656,10 @@ def render_report(dag: Dag, spec: dict, st=None) -> str:
             + (f'<p class="headline">{inline(spec["headline"])}</p>' if spec.get("headline") else "")
             + tiles(ctx) + (f'<p class="links">{links}</p>' if links else "") + "</header>")
 
+    toolkit = load_toolkit(dag.root)
     nav_items = [("scope", "Scope"), ("pipeline", "Pipeline"), ("approach", "Approach"), ("configuration", "Configuration"),
-                 ("results", "Results"), ("findings", "Findings"), ("graph", "DAG"), ("checks", "Every check"),
-                 ("open", "Open items")]
+                 ("results", "Results"), ("findings", "Findings"), ("strategies", "Strategies"), ("tools", "Tools"),
+                 ("graph", "DAG"), ("checks", "Every check"), ("open", "Open items")]
     nav = '<nav class="toc" aria-label="Sections">' + "".join(f'<a href="#{a}">{t}</a>' for a, t in nav_items) + "</nav>"
 
     parts = []
@@ -526,7 +702,7 @@ def render_report(dag: Dag, spec: dict, st=None) -> str:
     env_tab = table(["Component", "Version"], [[esc(a), f"<code>{esc(b)}</code>"] for a, b in env]) if env else ""
     parts.append(section("configuration", "Configuration and environment",
                          cfg_tab + (f"<h3>Pinned environment</h3>{env_tab}" if env_tab else ""),
-                         "Every setting comes from the paper where it is stated. Settings the paper leaves out use RRE's defaults and are measured in the sensitivity figure."))
+                         "Every setting comes from the paper where it is stated. Settings it leaves out or states ambiguously are either settled by calibration (each value checked against the alternatives) or marked not stated, with their measured effect in the figures."))
 
     parts.append(section("results", "Results", "".join(figure(ctx, f, figures) for f in figures.values())))
 
@@ -550,6 +726,14 @@ def render_report(dag: Dag, spec: dict, st=None) -> str:
                       f'<details><summary>Evidence ({len(evid)} check{"s" if len(evid) != 1 else ""})</summary><ul class="evl">{"".join(evid)}</ul></details>'
                       f'<p class="chips">{" ".join(status_chip(ctx, i) for i in f.get("nodes", []))}</p></article>')
     parts.append(section("findings", "Findings", f'<div class="findings">{"".join(fcards)}</div>'))
+
+    parts.append(section("strategies", "Strategies we can carry over to future papers", strategies_html(toolkit),
+                         "What this reproduction taught us about verifying numerical claims, written to apply beyond this paper. "
+                         'The same list is on the <a href="toolkit.html">toolkit page</a>.'))
+    parts.append(section("tools", "Associated tools for verification checks", tools_html(toolkit, spec.get("tools_used")),
+                         "The suite of tools a check can call on, depending on what kind of claim is being verified. "
+                         "Tools marked “in the verifier” back an implemented check kind; “used in a reproduction” were run for a paper; "
+                         "“candidate” tools fit a claim type we expect but are not wired in yet."))
 
     legend = '<div class="legend">' + "".join(
         f'<span><span class="sw" style="background:var(--{v})"></span>{esc(k)}</span>'
@@ -607,10 +791,28 @@ def render_index(dag: Dag, specs, st) -> str:
     head = ('<header class="hero"><p class="eyebrow"><a href="../index.html">Theorem DAG</a></p><h1>Verification reports</h1>'
             '<p class="summary">One page per paper the verifier has checked: what was checked, how, and what came out. '
             'Statuses and outcomes are read from the DAG when the page is generated.</p></header>')
-    body = f'<div class="rcards">{"".join(cards) or "<p>No reports yet.</p>"}</div>'
+    body = (f'<div class="rcards">{"".join(cards) or "<p>No reports yet.</p>"}</div>'
+            '<a class="rcard" href="toolkit.html"><h2>Toolkit: strategies and verification tools</h2>'
+            '<p class="summary">Strategies that carry over between papers, and the tools a check can use depending on the '
+            'kind of claim.</p></a>')
     return PAGE.format(title="Verification reports", fonts=fonts, tokens=tokens, css=CSS, head=head, nav="",
                        body=body, foot=f'<footer><p>Generated {esc(now_utc())} by <code>dagtool report</code>.</p></footer>',
                        desc="Verification reports for papers checked by the MBQC theorem DAG")
+
+
+def render_toolkit(dag: Dag) -> str:
+    fonts, tokens = tokens_css()
+    toolkit = load_toolkit(dag.root)
+    head = ('<header class="hero"><p class="eyebrow"><a href="index.html">All reports</a> · <a href="../index.html">theorem DAG</a></p>'
+            '<h1>Verification toolkit</h1><p class="summary">How we verify numerical and theoretical claims from papers: the strategies '
+            'that carried over from earlier reproductions, and the tools a check can use depending on the claim.</p></header>')
+    nav = '<nav class="toc" aria-label="Sections"><a href="#strategies">Strategies</a><a href="#tools">Tools</a></nav>'
+    body = (section("strategies", "Strategies we can carry over to future papers", strategies_html(toolkit))
+            + section("tools", "Associated tools for verification checks", tools_html(toolkit)))
+    return PAGE.format(title="Verification toolkit", fonts=fonts, tokens=tokens, css=CSS, head=head, nav=nav, body=body,
+                       foot=f'<footer><p>Generated {esc(now_utc())} by <code>dagtool report</code> from '
+                            f'<code>dag/reports/{TOOLKIT_FILE}</code>.</p></footer>',
+                       desc="Strategies and tools for verifying claims from papers")
 
 
 def write_reports(dag: Dag, out: Path, only: list[str] | None = None) -> list[Path]:
@@ -627,6 +829,9 @@ def write_reports(dag: Dag, out: Path, only: list[str] | None = None) -> list[Pa
     idx = out / "index.html"
     idx.write_text(render_index(dag, report_specs(dag.root), st), encoding="utf-8")
     written.append(idx)
+    tk = out / "toolkit.html"
+    tk.write_text(render_toolkit(dag), encoding="utf-8")
+    written.append(tk)
     return written
 
 
@@ -802,6 +1007,39 @@ table.checks td:nth-child(7) { white-space: nowrap; color: var(--ink-2); }
 table.checks tr.grp th { background: var(--sunk); text-transform: none; letter-spacing: 0; font-size: var(--s-2); color: var(--ink); font-weight: 500; }
 table.checks tr.grp .gt { margin-left: 6px; color: var(--ink-2); }
 .stale-t { color: var(--warn); font-weight: 600; }
+.badge.calibrated { color: var(--accent); border-color: currentColor; }
+.bgroup + .tv, .bgroup + details { margin-top: 8px; }
+.brow.rank .blab { font-size: 12px; }
+.scgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 12px; margin-top: 8px; }
+.pan { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px 6px; }
+.pan figcaption { font-weight: 600; font-size: var(--s-2); margin-bottom: 4px; }
+svg.sc { display: block; width: 100%; height: auto; overflow: visible; }
+svg.sc .g { stroke: var(--line); stroke-width: 1; }
+svg.sc .ax { stroke: var(--ink-3); stroke-width: 1; }
+svg.sc text { fill: var(--ink-2); font: 400 10.5px var(--f-ui); font-variant-numeric: tabular-nums; }
+svg.sc .yt { text-anchor: end; } svg.sc .xt, svg.sc .xl { text-anchor: middle; } svg.sc .xl { fill: var(--ink-3); }
+svg.sc .ol { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+svg .o { fill: var(--accent); stroke: var(--panel); stroke-width: 2; }
+svg .p { fill: var(--panel); stroke: var(--ink); stroke-width: 1.6; }
+h3.sub { margin: 22px 0 8px; }
+table.applic td:first-child { min-width: 220px; } table.applic td:nth-child(2) { min-width: 200px; }
+.tchip { display: inline-block; margin: 2px 2px 2px 0; padding: 1px 8px; border-radius: 999px; font-size: 12px; text-decoration: none;
+  border: 1px solid var(--line); color: var(--ink); background: var(--bg); white-space: nowrap; }
+.tchip.st-verifier { border-color: var(--t-proved); } .tchip.st-used { border-color: var(--accent); }
+.tchip.st-candidate { border-style: dashed; color: var(--ink-2); }
+.tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 12px; }
+.tool { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; scroll-margin-top: 56px; }
+.tool.candidate { border-style: dashed; }
+dl.sd { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; margin: 6px 0 0; font-size: var(--s-2); }
+dl.sd dt { color: var(--ink-3); font-weight: 600; } dl.sd dd { margin: 0; max-width: 90ch; }
+.tool h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: var(--s-3); }
+.tool .cat { margin: 0 0 6px; font-size: var(--s-1); color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; }
+.tool dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 10px; margin: 0; font-size: var(--s-2); }
+.tool dt { color: var(--ink-3); font-weight: 600; } .tool dd { margin: 0; }
+.badge.st-verifier { color: var(--t-proved); border-color: currentColor; }
+.badge.st-used { color: var(--accent); border-color: currentColor; }
+.badge.st-candidate { color: var(--ink-3); border-style: dashed; }
+.badge.here { background: var(--accent-soft); color: var(--ink); }
 ul.open { margin: 4px 0 0; padding-left: 20px; max-width: 86ch; } ul.open li { margin: 4px 0; }
 footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--line); font-size: var(--s-1); color: var(--ink-3); }
 .rcards { display: grid; gap: 14px; padding-top: 22px; }
@@ -809,7 +1047,9 @@ footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--line);
 .rcard:hover { border-color: var(--accent); }
 @media (max-width: 640px) {
   .step { grid-template-columns: minmax(0, 1fr); } .sn { width: 28px; height: 28px; }
-  dl.scope, dl.sm, .finding dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  dl.scope, dl.sm, dl.sd, .finding dl, .tool dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .tchip { white-space: normal; }
+  svg.sc text { font-size: 15px; }
   .chip-node .st { white-space: normal; } dl.scope dd, .finding dd { margin-bottom: 8px; }
   .srow { grid-template-columns: 1fr; gap: 0; } .srow.axis .slab { display: none; }
   .brow { grid-template-columns: 1fr 76px; } .brow .blab { grid-column: 1 / -1; }

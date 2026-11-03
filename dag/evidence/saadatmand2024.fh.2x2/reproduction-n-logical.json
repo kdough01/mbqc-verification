@@ -1,46 +1,48 @@
 {
- "input_hash": "a516df51a0c9e2f9",
+ "input_hash": "f27c8e7c70f9d10e",
  "inputs": {
   "check_code": {
    "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
   },
-  "check_params": "440cc12d2ded37a6",
+  "check_params": "faa646ae3c792d3e",
   "code": {
-   "experiments/rre/compare.py": "e5addd17e072934d23593641640c06784a21076c70d882fca12e707bbb22a96c",
-   "experiments/rre/config_paper_v3.yaml": "e62195061ffdecbca8a29ce2c9883a778a97cc397e13cfae01966f6d50fc79d1",
-   "experiments/rre/fh.py": "d63c21cde9804c5c7066f529528384b4fd6c04b50e9fa510c7934a35333762f2",
-   "experiments/rre/paper_v3_table2.yaml": "45780684718f5f6502f6c6c3ed4afc3983affcf77a9c4c9efb5ed168e94a48a0",
-   "experiments/rre/results/table2_2x2.json": "5a388a1caad1c59dc9219bc004e9b9d29d5057090684fea0863e11668aa1adf1"
+   "experiments/rre/compare.py": "3e91ce5389e1478b27fdb70aeba78066716ac77167defe6d097199f282843d9d",
+   "experiments/rre/config_calibrated.yaml": "9d69d8fec13a5daab7249c59567efa6b742a04ba4f574fce6c929f48062e9a52",
+   "experiments/rre/fh.py": "f6bd517a2ab7dd4d117cf6730a8809502efef74e3b8add1212228207fa43de33",
+   "experiments/rre/paper_v3_table2.yaml": "596921f3072ee8914373f4014c4fb72573fcb48641f60a7cef50c6821e06243c",
+   "experiments/rre/reproduce_table2.py": "b401e5994f8fa65d903b7a4f826c9786f3e3d42e9c9928f0499b46fc4dbad96b",
+   "experiments/rre/results/calibrated/fh_2x2.json": "1bfeead0e6423d238ffb32e5e4b99bb25e4552ac7e70c28068809ffc320711ed",
+   "experiments/rre/results/calibrated/table2_fh_2x2.json": "7a5cf55c9083593dd664a03b039283b57776fcd32e80773e1302cea2d770c131"
   },
   "definitions": {
    "def.fermi_hubbard_square": "99b6bd7d9917ffdd"
   },
   "parents": {
    "def.fermi_hubbard_square": "99b6bd7d9917ffdd:4f53cda1",
-   "saadatmand2024.config": "d800ae63e2cdfdc0:e10808d4"
+   "saadatmand2024.config": "ad4d63c00249d009:e10808d4"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
-  "statement": "523c36a6b3ddcf0f"
+  "statement": "92469c0bfd141d21"
  },
  "kind": "reproduction",
  "name": "reproduction-n-logical",
  "node": "saadatmand2024.fh.2x2",
  "params": {
-  "domain": "FH 2x2, RRE 0.26.33 @ 9383b4d, pyLIQTR 1.3.3, config_paper_v3.yaml, default widgetization",
+  "domain": "Fermi\u2013Hubbard 2\u00d72, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer, FIFO ancilla reuse",
   "expect": {
    "path": "quantities.n_logical.paper"
   },
   "op": "approx",
   "path": "quantities.n_logical.ours",
   "rel_tol": 0.01,
-  "results": "experiments/rre/results/table2_2x2.json"
+  "results": "experiments/rre/results/calibrated/table2_fh_2x2.json"
  },
  "provenance": {
-  "commit": "1b64d17ff7f53878d9ed4db619578f2f3f409001",
+  "commit": "74cf69002845257340c3fcd71b475e888aa6a37d",
   "dirty": true,
-  "finished": "2026-10-31T21:34:32+00:00",
+  "finished": "2026-11-03T19:07:04+00:00",
   "quick": false,
-  "seconds": 1.63,
+  "seconds": 1.09,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
@@ -51,21 +53,21 @@
   }
  },
  "result": {
-  "domain": "FH 2x2, RRE 0.26.33 @ 9383b4d, pyLIQTR 1.3.3, config_paper_v3.yaml, default widgetization",
+  "domain": "Fermi\u2013Hubbard 2\u00d72, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer, FIFO ancilla reuse",
   "evidence": {
    "expect": 36.0,
-   "expect_from": "experiments/rre/results/table2_2x2.json:quantities.n_logical.paper",
+   "expect_from": "experiments/rre/results/calibrated/table2_fh_2x2.json:quantities.n_logical.paper",
    "op": "approx",
    "path": "quantities.n_logical.ours",
    "provenance": null,
    "rel_tol": 0.01,
-   "results": "experiments/rre/results/table2_2x2.json",
-   "value": 87.0
+   "results": "experiments/rre/results/calibrated/table2_fh_2x2.json",
+   "value": 38.0
   },
   "frontier": [],
   "grants": "refuted",
   "outcome": "fail",
   "seed": null,
-  "summary": "not reproduced: quantities.n_logical.ours = 87 vs 36 (experiments/rre/results/table2_2x2.json:quantities.n_logical.paper): off by +141.7%"
+  "summary": "not reproduced: quantities.n_logical.ours = 38 vs 36 (experiments/rre/results/calibrated/table2_fh_2x2.json:quantities.n_logical.paper): off by +5.6%"
  }
 }

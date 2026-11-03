@@ -1,0 +1,129 @@
+id: saadatmand2024.ising.5x5
+kind: theorem
+title: 'Transverse-field Ising 5×5: Table II resources'
+statement: 'Transverse-field Ising 5×5 on the paper''s modular superconducting architecture needs: ñ_logical 212;
+  logical bus patches 2.98k; T patches 816; allocated physical qubits 4.39M; modules 6; hardware time 6.64h; P_diss,4K
+  2.52kW; P_diss,20mK 5.04nW; energy 6.42MWh (Table II of arXiv:2406.06015v3).'
+description: For the larger machine (experiments/rre/README.md, 'Larger instances'); its checks skip until the results
+  file is committed.
+code:
+- experiments/rre/fh.py
+- experiments/rre/compare.py
+- experiments/rre/reproduce_table2.py
+- experiments/rre/paper_v3_table2.yaml
+- experiments/rre/config_calibrated.yaml
+depends_on:
+- node: def.transverse_ising_triangular
+  kind: uses
+- node: saadatmand2024.config
+  kind: assumes
+source:
+  citation: 'S. N. Saadatmand et al., Superconducting qubits in the millions: the potential and limitations of modularity,
+    arXiv:2406.06015v3'
+  url: https://arxiv.org/abs/2406.06015v3
+  exact_form: Table II, Transverse-field Ising row 5x5
+checks:
+- kind: reproduction
+  name: reproduction-n-logical
+  params:
+    results: experiments/rre/results/calibrated/table2_ising_5x5.json
+    path: quantities.n_logical.ours
+    expect:
+      path: quantities.n_logical.paper
+    op: approx
+    rel_tol: 0.01
+    domain: Transverse-field Ising 5×5, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer,
+      greedy ancilla reuse
+- kind: reproduction
+  name: reproduction-bus-patches
+  params:
+    results: experiments/rre/results/calibrated/table2_ising_5x5.json
+    path: quantities.bus_patches.ours
+    expect:
+      path: quantities.bus_patches.paper
+    op: approx
+    rel_tol: 0.01
+    domain: Transverse-field Ising 5×5, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer,
+      greedy ancilla reuse
+- kind: reproduction
+  name: reproduction-t-patches
+  params:
+    results: experiments/rre/results/calibrated/table2_ising_5x5.json
+    path: quantities.t_patches.ours
+    expect:
+      path: quantities.t_patches.paper
+    op: approx
+    rel_tol: 0.01
+    domain: Transverse-field Ising 5×5, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer,
+      greedy ancilla reuse
+- kind: reproduction
+  name: reproduction-phys-qubits
+  params:
+    results: experiments/rre/results/calibrated/table2_ising_5x5.json
+    path: quantities.phys_qubits.ours
+    expect:
+      path: quantities.phys_qubits.paper
+    op: approx
+    rel_tol: 0.01
+    domain: Transverse-field Ising 5×5, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer,
+      greedy ancilla reuse
+- kind: reproduction
+  name: reproduction-modules
+  params:
+    results: experiments/rre/results/calibrated/table2_ising_5x5.json
+    path: quantities.modules.ours
+    expect:
+      path: quantities.modules.paper
+    op: approx
+    rel_tol: 0.01
+    domain: Transverse-field Ising 5×5, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer,
+      greedy ancilla reuse
+- kind: reproduction
+  name: reproduction-time-s
+  params:
+    results: experiments/rre/results/calibrated/table2_ising_5x5.json
+    path: quantities.time_s.ours
+    expect:
+      path: quantities.time_s.paper
+    op: approx
+    rel_tol: 0.01
+    domain: Transverse-field Ising 5×5, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer,
+      greedy ancilla reuse
+- kind: reproduction
+  name: reproduction-p4k-w
+  params:
+    results: experiments/rre/results/calibrated/table2_ising_5x5.json
+    path: quantities.p4k_w.ours
+    expect:
+      path: quantities.p4k_w.paper
+    op: approx
+    rel_tol: 0.01
+    domain: Transverse-field Ising 5×5, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer,
+      greedy ancilla reuse
+- kind: reproduction
+  name: reproduction-p20mk-w
+  params:
+    results: experiments/rre/results/calibrated/table2_ising_5x5.json
+    path: quantities.p20mk_w.ours
+    expect:
+      path: quantities.p20mk_w.paper
+    op: approx
+    rel_tol: 0.01
+    domain: Transverse-field Ising 5×5, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer,
+      greedy ancilla reuse
+- kind: reproduction
+  name: reproduction-energy-wh
+  params:
+    results: experiments/rre/results/calibrated/table2_ising_5x5.json
+    path: quantities.energy_wh.ours
+    expect:
+      path: quantities.energy_wh.paper
+    op: approx
+    rel_tol: 0.01
+    domain: Transverse-field Ising 5×5, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer,
+      greedy ancilla reuse
+tags:
+- ising
+- table-ii
+- saadatmand2024
+- reproduction

@@ -1,0 +1,73 @@
+{
+ "input_hash": "cc64c0050f6aebfb",
+ "inputs": {
+  "check_code": {
+   "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
+  },
+  "check_params": "a278ea70eb83ad34",
+  "code": {
+   "experiments/rre/compare.py": "3e91ce5389e1478b27fdb70aeba78066716ac77167defe6d097199f282843d9d",
+   "experiments/rre/config_calibrated.yaml": "9d69d8fec13a5daab7249c59567efa6b742a04ba4f574fce6c929f48062e9a52",
+   "experiments/rre/fh.py": "f6bd517a2ab7dd4d117cf6730a8809502efef74e3b8add1212228207fa43de33",
+   "experiments/rre/paper_v3_table2.yaml": "596921f3072ee8914373f4014c4fb72573fcb48641f60a7cef50c6821e06243c",
+   "experiments/rre/reproduce_table2.py": "b401e5994f8fa65d903b7a4f826c9786f3e3d42e9c9928f0499b46fc4dbad96b",
+   "experiments/rre/results/calibrated/ising_2x2.json": "f59a00232d7921d0cbeeb34a1084eb167f81a26c81c845f538856d95061a9d2d",
+   "experiments/rre/results/calibrated/table2_ising_2x2.json": "e1694d8c69bb6b07be4d62a18d9aba0437667f0b4571e940c35bdfb7807a7729"
+  },
+  "definitions": {
+   "def.transverse_ising_triangular": "7525edd038c82aaa"
+  },
+  "parents": {
+   "def.transverse_ising_triangular": "7525edd038c82aaa:4f53cda1",
+   "saadatmand2024.config": "ad4d63c00249d009:e10808d4"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "38a70e7fad8ead98"
+ },
+ "kind": "reproduction",
+ "name": "reproduction-t-patches",
+ "node": "saadatmand2024.ising.2x2",
+ "params": {
+  "domain": "Transverse-field Ising 2\u00d72, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer, greedy ancilla reuse",
+  "expect": {
+   "path": "quantities.t_patches.paper"
+  },
+  "op": "approx",
+  "path": "quantities.t_patches.ours",
+  "rel_tol": 0.01,
+  "results": "experiments/rre/results/calibrated/table2_ising_2x2.json"
+ },
+ "provenance": {
+  "commit": "74cf69002845257340c3fcd71b475e888aa6a37d",
+  "dirty": true,
+  "finished": "2026-11-03T19:07:44+00:00",
+  "quick": false,
+  "seconds": 1.13,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "Transverse-field Ising 2\u00d72, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, RRE's example widgetizer, greedy ancilla reuse",
+  "evidence": {
+   "expect": 2430.0,
+   "expect_from": "experiments/rre/results/calibrated/table2_ising_2x2.json:quantities.t_patches.paper",
+   "op": "approx",
+   "path": "quantities.t_patches.ours",
+   "provenance": null,
+   "rel_tol": 0.01,
+   "results": "experiments/rre/results/calibrated/table2_ising_2x2.json",
+   "value": 2382.0
+  },
+  "frontier": [],
+  "grants": "refuted",
+  "outcome": "fail",
+  "seed": null,
+  "summary": "not reproduced: quantities.t_patches.ours = 2382 vs 2430 (experiments/rre/results/calibrated/table2_ising_2x2.json:quantities.t_patches.paper): off by -2.0%"
+ }
+}

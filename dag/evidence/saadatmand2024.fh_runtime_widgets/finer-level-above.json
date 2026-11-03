@@ -1,0 +1,65 @@
+{
+ "input_hash": "e372a929f934bbaf",
+ "inputs": {
+  "check_code": {
+   "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
+  },
+  "check_params": "503fe429f4fb377e",
+  "code": {
+   "experiments/rre/fh_widgets.py": "cd4b73f1a85e7beda1c0496234206f50a3d87fcefc65616c3c064f0ef2cecb36",
+   "experiments/rre/results/calibrated/fh_widgets.json": "2e67554bb97e2a71bd78e2e693456af85e4fa28fb177d4f4aab4e59d7e7477c3"
+  },
+  "definitions": {
+   "def.fermi_hubbard_square": "99b6bd7d9917ffdd"
+  },
+  "parents": {
+   "def.fermi_hubbard_square": "99b6bd7d9917ffdd:4f53cda1",
+   "saadatmand2024.config": "ad4d63c00249d009:e10808d4"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "aa7c3c25585df3c1"
+ },
+ "kind": "reproduction",
+ "name": "finer-level-above",
+ "node": "saadatmand2024.fh_runtime_widgets",
+ "params": {
+  "domain": "FH 4\u00d74, \u2264 1,500-gate widgets (40 distinct, 11,572 steps)",
+  "expect": 1,
+  "op": "ge",
+  "path": "rows.4.ratios.time_s",
+  "results": "experiments/rre/results/calibrated/fh_widgets.json"
+ },
+ "provenance": {
+  "commit": "74cf69002845257340c3fcd71b475e888aa6a37d",
+  "dirty": true,
+  "finished": "2026-11-03T19:17:28+00:00",
+  "quick": false,
+  "seconds": 1.13,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "FH 4\u00d74, \u2264 1,500-gate widgets (40 distinct, 11,572 steps)",
+  "evidence": {
+   "expect": 1.0,
+   "expect_from": "the claim",
+   "op": "ge",
+   "path": "rows.4.ratios.time_s",
+   "provenance": null,
+   "rel_tol": null,
+   "results": "experiments/rre/results/calibrated/fh_widgets.json",
+   "value": 3.6047
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "reproduced: rows.4.ratios.time_s = 3.6047 vs 1 (the claim): \u2265"
+ }
+}

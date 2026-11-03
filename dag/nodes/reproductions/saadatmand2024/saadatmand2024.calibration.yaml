@@ -1,0 +1,134 @@
+id: saadatmand2024.calibration
+kind: lemma
+title: The QFT rows single out one configuration
+statement: 'Of the 48 combinations of the settings the paper does not state or states ambiguously (failure budget
+  0.95/0.5/0.05, logical-error fit paper/RRE, T-factory table Table I/RRE''s, gate time 200/50 ns, whole-circuit
+  or RRE-example widgets), exactly one reproduces 26 of the 27 Table II columns of QFT N-4, N-10 and N-25 within
+  1%: failure budget 0.05, the paper''s error fit, RRE''s shipped factory table, t = 200 ns, one widget per circuit.
+  Every point that changes any one of these reproduces at most 22.'
+description: Each grid point is an actual run of the pinned pipeline (experiments/rre/calibrate.py). QFT circuits
+  have no random phases and no ancillas, so only the configuration can differ. The one column it misses is QFT N-25's
+  bus patches (saadatmand2024.qft.n25).
+code:
+- experiments/rre/calibrate.py
+- experiments/rre/compare.py
+- experiments/rre/results/calibrated/calibration.json
+depends_on:
+- node: def.qft_cirq
+  kind: uses
+- node: saadatmand2024.config
+  kind: assumes
+source:
+  citation: 'S. N. Saadatmand et al., Superconducting qubits in the millions: the potential and limitations of modularity,
+    arXiv:2406.06015v3'
+  url: https://arxiv.org/abs/2406.06015v3
+  exact_form: Table II, QFT rows; §III.2.3 (p_algo = 0.95); Table I
+checks:
+- kind: reproduction
+  name: best-point
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.ranked.0.matched
+    expect: 26
+    op: ge
+    domain: QFT N-4, N-10, N-25 × 48 settings
+- kind: reproduction
+  name: runner-up
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.ranked.1.matched
+    expect: 22
+    op: le
+    domain: QFT N-4, N-10, N-25 × 48 settings
+- kind: reproduction
+  name: failure-budget-0-05
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.best_by_axis.target_p_algo.2.best
+    expect: 26
+    op: ge
+    domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
+- kind: reproduction
+  name: failure-budget-0-95
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.best_by_axis.target_p_algo.0.best
+    expect: 22
+    op: le
+    domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
+- kind: reproduction
+  name: failure-budget-0-5
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.best_by_axis.target_p_algo.1.best
+    expect: 22
+    op: le
+    domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
+- kind: reproduction
+  name: error-fit-paper
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.best_by_axis.coeffs.0.best
+    expect: 26
+    op: ge
+    domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
+- kind: reproduction
+  name: error-fit-rre
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.best_by_axis.coeffs.1.best
+    expect: 22
+    op: le
+    domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
+- kind: reproduction
+  name: factory-table-rre
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.best_by_axis.factories.1.best
+    expect: 26
+    op: ge
+    domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
+- kind: reproduction
+  name: factory-table-table-i
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.best_by_axis.factories.0.best
+    expect: 22
+    op: le
+    domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
+- kind: reproduction
+  name: gate-time-200ns
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.best_by_axis.gate_ns.0.best
+    expect: 26
+    op: ge
+    domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
+- kind: reproduction
+  name: gate-time-50ns
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.best_by_axis.gate_ns.1.best
+    expect: 22
+    op: le
+    domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
+- kind: reproduction
+  name: widgets-one
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.best_by_axis.widgets.0.best
+    expect: 26
+    op: ge
+    domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
+- kind: reproduction
+  name: widgets-rre-example
+  params:
+    results: experiments/rre/results/calibrated/calibration.json
+    path: summary.best_by_axis.widgets.1.best
+    expect: 22
+    op: le
+    domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
+tags:
+- calibration
+- saadatmand2024
+- reproduction

@@ -1,0 +1,66 @@
+{
+ "input_hash": "9b55224c64382df4",
+ "inputs": {
+  "check_code": {
+   "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
+  },
+  "check_params": "830b2a129a73f15f",
+  "code": {
+   "experiments/rre/calibrate.py": "023e84a3b3cc27e00e823395dcd9b35a253ce466c3819f1009b51e550c984614",
+   "experiments/rre/compare.py": "3e91ce5389e1478b27fdb70aeba78066716ac77167defe6d097199f282843d9d",
+   "experiments/rre/results/calibrated/calibration.json": "4aa4d79ee1c66bba33efe795a9b5c7bd8478b7286ebd3d53e709a5fe7db8a0fc"
+  },
+  "definitions": {
+   "def.qft_cirq": "20fe25eb3a491a57"
+  },
+  "parents": {
+   "def.qft_cirq": "20fe25eb3a491a57:4f53cda1",
+   "saadatmand2024.config": "ad4d63c00249d009:e10808d4"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "6f40714e62a87dac"
+ },
+ "kind": "reproduction",
+ "name": "failure-budget-0-5",
+ "node": "saadatmand2024.calibration",
+ "params": {
+  "domain": "QFT N-4, N-10, N-25 \u00d7 48 settings, 27 Table II columns",
+  "expect": 22,
+  "op": "le",
+  "path": "summary.best_by_axis.target_p_algo.1.best",
+  "results": "experiments/rre/results/calibrated/calibration.json"
+ },
+ "provenance": {
+  "commit": "74cf69002845257340c3fcd71b475e888aa6a37d",
+  "dirty": true,
+  "finished": "2026-11-03T19:06:30+00:00",
+  "quick": false,
+  "seconds": 1.1,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "QFT N-4, N-10, N-25 \u00d7 48 settings, 27 Table II columns",
+  "evidence": {
+   "expect": 22.0,
+   "expect_from": "the claim",
+   "op": "le",
+   "path": "summary.best_by_axis.target_p_algo.1.best",
+   "provenance": null,
+   "rel_tol": null,
+   "results": "experiments/rre/results/calibrated/calibration.json",
+   "value": 15.0
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "reproduced: summary.best_by_axis.target_p_algo.1.best = 15 vs 22 (the claim): \u2264"
+ }
+}

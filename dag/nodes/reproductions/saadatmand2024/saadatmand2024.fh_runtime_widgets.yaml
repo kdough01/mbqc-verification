@@ -1,0 +1,44 @@
+id: saadatmand2024.fh_runtime_widgets
+kind: lemma
+title: Fermi–Hubbard runtime follows widget granularity
+statement: 'With the calibrated configuration, the Fermi–Hubbard 4×4 runtime in Table II (35.1 s) lies between two
+  adjacent widget granularities of RRE''s public widgetizer: 14 distinct widgets / 2,948 steps gives 0.88× the paper''s
+  runtime, and 40 / 11,572 steps gives 3.6×.'
+description: Runtime is dominated by inter-module handover, paid once per widget step (Eq. 21), and the paper does
+  not state its widgetization. The levels are discrete because pyLIQTR's circuit structure fixes where widgets can
+  be cut. At 2×2 the public widgetizer fails below the default level (IndexError in qualtran's adder decomposition),
+  so the finer cuts the paper's 2×2 runtime would need cannot be produced with the public code.
+code:
+- experiments/rre/fh_widgets.py
+- experiments/rre/results/calibrated/fh_widgets.json
+depends_on:
+- node: def.fermi_hubbard_square
+  kind: uses
+- node: saadatmand2024.config
+  kind: assumes
+source:
+  citation: 'S. N. Saadatmand et al., Superconducting qubits in the millions: the potential and limitations of modularity,
+    arXiv:2406.06015v3'
+  url: https://arxiv.org/abs/2406.06015v3
+  exact_form: Table II, Fermi Hubbard 4x4; Eq. (21); Appendix B
+checks:
+- kind: reproduction
+  name: coarser-level-below
+  params:
+    results: experiments/rre/results/calibrated/fh_widgets.json
+    path: rows.3.ratios.time_s
+    expect: 1
+    op: le
+    domain: FH 4×4, ≤ 40-qubit widgets (14 distinct, 2,948 steps)
+- kind: reproduction
+  name: finer-level-above
+  params:
+    results: experiments/rre/results/calibrated/fh_widgets.json
+    path: rows.4.ratios.time_s
+    expect: 1
+    op: ge
+    domain: FH 4×4, ≤ 1,500-gate widgets (40 distinct, 11,572 steps)
+tags:
+- fermi-hubbard
+- widgetization
+- saadatmand2024

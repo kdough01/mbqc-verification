@@ -1,9 +1,14 @@
 """
-fh.py — Fermi–Hubbard resource estimates with the paper's own pipeline (Saadatmand et al., arXiv:2406.06015v3).
+fh.py — Table II resource estimates with the paper's own pipeline (Saadatmand et al., arXiv:2406.06015v3).
 
-    python experiments/rre/fh.py --n 2 [--phases random|optimization] [--seed 0]
+    python experiments/rre/fh.py --n 2 [--model fh|qft|ising] [--phases random|optimization] [--seed 0]
                                  [--config experiments/rre/config_paper_v3.yaml] [--set key=value ...]
+                                 [--qubit-manager simple|greedy|greedy-fifo]
                                  [--out experiments/rre/results/fh_2x2.json]
+
+Models (Table II's three families): fh = Fermi–Hubbard on an N×N square lattice (default); qft = cirq.qft on N
+qubits; ising = transverse-field Ising on an N×N triangular lattice, H = Σ Z_j Z_k + 0.1 Σ X_j (Eq. 24), with
+pyLIQTR's Heisenberg class and the PauliLCU block encoding, as §III.3 describes.
 
 Steps, following §III.2.2–III.3 and §II.4 of the paper:
   1. pyLIQTR 1.3.3: FermiHubbard instance on an N×N square lattice (J = 1, U = 2, t = 1), FermiHubbardSquare
@@ -55,13 +60,54 @@ def fh_circuit(n: int, phases: str, seed: int):
     return gate.circuit, info
 
 
+def qft_circuit(n: int):
+    """§III.3: "For QFT instances, we used the QFT circuits provided by the qft method in cirq"."""
+    import cirq
+    return cirq.Circuit(cirq.qft(*cirq.LineQubit.range(n))), {}
+
+
+def ising_circuit(n: int, phases: str, seed: int):
+    """Eq. (24): H = Σ_<j,k> Z_j Z_k + 0.1 Σ_j X_j on an N×N triangular lattice, t = 1; pyLIQTR's Heisenberg class with
+    the PauliLCU block encoding (§III.3)."""
+    import numpy as np
+    from pyLIQTR.BlockEncodings.getEncoding import VALID_ENCODINGS, getEncoding
+    from pyLIQTR.ProblemInstances.getInstance import getInstance
+    from pyLIQTR.clam.lattice_definitions import TriangularLattice
+    from pyLIQTR.qubitization.qsvt_dynamics import qsvt_dynamics, simulation_phases
+
+    np.random.seed(seed)
+    model = getInstance("Heisenberg", shape=(n, n), J=(0.0, 0.0, 1.0), h=(0.1, 0.0, 0.0), cell=TriangularLattice)
+    ph = simulation_phases(times=T_EVOLVE * model.alpha, eps=EPS_QSP, precompute=False, phase_algorithm=phases)
+    gate = qsvt_dynamics(encoding=getEncoding(VALID_ENCODINGS.PauliLCU), instance=model, phase_sets=ph)
+    info = {"alpha": float(model.alpha), "num_phases": [int(p.num_phases) for p in ph],
+            "tau": T_EVOLVE * float(model.alpha)}
+    return gate.circuit, info
+
+
+# model -> (Table II section in paper_v3_table2.yaml, instance label, circuit builder)
+MODELS = {
+    "fh": ("fermi_hubbard", lambda n: f"{n}x{n}", lambda n, phases, seed: fh_circuit(n, phases, seed)),
+    "qft": ("qft", lambda n: f"N-{n}", lambda n, phases, seed: qft_circuit(n)),
+    "ising": ("transverse_ising", lambda n: f"{n}x{n}", lambda n, phases, seed: ising_circuit(n, phases, seed)),
+}
+MODEL_INFO = {
+    "fh": {"model": "FermiHubbard", "J": J, "U": U, "t": T_EVOLVE, "eps_qsp": EPS_QSP, "encoding": "FermiHubbardSquare"},
+    "qft": {"model": "QFT", "source": "cirq.qft"},
+    "ising": {"model": "TransverseIsing", "lattice_cell": "triangular", "Jz": 1.0, "hx": 0.1, "t": T_EVOLVE,
+              "eps_qsp": EPS_QSP, "encoding": "PauliLCU"},
+}
+
+
 def decomposition_context(qubit_manager: str):
-    """How decompositions allocate ancillas. The paper does not say; RRE's default is a fresh qubit per ancilla."""
+    """How decompositions allocate ancillas. The paper does not say. RRE's default is a fresh qubit per ancilla
+    ("simple"); cirq's GreedyQubitManager reuses freed ancillas, most recently freed first ("greedy",
+    maximize_reuse=True) or in allocation order ("greedy-fifo", maximize_reuse=False)."""
     import cirq
     if qubit_manager == "simple":
         return None
-    if qubit_manager == "greedy":
-        return cirq.DecompositionContext(cirq.GreedyQubitManager(prefix="_anc", maximize_reuse=True))
+    if qubit_manager in ("greedy", "greedy-fifo"):
+        return cirq.DecompositionContext(cirq.GreedyQubitManager(prefix="_anc",
+                                                                 maximize_reuse=qubit_manager == "greedy"))
     raise ValueError(qubit_manager)
 
 
@@ -111,19 +157,24 @@ def _git(path: Path) -> str:
 
 
 def run(n: int, phases: str, seed: int, params_path: Path, overrides: list[str],
-        max_gates: int = WIDGET_MAX_GATES, max_q: int = WIDGET_MAX_Q, qubit_manager: str = "simple") -> dict:
+        max_gates: int = WIDGET_MAX_GATES, max_q: int = WIDGET_MAX_Q, qubit_manager: str = "simple",
+        model: str = "fh", params: dict | None = None, label: str | None = None) -> dict:
+    """Run one instance. `params` (a full RRE parameter dict) replaces params_path + overrides when given;
+    `label` names that configuration in the output."""
     from rigetti_resource_estimation import Configuration
     from rigetti_resource_estimation.estimation_pipeline import estimation_pipeline
     import pandas as pd
 
     t0 = time.time()
-    circuit, info = fh_circuit(n, phases, seed)
+    section, label_of, build = MODELS[model]
+    circuit, info = build(n, phases, seed)
     t_circ = time.time() - t0
-    name = f"fh{n}x{n}_{phases}_s{seed}"
+    label = label_of(n)
+    name = f"{model}{label}_{phases}_s{seed}".replace("-", "")
     context = decomposition_context(qubit_manager)
     wdict = widgetize(circuit, name, max_gates, max_q, context)
     t_widget = time.time() - t0 - t_circ
-    params = load_params(params_path, overrides)
+    params = params if params is not None else load_params(params_path, overrides)
     with tempfile.TemporaryDirectory() as tmp:
         csv = Path(tmp) / "out.csv"
         cwd = os.getcwd()
@@ -138,13 +189,13 @@ def run(n: int, phases: str, seed: int, params_path: Path, overrides: list[str],
     clean = {k: (v.item() if hasattr(v, "item") else v) for k, v in row.items()}
     rre = Path(md.distribution("rigetti-resource-estimation").locate_file("")).resolve()
     return {
-        "instance": {"model": "FermiHubbard", "lattice": f"{n}x{n}", "n": n, "J": J, "U": U, "t": T_EVOLVE,
-                     "eps_qsp": EPS_QSP, "encoding": "FermiHubbardSquare", "phases": phases, "seed": seed, **info,
+        "instance": {**MODEL_INFO[model], "family": model, "table_section": section, "lattice": label, "n": n,
+                     "phases": phases if model != "qft" else None, "seed": seed, **info,
                      "widgetizer": {"max_gates": max_gates, "max_q": max_q, "qubit_manager": qubit_manager,
                                     "n_distinct_widgets": len(wdict["widgets"]),
                                     "n_widgets": int(sum(c for _, c in wdict["widgets"].values()))}},
         "rre": clean,
-        "config": {"file": params_path.name, "overrides": overrides,
+        "config": {"file": params_path.name, "overrides": overrides, "label": label,
                    "sha256": hashlib.sha256(json.dumps(params, sort_keys=True).encode()).hexdigest()},
         "provenance": {"python": platform.python_version(), "machine": platform.machine(),
                        "rre": md.version("rigetti-resource-estimation"), "pyLIQTR": md.version("pyLIQTR"),
@@ -158,17 +209,18 @@ def run(n: int, phases: str, seed: int, params_path: Path, overrides: list[str],
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--n", type=int, required=True)
+    ap.add_argument("--model", default="fh", choices=sorted(MODELS))
     ap.add_argument("--phases", default="random", choices=["random", "optimization"])
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--config", default=str(HERE / "config_paper_v3.yaml"))
     ap.add_argument("--set", action="append", default=[], help="override a parameter, e.g. target_p_algo=0.05")
     ap.add_argument("--widget-max-gates", type=int, default=WIDGET_MAX_GATES)
     ap.add_argument("--widget-max-q", type=int, default=WIDGET_MAX_Q)
-    ap.add_argument("--qubit-manager", default="simple", choices=["simple", "greedy"])
+    ap.add_argument("--qubit-manager", default="simple", choices=["simple", "greedy", "greedy-fifo"])
     ap.add_argument("--out")
     args = ap.parse_args(argv)
     result = run(args.n, args.phases, args.seed, Path(args.config), args.set, args.widget_max_gates, args.widget_max_q,
-                 args.qubit_manager)
+                 args.qubit_manager, args.model)
     text = json.dumps(result, indent=1, default=str)
     if args.out:
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)

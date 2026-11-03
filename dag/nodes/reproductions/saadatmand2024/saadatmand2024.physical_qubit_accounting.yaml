@@ -3,9 +3,9 @@ kind: lemma
 title: Appendix A's two physical-qubit totals agree
 statement: The total allocated physical qubits (Parameter 35) equals the number of modules times the allocated physical
   qubits per module (Parameter 14).
-description: Parameter 14 prices each T-factory at its own qubit count Q (Table I); Parameter 35 prices it at its
-  footprint in 2d² patches, ⌈L_length/(√2d)⌉⌈L_width/(√2d)⌉. For FH 2×2 that is 1.29M against RRE's reported 1.66M;
-  the paper's Table II prints 1.32M.
+description: 'Parameter 14 prices each T-factory at its own qubit count Q (Table I); Parameter 35 prices it at its
+  footprint in 2d² patches. RRE reports Parameter 35. Table II follows modules × Parameter 14: the QFT rows reproduce
+  with it to 0.4% (saadatmand2024.column_readings).'
 code:
 - experiments/rre/rederive.py
 - experiments/rre/results/rederive_2x2.json

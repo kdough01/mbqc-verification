@@ -11,7 +11,7 @@ import yaml
 
 from dagtool.model import load_dag
 from dagtool.render import _slug
-from dagtool.report import ReportError, inline, render_report, report_specs, write_reports
+from dagtool.report import ReportError, inline, load_toolkit, render_report, render_toolkit, report_specs, write_reports
 from dagtool.status import compute
 
 REPO = Path(__file__).resolve().parents[1]
@@ -32,8 +32,9 @@ def page(dag, spec):
     return render_report(dag, spec, compute(dag))
 
 
-def test_specs_are_found(dag):
-    assert "saadatmand2024" in [s["id"] for _, s in report_specs(REPO)]
+def test_specs_are_found_and_toolkit_is_not_a_report(dag):
+    ids = [s["id"] for _, s in report_specs(REPO)]
+    assert "saadatmand2024" in ids and "toolkit" not in ids
 
 
 def test_every_check_of_every_report_node_is_listed(dag, page):
@@ -47,7 +48,8 @@ def test_every_check_of_every_report_node_is_listed(dag, page):
 
 
 def test_sections_and_no_scripts(page):
-    for sid in ("scope", "pipeline", "approach", "configuration", "results", "findings", "graph", "checks", "open"):
+    for sid in ("scope", "pipeline", "approach", "configuration", "results", "findings", "strategies", "tools", "graph",
+                "checks", "open"):
         assert f'id="{sid}"' in page
     assert "<script" not in page.lower()
     assert "@media (prefers-color-scheme: dark)" in page   # tokens copied from the browser
@@ -93,3 +95,45 @@ def test_write_reports_writes_pages_and_index(dag, tmp_path):
     names = {p.name for p in written}
     assert {"saadatmand2024.html", "index.html"} <= names
     assert 'href="saadatmand2024.html"' in (tmp_path / "index.html").read_text(encoding="utf-8")
+
+
+def test_toolkit_is_consistent(spec):
+    tk = load_toolkit(REPO)
+    ids = {tl["id"] for tl in tk["tools"]}
+    assert len(ids) == len(tk["tools"])
+    assert set(spec["tools_used"]) <= ids
+    for m in tk["applicability"]:
+        assert set(m["tools"]) <= ids, m["claim"]
+    from verification.kinds import CHECK_KINDS
+    for tl in tk["tools"]:
+        assert tl["status"] in ("verifier", "used", "candidate")
+        assert set(tl.get("check_kinds", [])) <= set(CHECK_KINDS), tl["id"]
+        if tl["status"] == "verifier":
+            assert tl.get("check_kinds"), tl["id"]      # a verifier tool backs an implemented check kind
+
+
+def test_toolkit_page_and_report_sections(dag, page):
+    tk = load_toolkit(REPO)
+    html = render_toolkit(dag)
+    for s in tk["strategies"]:
+        assert s["title"].replace("'", "&#x27;") in html
+    for tl in tk["tools"]:
+        assert f'id="tool-{tl["id"]}"' in html and f'id="tool-{tl["id"]}"' in page
+    assert page.count("used for this paper") >= len(yaml.safe_load(
+        (REPO / "dag" / "reports" / "saadatmand2024.yaml").read_text(encoding="utf-8"))["tools_used"])
+
+
+def test_scaling_figures_plot_only_runs(spec, page):
+    import json
+    for fig in (f for f in spec["figures"] if f["type"] == "scaling"):
+        pts = json.loads((REPO / fig["file"]).read_text(encoding="utf-8"))["series"][fig["series"]]["points"]
+        block = re.search(rf'<figure class="fig" id="fig-{fig["id"]}">.*?</figure>\s*(?=<figure class="fig"|</section>)',
+                          page, flags=re.S).group(0)
+        assert block.count('<circle class="o"') == len(pts) * len(fig["panels"])      # one dot per run, per panel
+        printed = sum(1 for p in pts if p.get("paper")) * sum(1 for pan in fig["panels"] if pan.get("paper"))
+        assert block.count('<rect class="p"') == printed                               # paper only where printed
+
+
+def test_calibration_ranking_shows_the_unique_best_point(page):
+    block = re.search(r'id="fig-calibration".*?</figure>', page, flags=re.S).group(0)
+    assert "26/27" in block and "<b>budget 0.05" in block

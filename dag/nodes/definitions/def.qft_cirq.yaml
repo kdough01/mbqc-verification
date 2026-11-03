@@ -1,0 +1,11 @@
+id: def.qft_cirq
+kind: definition
+title: Quantum Fourier transform on N qubits (cirq.qft)
+statement: The N-qubit quantum Fourier transform as built by cirq.qft(q_0, …, q_{N−1}) (with the final qubit reversal),
+  the circuit §III.3 of arXiv:2406.06015v3 uses for its QFT instances.
+code:
+- experiments/rre/fh.py
+tags:
+- qft
+- model
+- saadatmand2024

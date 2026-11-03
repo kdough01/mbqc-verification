@@ -1,0 +1,30 @@
+# The calibrated configuration: config_paper_v3.yaml with the two readings that the QFT rows of Table II settle
+# (experiments/rre/calibrate.py and README.md, "Calibration"). Overlay on RRE's default params.yaml (commit 9383b4d).
+#
+#   target_p_algo 0.05   the failure budget is 1 - 0.95 (the paper's p_algo = 0.95 is a success probability);
+#                        with 0.95 the code distances, runtimes and qubit counts of the QFT rows do not come out.
+#   no distill_widget_table override: RRE's shipped T-factory table, not Table I as printed. With RRE's table the
+#                        QFT rows reproduce to 0.4%; with Table I's footprints they do not.
+#
+# Everything else is as in config_paper_v3.yaml. The gate time t = 200 ns is still not stated in the paper, but every
+# QFT runtime reproduces with it (to 0.25%), which a different t would not.
+
+phys_gate_error_rate: 0.001                 # §II.4.7: p = 1e-3
+
+error_scaling_coeffs:                        # Eq. (1) with the MWPM fit of Appendix D / Fig. 16
+  k: 0.009                                   # RRE default 0.3
+  p_th: 0.016                                # RRE default 0.0142857
+
+1q_unitary_decomp_method: mixed_fallback     # Parameter 16: c0 = 0.57, c1 = 8.83 (RRE default)
+decoder_char_timescale_sec: 1.0e-6           # Parameter 27: t_decoder = 1 µs (RRE default)
+
+# §III.2.3: "the desired probability of success of our algorithm, p_algo, [is] 0.95"; RRE's target_p_algo is the
+# failure budget, so 0.05. (config_paper_v3.yaml used 0.95, the literal reading of Eq. 27.)
+target_p_algo: 0.05
+
+ftqc:
+  inter_handover_timescale_sec: 1.0e-6       # §II.3: t_inter = 1 µs (RRE default)
+  qcycle_char_timescale_ns: 200              # NOT STATED; RRE params.yaml default. Every QFT runtime reproduces
+                                             # with it (calibration.json); 50 ns does not.
+  processor:
+    num_qubits: 1000000                      # §II.4.7: n_phys = 1,000,000 per module (RRE default)

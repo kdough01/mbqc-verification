@@ -1,0 +1,167 @@
+{
+ "rows": [
+  {
+   "lattice": "2x2",
+   "max_gates": 10000,
+   "max_q": 100,
+   "distinct_widgets": 5,
+   "widget_steps": 140,
+   "distance": 13,
+   "t_count": 22960,
+   "graph_memory": 80,
+   "handover_s": 0.549328,
+   "consumption_s": 0.3202368000000001,
+   "ratios": {
+    "n_logical": 1.0556,
+    "bus_patches": 1.1429,
+    "t_patches": 1.1156,
+    "phys_qubits": 0.927,
+    "modules": 1.0,
+    "time_s": 0.2126,
+    "p4k_w": 1.0,
+    "p20mk_w": 1.0,
+    "energy_wh": 0.2127
+   },
+   "matched": [
+    "modules",
+    "p20mk_w",
+    "p4k_w"
+   ],
+   "steps_text": "140 steps",
+   "wall_seconds": 1.5
+  },
+  {
+   "lattice": "2x2",
+   "max_gates": 2500,
+   "max_q": 100,
+   "error": "IndexError: list index out of range",
+   "steps_text": "\u2264 2,500 gates: widgetizer fails",
+   "wall_seconds": 0.0
+  },
+  {
+   "lattice": "4x4",
+   "max_gates": 10000,
+   "max_q": 100,
+   "distinct_widgets": 5,
+   "widget_steps": 596,
+   "distance": 15,
+   "t_count": 182216,
+   "graph_memory": 139,
+   "handover_s": 5.2836,
+   "consumption_s": 3.1285536,
+   "ratios": {
+    "n_logical": 1.0,
+    "bus_patches": 1.6747,
+    "t_patches": 0.9398,
+    "phys_qubits": 1.1291,
+    "modules": 1.0,
+    "time_s": 0.2397,
+    "p4k_w": 1.0,
+    "p20mk_w": 1.0,
+    "energy_wh": 0.2398
+   },
+   "matched": [
+    "modules",
+    "n_logical",
+    "p20mk_w",
+    "p4k_w"
+   ],
+   "steps_text": "596 steps",
+   "wall_seconds": 0.5
+  },
+  {
+   "lattice": "4x4",
+   "max_gates": 10000,
+   "max_q": 40,
+   "distinct_widgets": 14,
+   "widget_steps": 2948,
+   "distance": 15,
+   "t_count": 182216,
+   "graph_memory": 87,
+   "handover_s": 26.16935999999999,
+   "consumption_s": 4.754256000000002,
+   "ratios": {
+    "n_logical": 1.0,
+    "bus_patches": 1.0482,
+    "t_patches": 1.0247,
+    "phys_qubits": 1.1566,
+    "modules": 1.0,
+    "time_s": 0.881,
+    "p4k_w": 1.0,
+    "p20mk_w": 1.0,
+    "energy_wh": 0.8816
+   },
+   "matched": [
+    "modules",
+    "n_logical",
+    "p20mk_w",
+    "p4k_w"
+   ],
+   "steps_text": "2,948 steps",
+   "wall_seconds": 0.5
+  },
+  {
+   "lattice": "4x4",
+   "max_gates": 1500,
+   "max_q": 100,
+   "distinct_widgets": 40,
+   "widget_steps": 11572,
+   "distance": 16,
+   "t_count": 185360,
+   "graph_memory": 87,
+   "handover_s": 109.60051199999994,
+   "consumption_s": 16.923033600000007,
+   "ratios": {
+    "n_logical": 1.0,
+    "bus_patches": 1.0482,
+    "t_patches": 0.9434,
+    "phys_qubits": 1.154,
+    "modules": 1.0,
+    "time_s": 3.6047,
+    "p4k_w": 1.0,
+    "p20mk_w": 1.0,
+    "energy_wh": 3.6072
+   },
+   "matched": [
+    "modules",
+    "n_logical",
+    "p20mk_w",
+    "p4k_w"
+   ],
+   "steps_text": "11,572 steps",
+   "wall_seconds": 0.7
+  },
+  {
+   "lattice": "4x4",
+   "max_gates": 10000,
+   "max_q": 30,
+   "distinct_widgets": 176,
+   "widget_steps": 77036,
+   "distance": 17,
+   "t_count": 233968,
+   "graph_memory": 83,
+   "handover_s": 775.2802399999989,
+   "consumption_s": 114.13957760000012,
+   "ratios": {
+    "n_logical": 1.0,
+    "bus_patches": 1.0,
+    "t_patches": 0.8169,
+    "phys_qubits": 1.0686,
+    "modules": 1.0,
+    "time_s": 25.3396,
+    "p4k_w": 1.0,
+    "p20mk_w": 1.0,
+    "energy_wh": 25.3572
+   },
+   "matched": [
+    "bus_patches",
+    "modules",
+    "n_logical",
+    "p20mk_w",
+    "p4k_w"
+   ],
+   "steps_text": "77,036 steps",
+   "wall_seconds": 1.1
+  }
+ ]
+}
