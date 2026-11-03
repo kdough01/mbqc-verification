@@ -54,13 +54,18 @@ def esc(s) -> str:
 
 
 def inline(text) -> str:
-    """Escape, then `code`, **bold**, *italic* and [label](url)."""
-    s = esc(text)
-    s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
-    s = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", s)
-    s = re.sub(r"(?<![\w*])\*([^*\s][^*]*)\*(?![\w*])", r"<i>\1</i>", s)
-    s = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r'<a href="\2">\1</a>', s)
-    return s
+    """Escape, then `code`, **bold**, *italic* and [label](url); nothing is interpreted inside code spans."""
+    out = []
+    for k, part in enumerate(re.split(r"`([^`]+)`", "" if text is None else str(text))):
+        if k % 2:
+            out.append(f"<code>{esc(part)}</code>")
+            continue
+        s = esc(part)
+        s = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", s)
+        s = re.sub(r"(?<![\w*])\*([^*\s][^*]*)\*(?![\w*])", r"<i>\1</i>", s)
+        s = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r'<a href="\2">\1</a>', s)
+        out.append(s)
+    return "".join(out)
 
 
 def num(v) -> str:
@@ -590,17 +595,30 @@ def tiles(ctx: Context) -> str:
         f'<div class="tile {c}"><div class="tn">{v}</div><div class="tl">{esc(k)}</div></div>' for k, v, c in items) + "</div>"
 
 
-STATUS_LABEL = {"verifier": "in the verifier", "used": "used in a reproduction", "candidate": "candidate"}
+STATUS_LABEL = {"verifier": "in the verifier", "used": "pinned tool the verifier runs", "candidate": "candidate"}
 
 
 def strategies_html(toolkit: dict) -> str:
-    cards = []
-    for k, s in enumerate(toolkit.get("strategies", []) or [], 1):
-        rows = "".join(f"<dt>{lab}</dt><dd>{inline(s[key])}</dd>" for key, lab in
-                       (("why", "Why"), ("example", "Here"), ("how", "In the verifier")) if s.get(key))
-        cards.append(f'<li class="step strat"><div class="sn">{k}</div><div class="sb"><h3>{esc(s["title"])}</h3>'
-                     f'<p>{inline(s.get("what", ""))}</p><dl class="sd">{rows}</dl></div></li>')
-    return f'<ol class="steps strats">{"".join(cards)}</ol>'
+    strategies = toolkit.get("strategies", []) or []
+    groups = toolkit.get("groups") or {}
+    order = list(groups) + sorted({s.get("group", "") for s in strategies} - set(groups))
+    principle = (f'<p class="principle"><b>Principle.</b> {inline(toolkit["principle"])}</p>'
+                 if toolkit.get("principle") else "")
+    out, k = [principle], 0
+    for g in order:
+        members = [s for s in strategies if s.get("group", "") == g]
+        if not members:
+            continue
+        cards = []
+        for s in members:
+            k += 1
+            rows = "".join(f"<dt>{lab}</dt><dd>{inline(s[key])}</dd>" for key, lab in
+                           (("why", "Why"), ("example", "Here"), ("how", "In the verifier")) if s.get(key))
+            cards.append(f'<li class="step strat"><div class="sn">{k}</div><div class="sb"><h3>{esc(s["title"])}</h3>'
+                         f'<p>{inline(s.get("what", ""))}</p><dl class="sd">{rows}</dl></div></li>')
+        head = f'<h3 class="sub">{esc(groups.get(g, g))}</h3>' if g else ""
+        out.append(f'{head}<ol class="steps strats">{"".join(cards)}</ol>')
+    return "".join(out)
 
 
 def tools_html(toolkit: dict, used: list | None = None) -> str:
@@ -728,12 +746,14 @@ def render_report(dag: Dag, spec: dict, st=None) -> str:
     parts.append(section("findings", "Findings", f'<div class="findings">{"".join(fcards)}</div>'))
 
     parts.append(section("strategies", "Strategies we can carry over to future papers", strategies_html(toolkit),
-                         "What this reproduction taught us about verifying numerical claims, written to apply beyond this paper. "
-                         'The same list is on the <a href="toolkit.html">toolkit page</a>.'))
+                         "How the verifier stays independent of whoever proposes a result, and what this reproduction taught us "
+                         'about checking numerical claims; written to apply beyond this paper. The same list is on the '
+                         '<a href="toolkit.html">toolkit page</a>.'))
     parts.append(section("tools", "Associated tools for verification checks", tools_html(toolkit, spec.get("tools_used")),
                          "The suite of tools a check can call on, depending on what kind of claim is being verified. "
-                         "Tools marked “in the verifier” back an implemented check kind; “used in a reproduction” were run for a paper; "
-                         "“candidate” tools fit a claim type we expect but are not wired in yet."))
+                         "None of them is an agent: “in the verifier” tools are implemented checks and gates; “pinned tool the verifier "
+                         "runs” are external tools run at fixed versions; “candidate” tools fit a claim type we expect but are not "
+                         "wired in yet."))
 
     legend = '<div class="legend">' + "".join(
         f'<span><span class="sw" style="background:var(--{v})"></span>{esc(k)}</span>'
@@ -804,8 +824,10 @@ def render_toolkit(dag: Dag) -> str:
     fonts, tokens = tokens_css()
     toolkit = load_toolkit(dag.root)
     head = ('<header class="hero"><p class="eyebrow"><a href="index.html">All reports</a> · <a href="../index.html">theorem DAG</a></p>'
-            '<h1>Verification toolkit</h1><p class="summary">How we verify numerical and theoretical claims from papers: the strategies '
-            'that carried over from earlier reproductions, and the tools a check can use depending on the claim.</p></header>')
+            '<h1>Verification toolkit</h1><p class="summary">The verifier is a fixed set of checks and pinned tools with no agent in '
+            'it. Proposers — agents or people — submit artifacts and receive feedback; they cannot change the checks. This page '
+            'lists the strategies that keep it that way and carry over between papers, and the tools a check can use depending '
+            'on the claim.</p></header>')
     nav = '<nav class="toc" aria-label="Sections"><a href="#strategies">Strategies</a><a href="#tools">Tools</a></nav>'
     body = (section("strategies", "Strategies we can carry over to future papers", strategies_html(toolkit))
             + section("tools", "Associated tools for verification checks", tools_html(toolkit)))
@@ -1040,6 +1062,8 @@ dl.sd dt { color: var(--ink-3); font-weight: 600; } dl.sd dd { margin: 0; max-wi
 .badge.st-used { color: var(--accent); border-color: currentColor; }
 .badge.st-candidate { color: var(--ink-3); border-style: dashed; }
 .badge.here { background: var(--accent-soft); color: var(--ink); }
+.principle { max-width: 86ch; margin: 4px 0 6px; padding: 12px 16px; background: var(--panel); border: 1px solid var(--line);
+  border-left: 3px solid var(--t-proved); border-radius: 6px; }
 ul.open { margin: 4px 0 0; padding-left: 20px; max-width: 86ch; } ul.open li { margin: 4px 0; }
 footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--line); font-size: var(--s-1); color: var(--ink-3); }
 .rcards { display: grid; gap: 14px; padding-top: 22px; }

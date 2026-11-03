@@ -1,131 +1,210 @@
 # Shared by every verification report (dagtool report) and published as reports/toolkit.html.
-# strategies: what carries over from one paper to the next. tools: what a check can call on, and when.
-# status: verifier = backs an implemented check kind (verification/kinds.py); used = run in a reproduction here;
-# candidate = fits a claim type we expect, not wired in yet. Text fields accept `code`, **bold** and [links](url).
+#
+# The verifier is a fixed set of deterministic checks and pinned tools with no agent in it. Whoever proposes a
+# result (a person or an agent: a formalization, a configuration, a run) submits artifacts; the verifier checks them
+# and returns feedback. The proposer can read that feedback but cannot change the checks, the claimed values, the
+# tolerances or the evidence. `principle` and the strategies below say how; `tools` lists what checks can call on.
+#
+# strategy group: independence = keeping the verifier separate from the proposer; numerical = checking numbers.
+# tool status: verifier = part of the verifier (an implemented check kind or gate); used = a pinned external tool
+# the verifier runs; candidate = fits a claim type we expect, not wired in yet.
+# Text fields accept `code`, **bold** and [links](url).
+principle: >-
+  The verifier has no agent in it. It is a fixed set of deterministic checks, pinned tools and frozen claims that
+  exists separately from whoever proposes a result. A proposer — an agent or a person — submits artifacts (a Lean
+  statement and proof, a configuration, a pipeline run) and gets feedback back: which checks passed, which failed,
+  and by how much. It cannot edit the checks, the values it is checked against, the tolerances or the evidence, so it
+  cannot make a check pass by changing the check. Everything below is written to keep it that way.
+
+groups:
+  independence: Keep the verifier independent of the proposer
+  numerical: Check numerical claims
+
 strategies:
-  - title: Run the authors' own pipeline, pinned
-    what: Before judging a number, rebuild exactly what produced it — the code at the commit the paper cites, its dependencies, the inputs — and record versions, commit and configuration hash with every result.
-    why: Most disagreements turn out to be configuration or interpretation, not the method. A pinned run makes them visible instead of arguable.
-    example: RRE 0.26.33 at `9383b4d`, Cabaliser at its submodule commit, pyLIQTR 1.3.3 and qualtran 0.4.0, built from scratch by `environment.sh`; every results file carries its provenance.
-    how: "`reproduction` check reading committed results; the results files are listed under each node's `code:` so new runs make the evidence stale."
-  - title: Calibrate on the least ambiguous instance first
-    what: Find the instances whose input is unambiguous (no random phases, no ancillas, no unstated circuit choices) and settle the unstated settings there, with a grid of real runs. Only then score the harder instances, with those settings unchanged.
-    why: If one configuration reproduces the unambiguous rows exactly, any remaining gap elsewhere is in that instance's circuit, not the configuration — the search space halves.
-    example: "Three QFT rows × 48 combinations of unstated settings: exactly one point reproduces 26 of 27 columns (failure budget 0.05, RRE's factory table, t = 200 ns, one widget); it then reproduces QFT N-100 as a held-out instance."
-    how: "`calibrate.py` writes every grid point; the calibration node's checks require a unique best point and that every alternative value of each setting scores lower."
-  - title: Make every column's meaning a checked claim
-    what: "A table column's mapping to the tool's outputs is a hypothesis: write it down, test the alternatives, and keep the old reading so earlier results stay reproducible."
+  - group: independence
+    title: Separate the verifier from the proposer
+    what: Checks, pinned tools, transcribed claims and the gate live in the verifier; proposers live outside it and only submit artifacts. No check calls a model, and nothing a proposer submits runs with write access to the verifier.
+    why: An agent that can touch its own tests can pass them without being right — not out of malice, just by optimizing for green.
+    example: "The reproduction checks, `compare.py`'s readings and the transcribed Table II are verifier-owned; the calibration grid is a fixed script, not a search an agent steers."
+    how: "Today the paper-formalization agent runs in its own read-only CI job and hands its files to a separate job that only checks them; the cleaner end state is the agent in its own repository, submitting pull requests to the verifier."
+  - group: independence
+    title: Proposals may only write to an allow-list
+    what: A proposal may add or change files in a few places (its Lean file, its node's statement draft, its results); a change anywhere else — check code, kinds, schema, transcribed claims, tolerances, acknowledgements, evidence — rejects the whole proposal.
+    why: The boundary has to be mechanical; reviewing every diff for sneaky edits does not scale.
+    example: "`dagtool formalize --apply` restores anything the agent touched outside its Lean file and rejects axioms, `sorry`, `native_decide`, IO and metaprogramming."
+    how: "Path allow-list enforced by the apply step; CODEOWNERS and branch protection on `verification/`, `tools/dagtool/`, `dag/schema/`, `experiments/*/paper_*.yaml` so those change only with a human review."
+  - group: independence
+    title: Freeze the claim before anyone tries to meet it
+    what: Transcribe the paper's values once, with the printed text, and treat them as read-only. Checks compare against that file, never against a number the proposer supplies.
+    why: The cheapest way to pass a check is to move the target.
+    example: "`paper_v3_table2.yaml` keeps each Table II row as printed; every `reproduction` check reads its expected value from there."
+    how: "Expected values referenced by path (`expect: {path: …}`) into frozen files; the transcription is reviewed once by a person."
+  - group: independence
+    title: Only the verifier writes evidence
+    what: Evidence files are produced by CI running the checks, stamped with hashes of everything they depended on (check code, parameters, statement, code and results files, parents). Any change to an input makes the evidence stale and forces a re-run.
+    why: Evidence a proposer can write is not evidence.
+    example: "Re-running `fh_widgets.py` changed its results by 0.1%; the two checks that read it went stale and re-ran on their own."
+    how: "`dag/evidence/` is written by the verify workflow only; `dagtool check` fails on stale or missing evidence."
+  - group: independence
+    title: Feedback without the answer key
+    what: Return enough to act on — which check failed, the measured value against the claim, the ratio — but keep some checks hidden from the proposer, chosen before any attempt.
+    why: A proposer that sees every test can fit to them. Held-out checks measure whether it generalized.
+    example: "The calibration used QFT N-4, N-10 and N-25; N-100 (four modules) was held out and reproduced all nine numbers."
+    how: "Held-out instances and their expected values kept outside what the proposer can read (a separate protected file or repository), evaluated only by CI."
+  - group: independence
+    title: Every check must be able to fail
+    what: Before trusting a check, show it rejects a wrong answer — a perturbed statement, a wrong reference, a mutated value — and record that it did.
+    why: A check that cannot fail gives a proposer a free pass.
+    example: "The paper's Appendix C test passes even with a wrong rotation reference; random inputs expose it."
+    how: "`mutation` checks for formulas; for numerical checks, a mutated-claim run that must come back refuted."
+  - group: independence
+    title: Caps, acknowledgements and regressions belong to the verifier
+    what: Each check kind can grant at most a fixed truth level; accepting a known refutation, loosening a tolerance or weakening a claim needs a person, not a proposer.
+    why: Otherwise a proposer can acknowledge its own failures or turn empirical agreement into "proved".
+    example: "`reproduction` caps at empirical; the Fermi–Hubbard and QFT N-25 acknowledgements came in reviewed commits, not from a proposer."
+    how: "Ceilings in `verification/kinds.py`; `acknowledged:` and `rel_tol` on the protected list; `dagtool check --before` fails when a claim got weaker."
+  - group: independence
+    title: Determinism and pinning
+    what: Pin every tool and dependency, record versions and configuration hashes with each result, and re-run checks on a schedule to catch drift and nondeterminism.
+    why: Feedback is only useful if the same artifact gets the same verdict.
+    example: "RRE `9383b4d`, Cabaliser at its submodule commit, pyLIQTR 1.3.3, qualtran 0.4.0, built by `environment.sh`; the scheduler's 0.1% run-to-run noise sits inside the 1% tolerance."
+    how: "`environment.sh`, provenance in every results file, the weekly `repro` workflow comparing verdicts."
+  - group: independence
+    title: Independent second implementations
+    what: Recompute what a pipeline reports with code that does not import it, and compare.
+    why: A proposer's pipeline and the verifier's check should not share bugs.
+    example: "`rederive.py` recomputes Appendix A without importing RRE; it found Parameter 35 against modules × Parameter 14."
+    how: "`differential` checks (Lean's computable definitions against the Python implementation); re-derivation scripts in the verifier."
+  - group: independence
+    title: Pre-declared searches, not tuning until green
+    what: When unstated settings must be inferred, fix the search space and the scoring before running, run all of it, and report the margin between the best point and the runner-up.
+    why: A search that stops at the first pass is indistinguishable from overfitting.
+    example: "48 combinations declared in `calibrate.py`, all run; the best scores 26/27 and the runner-up 22, and every alternative value of each setting scores lower."
+    how: "The grid lives in the verifier; checks require a unique best point by a margin."
+  - group: numerical
+    title: Run the authors' own pipeline, pinned
+    what: Before judging a number, rebuild exactly what produced it — the code at the commit the paper cites, its dependencies, the inputs.
+    why: Most disagreements turn out to be configuration or interpretation, not the method.
+    example: "Table II re-run with RRE, Cabaliser and pyLIQTR at the paper's versions."
+    how: "`reproduction` checks reading committed results; results files listed under each node's `code:`."
+  - group: numerical
+    title: Calibrate on the least ambiguous instance first
+    what: Settle unstated settings on the instances whose input is unambiguous, then score the harder ones with those settings unchanged.
+    why: If one configuration reproduces the unambiguous rows, the remaining gap elsewhere is in that instance's circuit.
+    example: "QFT rows (no random phases, no ancillas) settled the configuration; the Fermi–Hubbard gap then pointed at widget granularity."
+    how: "`calibrate.py` and the calibration node."
+  - group: numerical
+    title: Make every column's meaning a checked claim
+    what: How a table column maps to a tool's outputs is a hypothesis; write it down, test the alternatives, keep the old reading.
     why: Notation can disagree between a paper's appendix and its tables.
-    example: "Table II's ñ_logical is the input register (Parameter 15), not Appendix A's ñ (graph memory); its physical qubits are modules × Parameter 14, not the Parameter 35 the tool reports; its T patches count all modules."
-    how: "`compare.MAPPING` (and `MAPPING_V1` for the first pass); a column-readings node checks each reading on instances that pin it down."
-  - title: One check per reported number
-    what: Record each quantity as its own check against its own printed value, with a tolerance tied to the printed precision and to run-to-run variation.
-    why: A partial match is information. One pass/fail per row hides which column moved.
-    example: "36 Table II checks for the QFT rows: 35 reproduce, 1 does not (N-25 bus patches)."
-    how: "`reproduction` checks, `approx` within `rel_tol` (1% here: three printed significant figures, 0.1% scheduler noise)."
-  - title: Re-derive the formulas independently
-    what: Recompute closed-form outputs from the tool's intermediate values with the paper's own formulas, without importing the tool.
-    why: It separates errors in the formulas from errors in the compiled input, and catches internal inconsistencies.
-    example: "Appendix A's T-count and footprint formulas all match RRE, except Parameter 35 against modules × Parameter 14 — the inconsistency that later explained the physical-qubit column."
-    how: "`rederive.py`; a `symbolic` check when the formula should hold in general."
-  - title: Test correctness beyond the paper's own tests
-    what: Run the paper's correctness test, then the same test on inputs it does not cover (every basis state, random states), and check that the test can fail.
-    why: A test that passes on |0…0⟩ may be blind to the very errors it is meant to catch.
-    example: "The Appendix C test passes with a wrong reference (rotation mapped to T, T† = T³); random inputs expose it, and show the compiled graphs themselves are right."
-    how: "`cabaliser_inputs.py`; for MBQC patterns the `translation` and `numerical` checks do the same with graphix."
-  - title: Check the qualitative claims too
-    what: Turn statements in the text ("conservative", "dominates", "scales as") into checks with a direction.
-    why: They are easy to state and rarely tested; they are also what readers repeat.
-    example: "Random QSP phases were claimed conservative; with the pinned code they give 1,405 fewer T gates at 2×2."
-    how: "`reproduction` with `op: ge`/`le`; `refuter` when a counterexample search is possible."
-  - title: Measure what the paper leaves out
-    what: For each unstated setting, run every plausible value and record its effect on each reported quantity.
-    why: It tells you which missing detail matters, and what to ask the authors.
-    example: "Widget granularity moves the Fermi–Hubbard 4×4 runtime from 0.24× to 25× the paper's; the failure-budget reading moves the code distance by 4."
-    how: "`sensitivity.py`, `fh_widgets.py`: real runs, recorded with failures."
-  - title: Scaling only from runs, never from fits
-    what: A scaling statement is a series of actual runs; a point that was not run is absent, and the paper's values appear only where it prints them.
-    why: Extrapolation hides exactly the regime changes (module count, widget levels) that make these estimates interesting.
-    example: "QFT N = 4…100 and Fermi–Hubbard N = 2…6 are all runs; the QFT series crosses from two to four modules between N = 64 and 80."
-    how: "`scaling.py`; the `scaling` check kind for formulas likewise requires held-out grid points."
-  - title: Split small and large runs, and say which is which
-    what: Small instances run in CI on every change; large ones run on a dedicated machine. Their nodes exist from the start and skip until results are committed.
-    why: The record shows what has not been checked yet, and the large runs need no new wiring.
-    example: "Fermi–Hubbard 8×8–20×20, QFT N-500/1000 and Ising 5×5 have nodes and a runbook; their checks skip."
-    how: "`run.sh --only …` or the `reproduce` workflow with a self-hosted runner label."
-  - title: Keep expected refutations visible, not failing
-    what: When a refutation is the finding, acknowledge it with a reason so CI stays green while the node stays refuted.
-    why: Findings must survive in the record without blocking every later change.
-    example: "Fermi–Hubbard and Ising rows, QFT N-25's bus patches, the Appendix C test."
-    how: "`acknowledged:` on the node; the report and the theorem browser show the reason."
-  - title: Record the dead ends
-    what: Write down what did not work — build failures, settings that crash, readings that were wrong — next to what did.
-    why: The next paper hits the same walls; the first-pass reading here was wrong in three columns.
-    example: "Rust lint in Cabaliser, IPython 8, the widgetizer's IndexError below the default level at 2×2, the first column readings."
-    how: "The report's approach steps and the first-pass results kept beside the calibrated ones."
+    example: "ñ_logical is the input register, physical qubits are modules × Parameter 14, T patches count all modules."
+    how: "`compare.MAPPING` (and `MAPPING_V1`); the column-readings node."
+  - group: numerical
+    title: One check per reported number
+    what: Each quantity is its own check against its own printed value, with a tolerance tied to the printed precision and run-to-run noise.
+    why: A partial match is information.
+    example: "36 QFT checks: 35 reproduce, 1 does not (N-25 bus patches)."
+    how: "`reproduction`, `approx` within `rel_tol`."
+  - group: numerical
+    title: Test beyond the paper's own tests, and check qualitative claims
+    what: Run the paper's tests on inputs they do not cover, and turn statements like "conservative" or "dominates" into directional checks.
+    why: Tests that pass on one input, and claims nobody checks, are where errors hide.
+    example: "Compiled graphs on every basis and random input; random phases turned out not to be conservative."
+    how: "`cabaliser_inputs.py`, `phases.py`; `reproduction` with `op: ge`/`le`; `refuter`."
+  - group: numerical
+    title: Scaling only from runs, never from fits
+    what: A scaling statement is a series of actual runs; points not run are absent; the paper's values appear only where printed.
+    why: Extrapolation hides the regime changes (module count, widget levels) that matter.
+    example: "QFT N = 4…100 and Fermi–Hubbard N = 2…6, all runs; QFT steps from two to four modules between N = 64 and 80."
+    how: "`scaling.py`; the `scaling` check kind requires held-out grid points."
+  - group: numerical
+    title: Split small and large runs, and record the dead ends
+    what: Small instances run in CI on every change, large ones on a dedicated machine with nodes that skip until results land; failures and wrong turns are recorded beside the successes.
+    why: The record shows what has not been checked yet and what did not work.
+    example: "Fermi–Hubbard 8×8+ and QFT N-500/1000 await the larger machine; the widgetizer's IndexError at 2×2 is recorded."
+    how: "`run.sh --only …`, the `reproduce` workflow; report approach steps list obstacles."
 
 applicability:
+  - claim: A proposed formalization of a paper theorem
+    example: "an agent's Lean statement, proof and witness for a theorem uploaded to the review site"
+    tools: [lean, path-guard, verifier-scaling, evidence-hashing]
+    method: "Proposer writes only its Lean file; the verifier scans it (no axioms, sorry, IO), compiles it with the kernel, checks vocabulary, mutation and non-vacuity, and returns the outcome."
   - claim: A theorem with an exact statement
-    example: "e.g. a vertex count N = (36n − 18)D + 92n − 20"
-    tools: [lean, sympy, verifier-scaling]
-    method: "Formalize and prove in Lean; certify identities with SymPy; until proved, fit on a grid with held-out points and search for counterexamples."
+    example: "a vertex count N = (36n − 18)D + 92n − 20"
+    tools: [lean, sympy, verifier-scaling, hypothesis]
+    method: "Prove in Lean or certify with SymPy; until then, fit on a grid with held-out points, random instances and a counterexample search."
   - claim: A gate-to-MBQC translation is correct
-    example: "e.g. a compiled pattern implements its circuit"
-    tools: [graphix, qiskit, cabaliser]
-    method: "`translation`/`numerical`: compile, then simulate the pattern against the circuit unitary on basis and random inputs."
+    example: "a compiled pattern implements its circuit"
+    tools: [graphix, qiskit, cabaliser, hypothesis]
+    method: "Simulate the pattern against the circuit unitary on basis and random inputs; generated instances, not hand-picked ones."
   - claim: A resource table produced by a pipeline
-    example: "e.g. Table II of a resource-estimation paper"
-    tools: [verifier-reproduction, rre, pyliqtr, cirq, cabaliser]
-    method: "Pin the pipeline, calibrate unstated settings on the least ambiguous rows, one `reproduction` check per number."
+    example: "Table II of a resource-estimation paper"
+    tools: [verifier-reproduction, rre, pyliqtr, cirq, cabaliser, held-out]
+    method: "Frozen transcription, pinned pipeline, pre-declared calibration on the least ambiguous rows, one check per number, held-out instances."
   - claim: A gate count (T-count, rotations, qubits)
-    example: "e.g. N_T = n_Rz·L_ε + n_T"
+    example: "N_T = n_Rz·L_ε + n_T"
     tools: [qualtran, gridsynth, sympy, verifier-reproduction]
-    method: "Count independently (Qualtran's cost model, synthesis lengths from gridsynth) and compare; re-derive the closed form."
+    method: "Count independently and compare; re-derive the closed form without importing the pipeline."
   - claim: A logical-error model or threshold fit
-    example: "e.g. p_C = κ (p/p_th)^((d+1)/2) with κ = 0.009, p_th = 0.016"
+    example: "p_C = κ (p/p_th)^((d+1)/2) with κ = 0.009, p_th = 0.016"
     tools: [stim, pymatching, sinter]
     method: "Sample surface-code memory experiments at several d and p, decode with MWPM, refit κ and p_th, compare within the fit's uncertainty."
   - claim: A cross-estimator comparison
-    example: "e.g. physical qubits or runtime against another architecture's estimate"
+    example: "physical qubits or runtime against another architecture's estimate"
     tools: [azure-re, rre, qualtran]
-    method: "Run a second estimator under matched assumptions; agreement in order of magnitude, with the differing assumptions listed."
+    method: "A second estimator under matched assumptions; order-of-magnitude agreement with the differing assumptions listed."
   - claim: A qualitative or scaling statement
-    example: "e.g. random phases are conservative; runtime grows with problem size"
+    example: "random phases are conservative; runtime grows with problem size"
     tools: [verifier-reproduction, verifier-scaling]
     method: "A direction (`ge`/`le`) checked on actual runs over the sizes run; never from a fit."
 
 tools:
+  - id: path-guard
+    name: Proposal allow-list and scanner
+    category: Verifier gate
+    status: verifier
+    checks: A proposal touches only the files it may write; its Lean contains no axiom, sorry, admit, native_decide, IO, metaprogramming or foreign imports; anything else is restored or rejected.
+    applies: Every proposal from an agent (today the paper formalizer).
+    limits: Covers the formalization path; extending it to results and configurations, and adding CODEOWNERS and branch protection on the verifier's own paths, is the next step.
+    check_kinds: [lean]
+  - id: evidence-hashing
+    name: Input hashing, staleness and the CI gate
+    category: Verifier gate
+    status: verifier
+    checks: Each evidence file records hashes of its check code, parameters, statement, code files and parents; a change makes it stale. The gate fails on stale or missing evidence, failed checks, surviving mutants and weakened claims.
+    applies: Always; it is what makes evidence non-forgeable by a proposer.
+    check_kinds: [reproduction, lean, scaling]
   - id: verifier-reproduction
     name: reproduction check
     category: Verifier check kind
     status: verifier
-    checks: A recorded run of a pinned pipeline agrees with a claimed value (approx within a tolerance, eq, ge, le).
-    applies: Any number a paper reports that a pipeline you can run produces.
+    checks: A recorded run of a pinned pipeline agrees with a frozen claimed value (approx within a tolerance, eq, ge, le).
+    applies: Any number a paper reports that a pipeline the verifier can run produces.
     limits: Grants at most `empirical`, on the domain of the runs.
     check_kinds: [reproduction]
   - id: lean
-    name: Lean 4
+    name: Lean 4 kernel
     url: https://lean-lang.org
     category: Proof assistant
     status: verifier
-    checks: Proofs of exact statements; the vetted definitions, mutation and non-vacuity checks keep the statement faithful.
-    applies: Exact theorems about patterns, counts and constructions once they are formalized.
-    limits: Proved only modulo declared assumptions; formalization is the bottleneck (the agent drafts, checks gate).
+    checks: Kernel-checked proofs of exact statements; `#print axioms` lists only standard axioms and declared assumptions; vetted definitions, mutation and non-vacuity keep the statement faithful.
+    applies: Exact theorems about patterns, counts and constructions, including those an agent proposes.
+    limits: Proved only modulo declared assumptions; the statement's faithfulness still needs review.
     check_kinds: [lean, vocabulary, nonvacuity, differential, equivalence]
   - id: sympy
     name: SymPy
     url: https://www.sympy.org
     category: Computer algebra
     status: verifier
-    checks: Algebraic certificates for identities and closed forms (e.g. coefficient positivity).
-    applies: A formula that should hold symbolically, before (or instead of) a Lean proof.
+    checks: Algebraic certificates for identities and closed forms.
+    applies: A formula that should hold symbolically.
     check_kinds: [symbolic]
   - id: verifier-scaling
-    name: scaling, mutation and refuter checks
+    name: scaling, mutation, refuter and finite checks
     category: Verifier check kinds
     status: verifier
-    checks: A formula reproduces every count on a grid including held-out points; perturbed formulas are rejected; counterexample search.
-    applies: Counting formulas (vertices, edges, depth) that are checked on actual compiled instances.
+    checks: A formula reproduces every count on a grid including held-out points; perturbed formulas are rejected; counterexample search; exhaustive checks on finite domains.
+    applies: Counting formulas checked on actual compiled instances, and any check that must be shown able to fail.
     check_kinds: [scaling, mutation, refuter, finite]
   - id: graphix
     name: graphix
@@ -133,7 +212,7 @@ tools:
     category: MBQC patterns
     status: verifier
     checks: Builds and simulates measurement patterns; standardization, signal shifting, Pauli removal.
-    applies: Any claim that a measurement pattern implements a circuit, or about a pattern's size.
+    applies: Claims that a measurement pattern implements a circuit, or about a pattern's size.
     check_kinds: [translation, numerical]
   - id: qiskit
     name: Qiskit
@@ -141,7 +220,7 @@ tools:
     category: Circuits and simulation
     status: verifier
     checks: Reference circuits and statevectors for translation checks.
-    applies: Gate-model side of a gate-to-MBQC comparison.
+    applies: The gate-model side of a gate-to-MBQC comparison.
     check_kinds: [translation, numerical]
   - id: rre
     name: Rigetti Resource Estimation (RRE)
@@ -150,14 +229,14 @@ tools:
     status: used
     checks: Code distance, factories, qubits, runtime, power and energy for graph-state-compiled circuits on a modular superconducting architecture.
     applies: Papers whose numbers came from RRE, or that assume a comparable architecture.
-    limits: Some settings (widgetization, ancilla allocation) change results a lot and are often unstated; the scheduler varies by about 0.1% between runs.
+    limits: Widgetization and ancilla allocation change results a lot and are often unstated; about 0.1% run-to-run variation.
     check_kinds: [reproduction]
   - id: cabaliser
     name: Cabaliser and its local simulator
     url: https://github.com/Alan-Robertson/cabaliser
     category: Graph-state compiler
     status: used
-    checks: Compiles Clifford+T+Rz to graph states, measurement schedules and Pauli frames; the simulator checks a compiled widget against its circuit on any input.
+    checks: Compiles Clifford+T+Rz to graph states, schedules and Pauli frames; the simulator checks a compiled widget against its circuit on any input.
     applies: Graph-state (MBQC) compilation claims; correctness of compiled widgets.
     limits: The bundled simulator's Tdag is S·T; supply the correct T† and the real rotation angles.
     check_kinds: [reproduction, translation]
@@ -166,8 +245,8 @@ tools:
     url: https://github.com/isi-usc-edu/pyLIQTR
     category: Hamiltonians and QSP circuits
     status: used
-    checks: Problem instances (Fermi–Hubbard, Heisenberg, …), block encodings, QSP phase counts, gate counts.
-    applies: Hamiltonian-simulation papers built on it; independent instance construction.
+    checks: Problem instances, block encodings, QSP phase counts, gate counts.
+    applies: Hamiltonian-simulation papers built on it.
     limits: Random-phase mode uses one phase fewer for the sine sequence (1.3.3).
     check_kinds: [reproduction]
   - id: cirq
@@ -176,14 +255,37 @@ tools:
     category: Circuits
     status: used
     checks: Circuit construction (QFT), unitaries for small checks, decomposition contexts that set ancilla allocation.
-    applies: Circuits a paper builds with Cirq; how ancillas are allocated matters for register sizes.
+    applies: Circuits a paper builds with Cirq.
     check_kinds: [reproduction, numerical]
+  - id: held-out
+    name: Held-out instances
+    category: Verifier practice
+    status: candidate
+    checks: Instances and expected values the proposer never sees, evaluated only in CI after a proposal is frozen.
+    applies: Any claim a proposer could fit to — calibrations, formula fits, numerical reproductions.
+    limits: Done by hand once here (QFT N-100); keeping held-out values unreadable by proposers needs a protected file or repository.
+    check_kinds: [reproduction, scaling]
+  - id: codeowners
+    name: CODEOWNERS and branch protection
+    url: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+    category: Repository controls
+    status: candidate
+    checks: Changes to check code, schema, transcribed claims, tolerances and acknowledgements need a named human reviewer before merge.
+    applies: The verifier repository itself, against any proposer with push access.
+  - id: hypothesis
+    name: Hypothesis
+    url: https://hypothesis.readthedocs.io
+    category: Property-based testing
+    status: candidate
+    checks: Generates many random instances (and shrinks failures) for differential and translation checks, instead of a fixed list a proposer can learn.
+    applies: Any check over a family of instances.
+    check_kinds: [numerical, translation, refuter]
   - id: qualtran
     name: Qualtran
     url: https://github.com/quantumlib/Qualtran
     category: Fault-tolerant algorithms and cost models
     status: candidate
-    checks: Independent T-, Toffoli-, rotation- and qubit-counts for the same algorithm (it is already the decomposition layer under pyLIQTR here).
+    checks: Independent T-, Toffoli-, rotation- and qubit-counts for the same algorithm.
     applies: T-count and register claims; a second count before trusting one tool's.
     check_kinds: [reproduction, symbolic]
   - id: gridsynth
@@ -192,7 +294,7 @@ tools:
     category: Rotation synthesis
     status: candidate
     checks: Actual Clifford+T lengths for single-qubit rotations at a precision ε, against a stated L_ε formula.
-    applies: Claims that depend on synthesis constants (c0, c1).
+    applies: Claims that depend on synthesis constants.
     check_kinds: [reproduction, scaling]
   - id: stim
     name: Stim
@@ -207,7 +309,7 @@ tools:
     url: https://github.com/oscarhiggott/PyMatching
     category: Decoder (MWPM)
     status: candidate
-    checks: Minimum-weight perfect-matching decoding of sampled syndromes, the decoder the paper's error fit assumes.
+    checks: Minimum-weight perfect-matching decoding of sampled syndromes.
     applies: With Stim, re-deriving a logical-error fit.
     check_kinds: [numerical]
   - id: sinter
@@ -215,7 +317,7 @@ tools:
     url: https://github.com/quantumlib/Stim/tree/main/glue/sample
     category: Monte Carlo sampling
     status: candidate
-    checks: Runs Stim + decoder sampling at scale and collects logical error rates with confidence intervals.
+    checks: Stim + decoder sampling at scale, logical error rates with confidence intervals.
     applies: Refitting κ and p_th within uncertainty.
     check_kinds: [numerical]
   - id: azure-re
@@ -224,6 +326,6 @@ tools:
     category: Fault-tolerant resource estimator
     status: candidate
     checks: A second, independently built estimate of qubits and runtime under its own architecture assumptions.
-    applies: Order-of-magnitude cross-checks of resource tables, with assumptions matched where possible.
+    applies: Order-of-magnitude cross-checks of resource tables.
     limits: Different architecture model; agreement is approximate by construction.
     check_kinds: [reproduction]

@@ -137,3 +137,18 @@ def test_scaling_figures_plot_only_runs(spec, page):
 def test_calibration_ranking_shows_the_unique_best_point(page):
     block = re.search(r'id="fig-calibration".*?</figure>', page, flags=re.S).group(0)
     assert "26/27" in block and "<b>budget 0.05" in block
+
+
+def test_strategies_are_grouped_and_the_principle_is_shown(dag):
+    tk = load_toolkit(REPO)
+    assert tk["principle"] and set(tk["groups"]) >= {s["group"] for s in tk["strategies"]}
+    html = render_toolkit(dag)
+    assert 'class="principle"' in html
+    for title in tk["groups"].values():
+        assert title in html
+    # the list is numbered continuously across groups
+    assert f'<div class="sn">{len(tk["strategies"])}</div>' in html
+
+
+def test_inline_markup_leaves_code_spans_alone():
+    assert inline("`experiments/*/paper_*.yaml` and *x*") == "<code>experiments/*/paper_*.yaml</code> and <i>x</i>"

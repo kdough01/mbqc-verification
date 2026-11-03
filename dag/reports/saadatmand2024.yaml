@@ -757,6 +757,8 @@ open:
 - 'Wire in the candidate tools where they apply here: Stim + PyMatching + sinter to refit κ and p_th (Appendix D), Qualtran
   for an independent T count.'
 tools_used:
+- evidence-hashing
+- held-out
 - verifier-reproduction
 - rre
 - cabaliser
