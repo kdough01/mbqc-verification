@@ -1,0 +1,23 @@
+id: paper.p_3d26b0fcab93.cubic_tfim_slice_bound_and_refined_step_count
+kind: theorem
+title: Cubic TFIM slice bound and refined step count
+statement: 'For every T ≥0 and integer r ≥1, the unchanged basic formula in Eq. (2) satisfies
+
+
+  The outer factors act on different sites and are unitary, so its norm is exactly 2| sin(2hj(v −s))|'
+description: From "A compositional measurement-based implementation of basic THRIFT with a sharper TFIM
+  error bound and conditional physical resources", pages 7, 8 on the review site. Added by `dagtool pull-papers`;
+  it stays open until depends_on edges and checks are added.
+paper:
+  server: https://genesis-thrust2-review.fly.dev
+  theorem_id: paper.p_3d26b0fcab93.cubic_tfim_slice_bound_and_refined_step_count
+  paper_id: p_3d26b0fcab93
+  module_id: m_92a302330d54
+  paper_title: A compositional measurement-based implementation of basic THRIFT with a sharper TFIM error
+    bound and conditional physical resources
+  pages:
+  - 7
+  - 8
+tags:
+- paper
+- open

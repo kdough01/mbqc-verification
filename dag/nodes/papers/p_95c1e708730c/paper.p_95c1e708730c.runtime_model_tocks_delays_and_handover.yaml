@@ -1,0 +1,32 @@
+id: paper.p_95c1e708730c.runtime_model_tocks_delays_and_handover
+kind: theorem
+title: 'Runtime model: tocks, delays, and handover'
+statement: 'The factor of 8 arises because, in our architecture, each surface code sweep for stabilizer
+  syndrome extraction circuits requires at most one initialization
+
+
+  We must introduce a delay if we require more magic states than were accumulated on the T-transfer bus
+  during the prior preparation step
+
+
+  We must incur a cost if FTQC needs to teleport graph nodes vertically within the same leg
+
+
+  we consider a characteristic decoder cycle time of tdecoder = 1 µs'
+description: 'From "Superconducting qubits in the millions: the potential and limitations of modularity",
+  pages 15, 16, 29, 31 on the review site. Added by `dagtool pull-papers`; it stays open until depends_on
+  edges and checks are added.'
+paper:
+  server: https://genesis-thrust2-review.fly.dev
+  theorem_id: paper.p_95c1e708730c.runtime_model_tocks_delays_and_handover
+  paper_id: p_95c1e708730c
+  module_id: m_5887109d419e
+  paper_title: 'Superconducting qubits in the millions: the potential and limitations of modularity'
+  pages:
+  - 15
+  - 16
+  - 29
+  - 31
+tags:
+- paper
+- open
