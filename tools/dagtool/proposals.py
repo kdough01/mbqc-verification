@@ -232,21 +232,23 @@ class _Snapshot:
 
     def __init__(self, root: Path, node: Node, lean_file: Path):
         self.root = root
-        self.files = {node.path: node.path.read_text(encoding="utf-8"),
-                      root / "lean" / "MBQC.lean": (root / "lean" / "MBQC.lean").read_text(encoding="utf-8")}
+        # Bytes, not text: a text round trip rewrites CRLF checkouts as LF.
+        self.files = {node.path: node.path.read_bytes(),
+                      root / "lean" / "MBQC.lean": (root / "lean" / "MBQC.lean").read_bytes()}
         self.lean = root / lean_file
-        self.lean_before = self.lean.read_text(encoding="utf-8") if self.lean.exists() else None
+        self.lean_before = self.lean.read_bytes() if self.lean.exists() else None
         self.evidence = root / "dag" / "evidence" / node.id
         self.evidence_before = {p: p.read_bytes() for p in self.evidence.rglob("*") if p.is_file()} \
             if self.evidence.exists() else None
 
     def restore(self) -> None:
-        for p, text in self.files.items():
-            p.write_text(text, encoding="utf-8")
+        for p, data in self.files.items():
+            if p.read_bytes() != data:
+                p.write_bytes(data)
         if self.lean_before is None:
             self.lean.unlink(missing_ok=True)
-        else:
-            self.lean.write_text(self.lean_before, encoding="utf-8")
+        elif self.lean.read_bytes() != self.lean_before:
+            self.lean.write_bytes(self.lean_before)
         shutil.rmtree(self.evidence, ignore_errors=True)
         for p, data in (self.evidence_before or {}).items():
             p.parent.mkdir(parents=True, exist_ok=True)

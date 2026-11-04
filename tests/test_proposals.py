@@ -190,6 +190,16 @@ def test_feedback_is_the_same_verdict_and_changes_nothing(repo, prop):
     assert [n.id for n in pr.open_theorems(load_dag(repo))] == [TID]
 
 
+def test_feedback_keeps_crlf_checkouts_byte_identical(repo):
+    """A Windows checkout (CRLF) must come back byte for byte, not rewritten as LF."""
+    files = [p for p in repo.rglob("*") if p.is_file() and p.suffix in (".yaml", ".lean")]
+    for p in files:
+        p.write_bytes(p.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))
+    before = {p: p.read_bytes() for p in files}
+    pr.feedback(repo, submit(repo, prop=proposal(outcome="unproved")) / TID, run_checks=False)
+    assert {p: p.read_bytes() for p in files} == before
+
+
 def test_feedback_reports_rejections(repo):
     fb = pr.feedback(repo, submit(repo, prop=proposal(extra_checks=[{"kind": "scaling"}])) / TID, run_checks=False)
     assert fb["outcome"] == "rejected" and "cannot choose checks" in fb["reason"]
