@@ -25,7 +25,7 @@ tools/dagtool/            CLI: validate, run, status, show, queue, review, repro
 experiments/hamsim/       the full report (run_all.py), plots, results/hamsim_results.json, figures/
 experiments/rre/          reproduction of Saadatmand et al. (arXiv:2406.06015) with their pinned pipeline
 docs/                     write-ups and images
-.github/                  CI: verify (every push), papers (pull + formalize site theorems), reproduce (manual), review, repro (weekly), setup
+.github/                  CI: verify (every push), papers (pull site theorems), proposals (gate for submitted proofs), reproduce (manual), review, repro (weekly), setup
 tests/                    unit tests for the status rules and check logic
 ```
 
@@ -80,7 +80,8 @@ dagtool run --stale && dagtool status && dagtool check
 ```
 
 Other commands: `dagtool show <id>`, `dagtool queue`, `dagtool render`, `dagtool summary`, `dagtool repro`,
-`dagtool pull-papers`, `dagtool export`, `dagtool formalize`, `dagtool lean-check`.
+`dagtool pull-papers`, `dagtool export`, `dagtool report`, `dagtool open-theorems`, `dagtool feedback`,
+`dagtool apply-proposals`, `dagtool lean-check`.
 `python experiments/hamsim/run_all.py` prints the full Hamiltonian-simulation report.
 
 ## Papers from the Thrust 2 review site
@@ -92,17 +93,24 @@ module becomes a DAG theorem, and the site's **Theorem DAG** tab shows this DAG.
 - **In:** the `papers` workflow (every 15 minutes, or Actions → **papers** → Run workflow) runs
   `dagtool pull-papers`, which writes each open paper theorem as `dag/nodes/papers/<paper>/<id>.yaml` with a `paper:`
   field and no checks, so it starts as `conjecture` (shown as *open*). It never overwrites a node file.
-- **Automatic formalization** (`dagtool formalize`, same workflow): an agent (Claude Code) writes each new theorem's Lean
-  statement, a proof from the core results, and a non-vacuity witness, and proposes its `depends_on` edges. It runs
-  with read-only access and no shell beyond `dagtool lean-check`; its output leaves the job as an artifact. A second job
-  with no model checks that output (no axioms, `sorry`, IO or metaprogramming; statement untouched), adds it to the
-  node, and runs the node's `lean`, `vocabulary` and `nonvacuity` checks. Anything that fails is rolled back and tagged
-  `formalize-failed`; honest non-results are tagged `unproved`, `not-formalizable` or `counterexample-suspected`, with
-  the agent's reason in the node's notes. Tagged nodes are not retried; remove the tag to retry. Formalizations go
-  straight to the branch; the statement's faithfulness stays below human-reviewed until someone approves it.
-  Setup: a repository secret `CLAUDE_CODE_OAUTH_TOKEN` (`claude setup-token`, uses your Claude plan) or
-  `ANTHROPIC_API_KEY`; optional variables `FORMALIZE_MAX` (theorems per run, 3), `FORMALIZE_BUDGET` (USD per theorem, 5)
-  and `FORMALIZE_MODEL`. Without a secret, theorems are still pulled and stay open.
+- **Proposals** (from outside this repository): the verifier contains no model and calls none. A proposal for an
+  open theorem is a pull request adding `proposals/<node id>/proposal.json`, `theorem.lean` and optionally
+  `attempts.json` (every attempt and its rationale, kept as a record). What a proposal must contain comes from
+  `dagtool open-theorems --json`: the statement, the Lean namespace and path, the vetted vocabulary and the proved
+  results it may build on. Before submitting, a proposer runs `dagtool feedback --proposal DIR`, which runs exactly
+  what the gate runs and then restores every file. The Quantum Genesis dashboard does this from its tickets
+  (`doe-genesis-ai-quantum/dashboard/verifier.py`).
+- **The proposals gate** (`.github/workflows/proposals.yml`, `pull_request_target`): runs the base branch's own copy of
+  the workflow and tools, refuses a pull request that touches anything outside `proposals/`, copies the proposal files
+  out as data and runs `dagtool apply-proposals`: Lean scanned (no axioms, `sorry`, IO or metaprogramming) and
+  compiled without credentials, the node's fixed `lean`, `vocabulary` and `nonvacuity` checks, the CI gate. A proposal
+  cannot choose checks, tolerances or expected values. What passes is committed to main and the pull request is closed
+  with the verdict; honest non-results are recorded as `unproved`, `not-formalizable` or `counterexample-suspected`; a
+  rejected proposal changes nothing and its pull request stays open for a revision. Faithfulness stays below
+  human-reviewed until someone approves the statement.
+- **Reproduction candidates**: for numerical claims, a candidate configuration chosen from
+  `experiments/rre/settings_space.yaml` runs with `experiments/rre/run_candidate.py`, and
+  `dagtool feedback --node ID --results-root DIR` scores it against the node's frozen expected values.
 - **Out:** `verify` writes `dagtool export` (nodes, edges, computed status, evidence summaries and a verdict per
   node) to `site/dag.json`; on main it is published with the browser at
   `https://kdough01.github.io/mbqc-verification/dag.json`, and the site reads it from there.

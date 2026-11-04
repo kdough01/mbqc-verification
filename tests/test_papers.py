@@ -73,7 +73,7 @@ def test_pull_adds_open_nodes_that_validate(repo):
     assert n.raw["paper"] == {"server": SERVER, "theorem_id": n.id, "paper_id": "p_abc", "module_id": "m_1",
                               "paper_title": "A transferred paper", "pages": [4]}
     assert verdicts(repo)[n.id]["state"] == "open"
-    assert verdicts(repo)[n.id]["reason"] == "waiting for automatic formalization"
+    assert verdicts(repo)[n.id]["reason"] == "waiting for a proposal"
 
 
 def test_pull_is_idempotent_and_keeps_edits(repo):

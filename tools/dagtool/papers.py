@@ -6,8 +6,8 @@ papers.py — the link to the Thrust 2 review site (Modulus, genesis-thrust2-rev
 
 When a paper is uploaded to the site it is split into modules; every theorem module becomes a theorem
 with a stable id (paper.<paper id>.<title slug>). `pull-papers` adds the ones this DAG does not have yet
-as nodes with no checks, so they start as `conjecture` (shown as *open*). A person or agent then adds
-`depends_on` edges into the core and the checks that should run; CI computes the status and publishes
+as nodes with no checks, so they start as `conjecture` (shown as *open*). A proposal (proposals.py) then
+supplies the Lean statement, proof and `depends_on` edges into the core; CI computes the status and publishes
 `export` as dag.json on GitHub Pages, which the site reads. Existing node files are never overwritten,
 so edits made here are kept. Neither direction needs a secret.
 """

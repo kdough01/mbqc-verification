@@ -1,7 +1,7 @@
 # Shared by every verification report (dagtool report) and published as reports/toolkit.html.
 #
-# The verifier is a fixed set of deterministic checks and pinned tools with no agent in it. Whoever proposes a
-# result (a person or an agent: a formalization, a configuration, a run) submits artifacts; the verifier checks them
+# The verifier is a fixed set of deterministic checks and pinned tools. Whoever proposes a result (a formalization,
+# a configuration, a run) does so from outside this repository and submits artifacts; the verifier checks them
 # and returns feedback. The proposer can read that feedback but cannot change the checks, the claimed values, the
 # tolerances or the evidence. `principle` and the strategies below say how; `tools` lists what checks can call on.
 #
@@ -10,8 +10,8 @@
 # the verifier runs; candidate = fits a claim type we expect, not wired in yet.
 # Text fields accept `code`, **bold** and [links](url).
 principle: >-
-  The verifier has no agent in it. It is a fixed set of deterministic checks, pinned tools and frozen claims that
-  exists separately from whoever proposes a result. A proposer — an agent or a person — submits artifacts (a Lean
+  The verifier contains no model and calls none. It is a fixed set of deterministic checks, pinned tools and frozen
+  claims that exists separately from whoever proposes a result. A proposer, working from another repository, submits artifacts (a Lean
   statement and proof, a configuration, a pipeline run) and gets feedback back: which checks passed, which failed,
   and by how much. It cannot edit the checks, the values it is checked against, the tolerances or the evidence, so it
   cannot make a check pass by changing the check. Everything below is written to keep it that way.
@@ -24,14 +24,14 @@ strategies:
   - group: independence
     title: Separate the verifier from the proposer
     what: Checks, pinned tools, transcribed claims and the gate live in the verifier; proposers live outside it and only submit artifacts. No check calls a model, and nothing a proposer submits runs with write access to the verifier.
-    why: An agent that can touch its own tests can pass them without being right — not out of malice, just by optimizing for green.
-    example: "The reproduction checks, `compare.py`'s readings and the transcribed Table II are verifier-owned; the calibration grid is a fixed script, not a search an agent steers."
-    how: "Today the paper-formalization agent runs in its own read-only CI job and hands its files to a separate job that only checks them; the cleaner end state is the agent in its own repository, submitting pull requests to the verifier."
+    why: A proposer that can touch its own tests can pass them without being right — not out of malice, just by optimizing for green.
+    example: "The reproduction checks, `compare.py`'s readings and the transcribed Table II are verifier-owned; the calibration grid is a fixed script, not a search a proposer steers."
+    how: "Proposals are written in the Quantum Genesis repository (dashboard tickets) and reach the verifier only as pull requests under `proposals/`; the `proposals` workflow runs from the base branch, so a pull request cannot change the gate that judges it."
   - group: independence
     title: Proposals may only write to an allow-list
     what: A proposal may add or change files in a few places (its Lean file, its node's statement draft, its results); a change anywhere else — check code, kinds, schema, transcribed claims, tolerances, acknowledgements, evidence — rejects the whole proposal.
     why: The boundary has to be mechanical; reviewing every diff for sneaky edits does not scale.
-    example: "`dagtool formalize --apply` restores anything the agent touched outside its Lean file and rejects axioms, `sorry`, `native_decide`, IO and metaprogramming."
+    example: "The `proposals` gate refuses a pull request that touches anything outside `proposals/<node>/`; `dagtool apply-proposals` rejects axioms, `sorry`, `native_decide`, IO, metaprogramming and proposer-chosen checks."
     how: "Path allow-list enforced by the apply step; CODEOWNERS and branch protection on `verification/`, `tools/dagtool/`, `dag/schema/`, `experiments/*/paper_*.yaml` so those change only with a human review."
   - group: independence
     title: Freeze the claim before anyone tries to meet it
@@ -45,6 +45,18 @@ strategies:
     why: Evidence a proposer can write is not evidence.
     example: "Re-running `fh_widgets.py` changed its results by 0.1%; the two checks that read it went stale and re-ran on their own."
     how: "`dag/evidence/` is written by the verify workflow only; `dagtool check` fails on stale or missing evidence."
+  - group: independence
+    title: One verdict function, two uses
+    what: The command a proposer runs for feedback is the same code the gate runs to accept a proposal, with every file restored afterwards.
+    why: A proposer iterating on feedback is then iterating on the real verdict, and still cannot change it.
+    example: "`dagtool feedback --proposal DIR` and the `proposals` gate both call the same apply step; feedback ends by restoring the node, the Lean import and the evidence exactly."
+    how: "`dagtool feedback` (Lean proposals), `dagtool feedback --node ID --results-root DIR` (reproduction candidates); `apply-proposals` in the gate."
+  - group: independence
+    title: Configurations only from a declared space
+    what: When a proposer may choose settings (a reproduction configuration), the verifier declares the settings and values that exist; a candidate outside that space is refused before anything runs.
+    why: Trying a different configuration should mean choosing among declared alternatives, not inventing a new knob after seeing the result.
+    example: "`experiments/rre/settings_space.yaml` lists the failure budget, factory table, gate time, widget levels and ancilla allocation; `run_candidate.py` validates a candidate against it."
+    how: "`experiments/rre/candidates.py validate` before any run; every attempt and its rationale is kept with the proposal."
   - group: independence
     title: Feedback without the answer key
     what: Return enough to act on — which check failed, the measured value against the claim, the ratio — but keep some checks hidden from the proposer, chosen before any attempt.
@@ -126,7 +138,7 @@ strategies:
 
 applicability:
   - claim: A proposed formalization of a paper theorem
-    example: "an agent's Lean statement, proof and witness for a theorem uploaded to the review site"
+    example: "a submitted Lean statement, proof and witness for a theorem uploaded to the review site"
     tools: [lean, path-guard, verifier-scaling, evidence-hashing]
     method: "Proposer writes only its Lean file; the verifier scans it (no axioms, sorry, IO), compiles it with the kernel, checks vocabulary, mutation and non-vacuity, and returns the outcome."
   - claim: A theorem with an exact statement
@@ -164,8 +176,8 @@ tools:
     category: Verifier gate
     status: verifier
     checks: A proposal touches only the files it may write; its Lean contains no axiom, sorry, admit, native_decide, IO, metaprogramming or foreign imports; anything else is restored or rejected.
-    applies: Every proposal from an agent (today the paper formalizer).
-    limits: Covers the formalization path; extending it to results and configurations, and adding CODEOWNERS and branch protection on the verifier's own paths, is the next step.
+    applies: Every pull request carrying proposals, and every `dagtool feedback` run.
+    limits: Covers proposals under `proposals/`; CODEOWNERS and branch protection on the verifier's own paths are still to be set up.
     check_kinds: [lean]
   - id: evidence-hashing
     name: Input hashing, staleness and the CI gate
@@ -188,7 +200,7 @@ tools:
     category: Proof assistant
     status: verifier
     checks: Kernel-checked proofs of exact statements; `#print axioms` lists only standard axioms and declared assumptions; vetted definitions, mutation and non-vacuity keep the statement faithful.
-    applies: Exact theorems about patterns, counts and constructions, including those an agent proposes.
+    applies: Exact theorems about patterns, counts and constructions, including submitted ones.
     limits: Proved only modulo declared assumptions; the statement's faithfulness still needs review.
     check_kinds: [lean, vocabulary, nonvacuity, differential, equivalence]
   - id: sympy

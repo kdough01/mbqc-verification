@@ -21,12 +21,11 @@ from .model import Dag
 from .status import NodeStatus
 
 FOUNDATION_KINDS = ("definition", "core", "transfer")
-# Why an open paper theorem is still open, from the automatic formalization (formalize.py)
+# Why an open paper theorem is still open, from the outcome a proposal recorded (proposals.py)
 OPEN_REASONS = {
-    "unproved": "the agent stated it in Lean but could not prove it yet (see notes)",
+    "unproved": "a proposal stated it in Lean but did not prove it yet (see notes)",
     "not-formalizable": "the vetted definitions cannot express it yet (see notes)",
-    "counterexample-suspected": "the agent suspects it is false; a person should check (see notes)",
-    "formalize-failed": "the automatic formalization did not pass its checks (see notes)",
+    "counterexample-suspected": "a proposal reports it may be false; a person should check (see notes)",
 }
 
 
@@ -56,5 +55,5 @@ def verdict(dag: Dag, node_id: str, st: dict[str, NodeStatus]) -> dict:
         if tag in dag.nodes[node_id].tags:
             return {"state": "open", **out, "reason": why}
     if dag.nodes[node_id].raw.get("paper") and not dag.nodes[node_id].checks:
-        return {"state": "open", **out, "reason": "waiting for automatic formalization"}
+        return {"state": "open", **out, "reason": "waiting for a proposal"}
     return {"state": "open", **out, "reason": "no passing check yet"}

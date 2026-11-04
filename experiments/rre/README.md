@@ -106,6 +106,22 @@ is in their circuits:
 `results/calibrated/scaling.json`. Every point is a run; nothing is fitted or extrapolated; the paper's values are
 shown only where Table II prints them. The QFT series crosses from two to four modules between N = 64 and 80.
 
+## Trying another configuration (candidates)
+
+A proposer who wants to try different settings does not edit this folder. It writes a candidate that picks one
+declared value per setting (`settings_space.yaml`: failure budget, error fit, factory table, gate time, and per family
+the widget level and ancilla allocation), runs it, and reads the verifier's feedback:
+
+```bash
+python experiments/rre/candidates.py validate candidate.yaml        # refused if anything is not declared
+python experiments/rre/run_candidate.py --candidate candidate.yaml --out /tmp/cand   # RRE environment
+dagtool feedback --node saadatmand2024.fh.4x4 --results-root /tmp/cand            # verifier environment
+```
+
+Feedback scores the candidate's results with the node's own checks; expected values must equal the frozen ones, so a
+candidate cannot move the target. Adopting a configuration in the verifier (`config_calibrated.yaml`,
+`reproduce_table2.py`) is a reviewed change, followed by a `reproduce` run.
+
 ## Larger instances (for the larger machine; not run here)
 
 Fermi–Hubbard 8×8, 16×16, 20×20, QFT N-500 and N-1000, and Ising 5×5 have DAG nodes whose checks **skip** until
@@ -148,5 +164,7 @@ the machine as a GitHub self-hosted runner and start the **reproduce** workflow 
 | `phases.py` | random vs optimized QSP phases |
 | `cabaliser_inputs.py` | compiled graph states vs the circuit unitary on basis and random inputs |
 | `sensitivity.py` | first pass: one unstated setting at a time |
+| `settings_space.yaml`, `candidates.py` | the declared settings a candidate may choose from, and its validator |
+| `run_candidate.py` | runs one candidate and writes results a node's checks can score |
 | `run.sh` | runs all of the above |
 | `results/` | first-pass results; `results/calibrated/` the calibrated ones. The DAG checks read both |

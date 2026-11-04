@@ -1,0 +1,29 @@
+# The declared space of settings a reproduction candidate may choose from (see candidates.py).
+# These are the settings Saadatmand et al. (arXiv:2406.06015v3) do not state or state ambiguously. A candidate
+# picks one value per setting and per family; anything not declared here is refused before a run starts.
+# Changing this file is a change to the verifier and needs review; a proposer cannot extend it.
+settings:
+  target_p_algo: [0.95, 0.5, 0.05]          # failure budget reading of Eq. (27)
+  coeffs: [paper, rre]                       # logical-error fit: Appendix D or RRE's params.yaml
+  factories: [paper, rre]                    # T-factory table: Table I as printed, or RRE's shipped table
+  gate_ns: [200, 50]                         # characteristic gate time t
+family_settings:
+  widgets:                                   # name: [max gates per widget, max qubits per widget]
+    one: [1000000000, 10000]
+    rre-example: [10000, 100]
+    q40: [10000, 40]
+    g1500: [1500, 100]
+    q30: [10000, 30]
+  qubit_manager: [simple, greedy, greedy-fifo]
+families: [qft, fh, ising]
+# Instances a candidate may run here; larger ones need the larger machine and are run through run.sh --only.
+instances: ["qft:4", "qft:10", "qft:25", "qft:100", "fh:2", "fh:4", "ising:2"]
+# Which DAG nodes score each instance (dagtool feedback --node ID --results-root DIR).
+nodes:
+  "qft:4": saadatmand2024.qft.n4
+  "qft:10": saadatmand2024.qft.n10
+  "qft:25": saadatmand2024.qft.n25
+  "qft:100": saadatmand2024.qft.n100
+  "fh:2": saadatmand2024.fh.2x2
+  "fh:4": saadatmand2024.fh.4x4
+  "ising:2": saadatmand2024.ising.2x2

@@ -595,7 +595,7 @@ def tiles(ctx: Context) -> str:
         f'<div class="tile {c}"><div class="tn">{v}</div><div class="tl">{esc(k)}</div></div>' for k, v, c in items) + "</div>"
 
 
-STATUS_LABEL = {"verifier": "in the verifier", "used": "pinned tool the verifier runs", "candidate": "candidate"}
+STATUS_LABEL = {"verifier": "in the verifier", "used": "pinned tool", "candidate": "candidate"}
 
 
 def strategies_html(toolkit: dict) -> str:
@@ -751,9 +751,9 @@ def render_report(dag: Dag, spec: dict, st=None) -> str:
                          '<a href="toolkit.html">toolkit page</a>.'))
     parts.append(section("tools", "Associated tools for verification checks", tools_html(toolkit, spec.get("tools_used")),
                          "The suite of tools a check can call on, depending on what kind of claim is being verified. "
-                         "None of them is an agent: “in the verifier” tools are implemented checks and gates; “pinned tool the verifier "
-                         "runs” are external tools run at fixed versions; “candidate” tools fit a claim type we expect but are not "
-                         "wired in yet."))
+                         "All of them are deterministic: “in the verifier” tools are implemented checks and gates; “pinned tool” "
+                         "means an external tool at a fixed version that the verifier's own scripts run; “candidate” tools fit a "
+                         "claim type we expect but are not wired in yet."))
 
     legend = '<div class="legend">' + "".join(
         f'<span><span class="sw" style="background:var(--{v})"></span>{esc(k)}</span>'
@@ -824,10 +824,10 @@ def render_toolkit(dag: Dag) -> str:
     fonts, tokens = tokens_css()
     toolkit = load_toolkit(dag.root)
     head = ('<header class="hero"><p class="eyebrow"><a href="index.html">All reports</a> · <a href="../index.html">theorem DAG</a></p>'
-            '<h1>Verification toolkit</h1><p class="summary">The verifier is a fixed set of checks and pinned tools with no agent in '
-            'it. Proposers — agents or people — submit artifacts and receive feedback; they cannot change the checks. This page '
-            'lists the strategies that keep it that way and carry over between papers, and the tools a check can use depending '
-            'on the claim.</p></header>')
+            '<h1>Verification toolkit</h1><p class="summary">The verifier is a fixed set of deterministic checks and pinned tools. '
+            'Proposers submit artifacts from outside it and receive its feedback; they cannot change the checks. This page lists '
+            'the strategies that keep it that way and carry over between papers, and the tools a check can use depending on the '
+            'claim.</p></header>')
     nav = '<nav class="toc" aria-label="Sections"><a href="#strategies">Strategies</a><a href="#tools">Tools</a></nav>'
     body = (section("strategies", "Strategies we can carry over to future papers", strategies_html(toolkit))
             + section("tools", "Associated tools for verification checks", tools_html(toolkit)))

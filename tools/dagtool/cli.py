@@ -15,8 +15,12 @@ dagtool — validate, run and inspect the theorem DAG.
     dagtool check                        CI gate: exit 1 on stale evidence, failures or bad edges
     dagtool pull-papers [--server URL]   add open theorems from the review site as dag/nodes/papers/
     dagtool export [--out PATH]          computed DAG as JSON (nodes, edges, status, verdicts)
-    dagtool formalize --list|--run --out DIR|--apply DIR    agent formalization of paper theorems
-    dagtool lean-check FILE              compile one agent Lean file (scan first, no secrets in env)
+    dagtool open-theorems [--json] [--count]   open paper theorems and what a proposal for each must contain
+    dagtool feedback --proposal DIR      every check on a proposal, then restore everything (nothing changes)
+    dagtool feedback --node ID --results-root DIR   a node's reproduction checks on candidate results
+    dagtool apply-proposals DIR          apply proposals that pass (the proposals gate runs this)
+    dagtool proposal-paths < FILES       fail if a changed path is not proposals/<node>/<allowed file>
+    dagtool lean-check FILE              scan and compile one Lean file under lean/MBQC/Papers/
 
 Run from the repository root (or pass --root).
 """
@@ -246,43 +250,53 @@ def cmd_export(dag, args):
     return 0
 
 
-def cmd_formalize(dag, args):
-    from . import formalize as fz
-    todo = fz.pending(dag, only=set(args.node or []) or None)
-    if args.list or args.count:
-        print(len(todo) if args.count else "\n".join(n.id for n in todo) or "nothing pending")
-        return 0
-    if args.apply:
-        rows = fz.apply(dag.root, Path(args.apply), run_checks=not args.no_checks)
-        if args.report:
-            Path(args.report).write_text(json.dumps(rows, indent=1) + "\n", encoding="utf-8")
-        print(f"{sum(r['outcome'] == 'formalized' for r in rows)} formalized, {len(rows)} attempted")
-        return 0
-    if not args.run or not args.out:
-        print("use --list, --run --out DIR, or --apply DIR", file=sys.stderr)
-        return 2
-    out = Path(args.out)
-    out.mkdir(parents=True, exist_ok=True)
-    for i, node in enumerate(todo[: args.max]):
-        print(f"[{i + 1}/{min(len(todo), args.max)}] {node.id} ...", flush=True)
-        try:
-            res = fz.run_agent(dag, node, out, budget=args.budget, model=args.model, timeout=args.timeout)
-        except RuntimeError as e:
-            print(f"cannot run the agent: {e}", file=sys.stderr)
-            return 1
-        got = sorted(p.name for p in (out / node.id).iterdir() if p.name != "result.json")
-        print(f"   exit {res.get('exit_code')}, {res.get('seconds')}s, cost {res.get('cost_usd')}, wrote {got or 'nothing'}")
-        if i == 0 and not got and res.get("exit_code") not in (0, None):
-            # nothing written and the CLI failed: a setup problem (credentials, CLI), not this theorem
-            import shutil
-            shutil.rmtree(out / node.id, ignore_errors=True)
-            print("the agent failed before writing anything; not marking any node:\n" + str(res.get("log"))[-2000:], file=sys.stderr)
-            return 1
+def cmd_open_theorems(dag, args):
+    from . import proposals as pr
+    todo = pr.open_theorems(dag, only=set(args.node or []) or None)
+    if args.count:
+        print(len(todo))
+    elif args.json:
+        print(json.dumps([pr.describe(dag, n) for n in todo], indent=1, ensure_ascii=False, default=str))
+    else:
+        print("\n".join(n.id for n in todo) or "nothing open")
     return 0
 
 
+def cmd_feedback(dag, args):
+    from . import proposals as pr
+    if args.proposal:
+        out = pr.feedback(dag.root, Path(args.proposal).resolve(), run_checks=not args.no_checks)
+        ok = out.get("accepted", False)
+    elif args.node and args.results_root:
+        out = pr.reproduction_feedback(dag, args.node, Path(args.results_root).resolve())
+        ok = "error" not in out and out["passed"] == out["of"]
+    else:
+        print("use --proposal DIR, or --node ID --results-root DIR", file=sys.stderr)
+        return 2
+    print(json.dumps(out, indent=1, ensure_ascii=False, default=str))
+    return 0 if ok else 1
+
+
+def cmd_apply_proposals(dag, args):
+    from . import proposals as pr
+    rows = pr.apply(dag.root, Path(args.dir), run_checks=not args.no_checks)
+    if args.report:
+        Path(args.report).write_text(json.dumps(rows, indent=1, default=str) + "\n", encoding="utf-8")
+    accepted = sum(bool(r.get("accepted")) for r in rows)
+    print(f"{accepted} accepted, {len(rows) - accepted} rejected or skipped, {len(rows)} proposals")
+    return 0
+
+
+def cmd_proposal_paths(dag, args):
+    from . import proposals as pr
+    ok, bad = pr.proposal_paths([line for line in sys.stdin.read().splitlines() if line.strip()])
+    for b in bad:
+        print(f"not allowed in a proposal: {b}", file=sys.stderr)
+    return 0 if ok else 1
+
+
 def cmd_lean_check(dag, args):
-    from .formalize import lean_check
+    from .proposals import lean_check
     ok, out = lean_check(dag.root, args.file)
     print(out)
     return 0 if ok else 1
@@ -335,20 +349,21 @@ def main(argv=None) -> int:
     p = sub.add_parser("export", help="computed DAG as JSON")
     p.add_argument("--out")
     p.add_argument("--no-circuits", action="store_true")
-    p = sub.add_parser("formalize", help="agent formalization of open paper theorems")
-    p.add_argument("--list", action="store_true")
+    p = sub.add_parser("open-theorems", help="open paper theorems and the proposal each needs")
+    p.add_argument("--json", action="store_true")
     p.add_argument("--count", action="store_true")
-    p.add_argument("--run", action="store_true", help="run the agent; its output goes to --out only")
-    p.add_argument("--out")
-    p.add_argument("--apply", help="check and apply agent output from this folder")
-    p.add_argument("--report")
-    p.add_argument("--no-checks", action="store_true", help="with --apply: do not run the node's checks")
     p.add_argument("--node", action="append")
-    p.add_argument("--max", type=int, default=3)
-    p.add_argument("--budget", type=float, default=5.0, help="USD cap per theorem")
-    p.add_argument("--model")
-    p.add_argument("--timeout", type=int, default=1500, help="seconds per theorem")
-    p = sub.add_parser("lean-check", help="compile one agent Lean file")
+    p = sub.add_parser("feedback", help="run the checks on a proposal or candidate results; changes nothing")
+    p.add_argument("--proposal", help="a proposal directory (proposal.json, theorem.lean)")
+    p.add_argument("--node", help="with --results-root: the node whose reproduction checks to run")
+    p.add_argument("--results-root", help="directory holding candidate results files")
+    p.add_argument("--no-checks", action="store_true", help="validate and compile only")
+    p = sub.add_parser("apply-proposals", help="apply the proposals in DIR that pass")
+    p.add_argument("dir")
+    p.add_argument("--report")
+    p.add_argument("--no-checks", action="store_true")
+    sub.add_parser("proposal-paths", help="check changed paths (stdin) against the proposal allow-list")
+    p = sub.add_parser("lean-check", help="scan and compile one Lean file under lean/MBQC/Papers/")
     p.add_argument("file")
     args = ap.parse_args(argv)
 

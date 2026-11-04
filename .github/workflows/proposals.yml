@@ -1,0 +1,146 @@
+# Proposals for open paper theorems arrive as pull requests that add files under proposals/<node id>/
+# (proposal.json, theorem.lean, attempts.json). This gate decides, with the verifier's own code only:
+#
+#   check   runs from the base branch's copy of this workflow and tools (pull_request_target), with read-only
+#           permissions and no credentials on disk. It refuses the pull request if it touches anything outside
+#           proposals/, copies the proposal files out as data, and runs `dagtool apply-proposals`, which scans
+#           and compiles the Lean, runs the node's fixed checks, and keeps only what passes.
+#   apply   commits what passed to the base branch and comments the verdict on the pull request. Accepted
+#           proposals close the pull request; if nothing passed, it stays open for a revised proposal.
+#   verify  the usual verify run, which publishes dag.json for the review site.
+#
+# The pull request's own files are never merged and never executed, apart from compiling its scanned Lean file.
+name: proposals
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    paths: ["proposals/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    outputs:
+      accepted: ${{ steps.apply.outputs.accepted }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Take the proposal files out of the pull request, as data
+        env:
+          PR: ${{ github.event.pull_request.number }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          git fetch --no-tags origin "pull/$PR/head:pr-head"
+          git diff --name-only "origin/$BASE...pr-head" > "$RUNNER_TEMP/changed.txt"
+          cat "$RUNNER_TEMP/changed.txt"
+          python -m pip install -q pyyaml jsonschema
+          PYTHONPATH=tools:src:. python -m dagtool proposal-paths < "$RUNNER_TEMP/changed.txt"
+          mkdir -p "$RUNNER_TEMP/in"
+          while IFS= read -r f; do
+            [ -n "$f" ] || continue
+            if git cat-file -e "pr-head:$f" 2>/dev/null; then
+              mkdir -p "$RUNNER_TEMP/in/$(dirname "$f")"
+              git show "pr-head:$f" > "$RUNNER_TEMP/in/$f"
+            fi
+          done < "$RUNNER_TEMP/changed.txt"
+
+      - uses: ./.github/actions/setup
+
+      - name: Apply what passes
+        id: apply
+        run: |
+          dagtool apply-proposals "$RUNNER_TEMP/in/proposals" --report "$RUNNER_TEMP/applied.json"
+          git add -A dag lean
+          git diff --cached --binary > "$RUNNER_TEMP/applied.patch"
+          python -c "import json,sys; print('accepted=' + str(sum(bool(r.get('accepted')) for r in json.load(open(sys.argv[1])))))" "$RUNNER_TEMP/applied.json" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: proposals-${{ github.event.pull_request.number }}
+          path: |
+            ${{ runner.temp }}/applied.json
+            ${{ runner.temp }}/applied.patch
+          if-no-files-found: warn
+
+  apply:
+    needs: check
+    if: ${{ !cancelled() && needs.check.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+    concurrency:
+      group: dag-${{ github.event.pull_request.base.ref }}
+      cancel-in-progress: false
+    outputs:
+      committed: ${{ steps.commit.outputs.committed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: proposals-${{ github.event.pull_request.number }}
+          path: ${{ runner.temp }}/result
+
+      - name: Commit what passed
+        id: commit
+        env:
+          PR: ${{ github.event.pull_request.number }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          if [ ! -s "$RUNNER_TEMP/result/applied.patch" ]; then echo "committed=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          git apply --index "$RUNNER_TEMP/result/applied.patch"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Apply proposals from #$PR [skip ci]"
+          git pull --rebase origin "$BASE"
+          git push origin "HEAD:$BASE"
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Report the verdict on the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          ACCEPTED: ${{ needs.check.outputs.accepted }}
+        run: |
+          python - "$RUNNER_TEMP/result/applied.json" > "$RUNNER_TEMP/comment.md" <<'PY'
+          import json, sys
+          rows = json.load(open(sys.argv[1]))
+          print("### Verifier verdict\n")
+          for r in rows:
+              print(f"- `{r['node']}`: **{r['outcome']}** {r.get('reason', '')}")
+              for c in r.get("checks") or []:
+                  print(f"  - {c['name']}: {c['outcome']} — {c['summary']}")
+              if r.get("compiler"):
+                  print("  <details><summary>compiler output</summary>\n\n```\n" + r["compiler"][-3000:] + "\n```\n</details>")
+          PY
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/comment.md"
+          if [ "${ACCEPTED:-0}" != "0" ]; then
+            gh pr close "$PR" --repo "$GITHUB_REPOSITORY" --comment "Applied to the DAG by the verifier; the proposal files themselves are not merged."
+          fi
+
+  verify:
+    needs: apply
+    if: ${{ !cancelled() && needs.apply.outputs.committed == 'true' }}
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/verify.yml
+    with:
+      rerun: stale
