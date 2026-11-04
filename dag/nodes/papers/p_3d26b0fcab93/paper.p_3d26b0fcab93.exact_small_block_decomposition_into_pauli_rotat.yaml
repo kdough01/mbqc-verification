@@ -1,0 +1,24 @@
+id: paper.p_3d26b0fcab93.exact_small_block_decomposition_into_pauli_rotat
+kind: theorem
+title: Exact small-block decomposition into Pauli rotations
+statement: 'Consequently M2 = 81 and M4 = 14535 are valid upper bounds.
+
+
+  Our calculation code counts the theorem''s envelope, not floating-point cancellations in particular
+  QR instances.'
+description: From "A compositional measurement-based implementation of basic THRIFT with a sharper TFIM
+  error bound and conditional physical resources", pages 5, 6 on the review site. Added by `dagtool pull-papers`;
+  it stays open until depends_on edges and checks are added.
+paper:
+  server: https://genesis-thrust2-review.fly.dev
+  theorem_id: paper.p_3d26b0fcab93.exact_small_block_decomposition_into_pauli_rotat
+  paper_id: p_3d26b0fcab93
+  module_id: m_fdf829808ce2
+  paper_title: A compositional measurement-based implementation of basic THRIFT with a sharper TFIM error
+    bound and conditional physical resources
+  pages:
+  - 5
+  - 6
+tags:
+- paper
+- open

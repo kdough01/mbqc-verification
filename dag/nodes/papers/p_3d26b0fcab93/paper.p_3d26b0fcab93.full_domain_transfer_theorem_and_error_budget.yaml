@@ -1,0 +1,26 @@
+id: paper.p_3d26b0fcab93.full_domain_transfer_theorem_and_error_budget
+kind: theorem
+title: Full-domain transfer theorem and error budget
+statement: 'The corresponding channel diamond distance is at most twice the right-hand side.
+
+
+  Thus a sufficient count is
+
+
+  If R > 0, allocating operator error ϵsyn/R per arbitrary rotation suffices.'
+description: From "A compositional measurement-based implementation of basic THRIFT with a sharper TFIM
+  error bound and conditional physical resources", pages 4, 5 on the review site. Added by `dagtool pull-papers`;
+  it stays open until depends_on edges and checks are added.
+paper:
+  server: https://genesis-thrust2-review.fly.dev
+  theorem_id: paper.p_3d26b0fcab93.full_domain_transfer_theorem_and_error_budget
+  paper_id: p_3d26b0fcab93
+  module_id: m_4e357eb480cd
+  paper_title: A compositional measurement-based implementation of basic THRIFT with a sharper TFIM error
+    bound and conditional physical resources
+  pages:
+  - 4
+  - 5
+tags:
+- paper
+- open

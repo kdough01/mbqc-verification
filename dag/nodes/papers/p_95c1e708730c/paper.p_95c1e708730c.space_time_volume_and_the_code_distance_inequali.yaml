@@ -1,0 +1,32 @@
+id: paper.p_95c1e708730c.space_time_volume_and_the_code_distance_inequali
+kind: theorem
+title: Space-time volume and the code-distance inequality
+statement: 'If we assume the worst-case sequential execution, the upper bound on the full space-time volume
+  becomes:
+
+
+  The minimum code distance required is the smallest integer d that satisfies eq. (17).
+
+
+  we must ensure that the distillation output is at least as good as a unit cell in the space-time volume
+
+
+  T-factory Lookup Table: Litinski''s T-factories that match our superconducting architecture with p =
+  10−3.'
+description: 'From "Superconducting qubits in the millions: the potential and limitations of modularity",
+  pages 13, 14, 15, 28 on the review site. Added by `dagtool pull-papers`; it stays open until depends_on
+  edges and checks are added.'
+paper:
+  server: https://genesis-thrust2-review.fly.dev
+  theorem_id: paper.p_95c1e708730c.space_time_volume_and_the_code_distance_inequali
+  paper_id: p_95c1e708730c
+  module_id: m_a809f12c5d25
+  paper_title: 'Superconducting qubits in the millions: the potential and limitations of modularity'
+  pages:
+  - 13
+  - 14
+  - 15
+  - 28
+tags:
+- paper
+- open
