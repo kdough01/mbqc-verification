@@ -2,6 +2,7 @@
 proposals.py — the verifier's side of a proposal: describe open theorems, give feedback, apply what passes.
 
     dagtool open-theorems [--json] [--count] [--node ID]   what is open, and what a proposal for it must look like
+    dagtool proof-targets [--json] [--node ID]             formalized theorems that can take another Lean proof
     dagtool feedback --proposal DIR                        run every check on a proposal without changing anything
     dagtool feedback --node ID --results-root DIR          a node's reproduction checks against candidate results
     dagtool apply-proposals DIR [--report F]               apply the proposals that pass (used by the proposals gate)
@@ -14,6 +15,11 @@ repositories, such as the Quantum Genesis dashboard) and reach the verifier as d
     proposals/<node id>/proposal.json   outcome, Lean declaration, witness, dependency edges, notes
     proposals/<node id>/theorem.lean    the statement, its proof and a witness, in the node's own namespace
     proposals/<node id>/attempts.json   optional: every attempt the proposer made and why (kept as a record)
+
+A proposal with outcome `proof` adds another Lean proof to a theorem that is already formalized. It goes in its
+own file and namespace (lean/MBQC/Papers/<paper>/<theorem>/Proof_<k>.lean, <namespace>.Proof_<k>), cannot import
+the other proofs, must state the theorem exactly as the main declaration does and must not repeat its proof term
+(the lean_proof check). It must say in `approach` what idea the proof uses. The node then records every proof.
 
 What a proposal can and cannot do:
   * It may write one Lean file at the node's own path and propose dependency edges to existing nodes.
@@ -43,6 +49,7 @@ from .model import EDGE_KINDS, Dag, Node, load_dag
 
 DONE_TAGS = ("formalized", "not-formalizable", "counterexample-suspected", "unproved")
 OUTCOMES = ("formalized", "unproved", "not_formalizable", "counterexample")
+PROOF_OUTCOME = "proof"      # another Lean proof of a formalized theorem
 PROPOSAL_FILES = ("proposal.json", "theorem.lean", "attempts.json")
 SECRET_ENV = ("GITHUB_TOKEN", "GH_TOKEN", "ACTIONS_RUNTIME_TOKEN", "ACTIONS_ID_TOKEN_REQUEST_TOKEN",
               "ACTIONS_ID_TOKEN_REQUEST_URL")
@@ -75,6 +82,31 @@ def lean_names(node: Node) -> tuple[str, Path]:
     pmod = "Paper_" + _ident(paper.get("paper_id") or node.id.split(".")[1])
     tmod = "T_" + _ident(node.id.split(".")[-1])
     return f"MBQC.Papers.{pmod}.{tmod}", Path("lean") / "MBQC" / "Papers" / pmod / f"{tmod}.lean"
+
+
+def proofs_of(node: Node) -> list[dict]:
+    """Every Lean proof the node records: the main declaration first, then each lean_proof check."""
+    main = next((c.name for c in node.checks if c.kind == "lean"), None)
+    if not node.lean_decl or main is None:
+        return []
+    out = [{"index": 1, "decl": node.lean_decl, "check": main, "approach": None}]
+    for c in node.checks:
+        if c.kind == "lean_proof":
+            out.append({"index": len(out) + 1, "decl": c.params.get("decl"), "check": c.name,
+                        "approach": c.params.get("approach"), "added": c.params.get("added")})
+    return out
+
+
+def proof_names(node: Node, index: int) -> tuple[str, Path]:
+    """(namespace, path) for the node's proof number `index` (2, 3, ...)."""
+    ns, path = lean_names(node)
+    return f"{ns}.Proof_{index}", path.with_suffix("") / f"Proof_{index}.lean"
+
+
+def proof_targets(dag: Dag, only: set[str] | None = None) -> list[Node]:
+    """Formalized paper theorems (a main Lean declaration with a lean check) that can take another proof."""
+    return sorted((n for n in dag.nodes.values() if (not only or n.id in only) and isinstance(n.raw.get("paper"), dict)
+                   and n.lean_decl and any(c.kind == "lean" for c in n.checks)), key=lambda n: n.id)
 
 
 def open_theorems(dag: Dag, only: set[str] | None = None) -> list[Node]:
@@ -118,6 +150,42 @@ def describe(dag: Dag, node: Node) -> dict:
             "lean_forbidden": [why for _, why in FORBIDDEN_LEAN],
         },
     }
+
+
+def describe_proof(dag: Dag, node: Node, root: Path | None = None) -> dict:
+    """What another proof of a formalized theorem must look like: the main declaration and its file (to restate the
+    statement exactly), the proofs so far and their approaches (so a new one can use a different idea)."""
+    root = root or dag.root
+    proofs = proofs_of(node)
+    k = len(proofs) + 1
+    ns, path = proof_names(node, k)
+    main_file = root / lean_names(node)[1]
+    return {
+        "node": node.id, "title": node.title, "statement": node.statement.strip(), "main_decl": node.lean_decl,
+        "main_lean_file": lean_names(node)[1].as_posix(),
+        "main_lean_source": main_file.read_text(encoding="utf-8") if main_file.exists() else None,
+        "proofs": proofs, "next_index": k, "namespace": ns, "lean_file": path.as_posix(),
+        "checks_run": ["lean_proof"],
+        "rules": ["state the theorem exactly as the main declaration does (syntactically, not only definitionally)",
+                  "a different proof term from every earlier proof", "no imports under MBQC.Papers",
+                  "say in approach which idea the proof uses"],
+        "proposal_format": {
+            "directory": f"proposals/{node.id}/",
+            "files": {"proposal.json": "required", "theorem.lean": "required: the proof, in namespace " + ns,
+                      "attempts.json": "optional record of every attempt and its rationale"},
+            "proposal.json": {"node": node.id, "outcome": PROOF_OUTCOME, "lean_decl": f"{ns}.<theorem name>",
+                              "approach": "one line: the idea of this proof", "notes": "text"},
+            "lean_forbidden": [why for _, why in FORBIDDEN_LEAN],
+        },
+    }
+
+
+def _normalized(text: str) -> str:
+    """Lean source without comments, namespace lines or whitespace, to spot a copied proof before compiling."""
+    code = re.sub(r"/-.*?-/", "", text, flags=re.S)
+    code = re.sub(r"--[^\n]*", "", code)
+    code = re.sub(r"^\s*(namespace|end)\b[^\n]*$", "", code, flags=re.M)
+    return re.sub(r"\s+", " ", code).strip()
 
 
 # ---------------------------------------------------------------- checking
@@ -261,6 +329,12 @@ def apply_one(root: Path, node_id: str, src: Path, run_checks: bool = True, dry_
     dag = load_dag(root)
     node = dag.nodes.get(node_id)
     row = {"node": node_id, "dry_run": dry_run}
+    try:
+        peek = json.loads((src / "proposal.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        peek = None
+    if node is not None and isinstance(peek, dict) and peek.get("outcome") == PROOF_OUTCOME:
+        return apply_proof(root, dag, node, src, peek, run_checks=run_checks, dry_run=dry_run, echo=echo)
     if node is None or node_id not in {n.id for n in open_theorems(dag)}:
         return {**row, "outcome": "skipped", "reason": "not an open paper theorem"}
     ns, lean_file = lean_names(node)
@@ -361,6 +435,87 @@ def apply_one(root: Path, node_id: str, src: Path, run_checks: bool = True, dry_
         keep_record()
         echo(f"{node_id}: formalized; " + ", ".join(f"{c['name']} {c['outcome']}" for c in checks))
     return {**row, "outcome": "formalized", "reason": reason, "accepted": True, "checks": checks}
+
+
+def apply_proof(root: Path, dag: Dag, node: Node, src: Path, prop: dict, run_checks: bool = True,
+                dry_run: bool = False, echo=print) -> dict:
+    """Another Lean proof of a formalized theorem: its own file, the lean_proof check, nothing else changes."""
+    row = {"node": node.id, "dry_run": dry_run, "kind": "proof"}
+    if node.id not in {n.id for n in proof_targets(dag)}:
+        return {**row, "outcome": "skipped", "reason": "not a formalized paper theorem (formalize it first)"}
+    proofs = proofs_of(node)
+    k = len(proofs) + 1
+    ns, lean_file = proof_names(node, k)
+    errs = []
+    if prop.get("node") not in (None, node.id):
+        errs.append(f"proposal.json names node {prop.get('node')!r}, not {node.id}")
+    if prop.get("extra_checks") or prop.get("depends_on"):
+        errs.append("a proof proposal cannot choose checks or edges: it only adds a proof")
+    if not re.fullmatch(re.escape(ns) + r"\.[A-Za-z_][A-Za-z0-9_']*", prop.get("lean_decl") or ""):
+        errs.append(f"lean_decl must be {ns}.<name> (this is proof {k})")
+    approach = " ".join(str(prop.get("approach") or "").split())
+    if not approach:
+        errs.append("approach: say in one line which idea this proof uses")
+    if not (src / "theorem.lean").exists():
+        errs.append("no theorem.lean")
+    if errs:
+        return {**row, "outcome": "rejected", "reason": "; ".join(errs)}
+    text = (src / "theorem.lean").read_text(encoding="utf-8")
+    problems = scan_lean(text)
+    if problems or f"namespace {ns}" not in text:
+        return {**row, "outcome": "rejected", "reason": "Lean file rejected: " + "; ".join(problems or [f"not inside namespace {ns}"])}
+    earlier = [root / lean_names(node)[1]] + [root / proof_names(node, p["index"])[1] for p in proofs[1:]]
+    if any(f.exists() and _normalized(f.read_text(encoding="utf-8")) == _normalized(text) for f in earlier):
+        return {**row, "outcome": "rejected", "reason": "the file repeats an earlier proof"}
+
+    snap = _Snapshot(root, node, lean_file)
+    target = root / lean_file
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(text, encoding="utf-8")
+    _set_import(root, lean_file, True)
+
+    def reject(why: str, **extra) -> dict:
+        snap.restore()
+        return {**row, "outcome": "rejected", "reason": why, **extra}
+
+    if run_checks:
+        try:
+            ok, compiled = lean_check(root, lean_file.as_posix())
+        except Exception as e:  # noqa: BLE001 - no toolchain, or it could not start
+            return reject(f"the Lean toolchain could not run: {e}")
+        if not ok:
+            return reject("the Lean file does not compile", compiler=compiled)
+    raw = _load_raw(node)
+    name = f"lean-proof-{k}"
+    raw["checks"] = list(raw.get("checks") or []) + [{"kind": "lean_proof", "name": name, "params": {
+        "decl": prop["lean_decl"], "approach": approach[:300], "added": time.strftime("%Y-%m-%d", time.gmtime())}}]
+    _note(raw, f"proof {k} added from a submitted proposal ({approach[:200]}). " + str(prop.get("notes") or ""))
+    _save_raw(node, raw)
+    try:
+        dag = load_dag(root)
+    except Exception as e:  # noqa: BLE001
+        return reject(f"the proposal makes the DAG invalid: {e}")
+    checks = []
+    if run_checks:
+        from .runner import plan, run
+        records = [r for r in run(dag, plan(dag, node_ids={node.id}), echo=lambda *a, **k: None)]
+        checks = [{"name": r["name"], "kind": r["kind"], "outcome": r["result"]["outcome"],
+                   "grants": r["result"]["grants"], "summary": r["result"]["summary"]} for r in records]
+        bad = [c for c in checks if c["outcome"] in ("fail", "error")]
+        if bad:
+            return reject("checks did not pass: " + "; ".join(f"{c['name']}: {c['summary']}" for c in bad), checks=checks)
+        if not any(c["name"] == name and c["outcome"] == "pass" for c in checks):
+            return reject(f"{name} did not run", checks=checks)
+    if dry_run:
+        snap.restore()
+    else:
+        attempts = src / "attempts.json"
+        if attempts.exists():
+            dest = root / "dag" / "proposals" / node.id
+            dest.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(attempts, dest / time.strftime("attempts-%Y%m%dT%H%M%SZ.json", time.gmtime()))
+        echo(f"{node.id}: proof {k} added; " + ", ".join(f"{c['name']} {c['outcome']}" for c in checks))
+    return {**row, "outcome": "proof_added", "index": k, "reason": approach, "accepted": True, "checks": checks}
 
 
 def apply(root: Path, in_dir: Path, run_checks: bool = True, echo=print) -> list[dict]:

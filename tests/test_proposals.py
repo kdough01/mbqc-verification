@@ -85,7 +85,8 @@ def raw(repo):
 def tree(repo):
     """A digest of every file outside the proposal inbox, to show a dry run changes nothing."""
     h = hashlib.sha256()
-    for p in sorted(x for x in repo.rglob("*") if x.is_file() and "in" not in x.relative_to(repo).parts[:1]):
+    for p in sorted(x for x in repo.rglob("*") if x.is_file() and "in" not in x.relative_to(repo).parts[:1]
+                    and ".lake" not in x.relative_to(repo).parts):      # Lean build outputs are not the repository
         h.update(p.relative_to(repo).as_posix().encode() + p.read_bytes())
     return h.hexdigest()
 

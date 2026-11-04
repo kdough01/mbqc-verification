@@ -51,7 +51,8 @@ def node_prefixes(dag) -> dict[str, str]:
 
 
 def inspect(ctx) -> dict[str, dict]:
-    """Inspect every node's main declaration and every witness, cached for the run."""
+    """Inspect every node's main declaration, every witness and every additional proof, cached for the run.
+    A `lean_proof` comparison is stored under "same:<main>|<proof>"."""
     if "lean_inspect" in ctx.cache:
         return ctx.cache["lean_inspect"]
     b = build(ctx)
@@ -60,7 +61,17 @@ def inspect(ctx) -> dict[str, dict]:
     dag = ctx.dag
     decls = {n.lean_decl for n in dag.nodes.values() if n.lean_decl and n.kind not in ("definition", "assumption")}
     decls |= {c.params["witness"] for n in dag.nodes.values() for c in n.checks if c.params.get("witness")}
-    lines = [f"decl {d}" for d in sorted(decls)] + [f"stop {p}" for p in sorted(node_prefixes(dag))]
+    sames = set()
+    for n in dag.nodes.values():
+        earlier = [n.lean_decl] if n.lean_decl else []
+        for c in n.checks:
+            if c.kind == "lean_proof" and earlier and c.params.get("decl"):
+                sames |= {(e, c.params["decl"]) for e in earlier}     # each proof against every earlier one
+                earlier.append(c.params["decl"])
+    sames = sorted(sames)
+    decls |= {b for _, b in sames}
+    lines = [f"decl {d}" for d in sorted(decls)] + [f"stop {p}" for p in sorted(node_prefixes(dag))] \
+        + [f"same {a} {b}" for a, b in sames]
     with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False, encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
         req = f.name
@@ -77,7 +88,7 @@ def inspect(ctx) -> dict[str, dict]:
         line = line.strip()
         if line.startswith("{"):
             d = json.loads(line)
-            out[d["name"]] = d
+            out["same:" + "|".join(d["same"]) if "same" in d else d["name"]] = d
     ctx.cache["lean_inspect"] = out
     return out
 

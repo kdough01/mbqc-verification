@@ -16,6 +16,7 @@ dagtool — validate, run and inspect the theorem DAG.
     dagtool pull-papers [--server URL]   add open theorems from the review site as dag/nodes/papers/
     dagtool export [--out PATH]          computed DAG as JSON (nodes, edges, status, verdicts)
     dagtool open-theorems [--json] [--count]   open paper theorems and what a proposal for each must contain
+    dagtool proof-targets [--json] [--node ID]   formalized theorems, their Lean proofs, and what another needs
     dagtool feedback --proposal DIR      every check on a proposal, then restore everything (nothing changes)
     dagtool feedback --node ID --results-root DIR   a node's reproduction checks on candidate results
     dagtool apply-proposals DIR          apply proposals that pass (the proposals gate runs this)
@@ -262,6 +263,16 @@ def cmd_open_theorems(dag, args):
     return 0
 
 
+def cmd_proof_targets(dag, args):
+    from . import proposals as pr
+    todo = pr.proof_targets(dag, only=set(args.node or []) or None)
+    if args.json:
+        print(json.dumps([pr.describe_proof(dag, n) for n in todo], indent=1, ensure_ascii=False, default=str))
+    else:
+        print("\n".join(f"{n.id}  ({len(pr.proofs_of(n))} Lean proof(s))" for n in todo) or "nothing formalized yet")
+    return 0
+
+
 def cmd_feedback(dag, args):
     from . import proposals as pr
     if args.proposal:
@@ -352,6 +363,9 @@ def main(argv=None) -> int:
     p = sub.add_parser("open-theorems", help="open paper theorems and the proposal each needs")
     p.add_argument("--json", action="store_true")
     p.add_argument("--count", action="store_true")
+    p.add_argument("--node", action="append")
+    p = sub.add_parser("proof-targets", help="formalized theorems that can take another Lean proof")
+    p.add_argument("--json", action="store_true")
     p.add_argument("--node", action="append")
     p = sub.add_parser("feedback", help="run the checks on a proposal or candidate results; changes nothing")
     p.add_argument("--proposal", help="a proposal directory (proposal.json, theorem.lean)")

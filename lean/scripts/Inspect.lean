@@ -7,11 +7,14 @@ Inspect declarations for the Lean checks (verification/truth/lean and friends).
     MBQC_INSPECT=<request file> lake env lean scripts/Inspect.lean
 
 Request lines: `decl <Name>` to inspect a declaration, `stop <Prefix>` to name a
-DAG node's declarations (a name or namespace). For each `decl`, prints one JSON
+DAG node's declarations (a name or namespace), `same <A> <B>` to compare two proofs of one
+statement (lean_proof check). For each `decl`, prints one JSON
 line with: kind, module, axioms (`#print axioms`), the constants its statement
 uses with their modules (vocabulary check), the `stop` prefixes its proof
 reaches through MBQC code (edge extraction), its Prop hypotheses, and, for an
-`∃ …, A ∧ B` statement, its conjuncts (non-vacuity check).
+`∃ …, A ∧ B` statement, its conjuncts (non-vacuity check). For each `same`, prints whether B's
+statement is syntactically A's, whether it is definitionally equal to A's, and whether the two proof terms
+are identical.
 -/
 
 open Lean Meta Elab Command
@@ -78,10 +81,36 @@ def inspectOne (stops : List Name) (n : Name) : CommandElabM Json := do
     ("node_deps", toJson (deps.toList.map Name.toString)),
     ("hypotheses", toJson hyps), ("conjuncts", toJson conj)]
 
+/-- Is `b` a proof of the statement `a` proves? Universe parameters are matched by position. -/
+def sameOne (a b : Name) : CommandElabM Json := do
+  let env ← getEnv
+  let base := [("same", toJson #[a.toString, b.toString])]
+  let some ca := env.find? a | return Json.mkObj (base ++ [("missing", toJson a.toString)])
+  let some cb := env.find? b | return Json.mkObj (base ++ [("missing", toJson b.toString)])
+  if ca.levelParams.length != cb.levelParams.length then
+    return Json.mkObj (base ++ [("type_equal", toJson false), ("defeq", toJson false),
+      ("value_equal", toJson false), ("note", toJson "different universe parameters")])
+  let us := ca.levelParams.map Level.param
+  let tb := cb.type.instantiateLevelParams cb.levelParams us
+  let va := ca.value? (allowOpaque := true)
+  let vb := (cb.value? (allowOpaque := true)).map (·.instantiateLevelParams cb.levelParams us)
+  let defeq ← liftTermElabM do
+    try Meta.isDefEq ca.type tb catch _ => pure false
+  return Json.mkObj (base ++ [("type_equal", toJson (ca.type == tb)), ("defeq", toJson defeq),
+    ("value_equal", toJson (va.isSome && va == vb))])
+
 #eval show CommandElabM Unit from do
   let some path ← IO.getEnv "MBQC_INSPECT" | throwError "set MBQC_INSPECT to a request file"
   let lines := ((← IO.FS.readFile path).splitOn "\n").map String.trim |>.filter (· ≠ "")
   let decls := lines.filterMap fun l => if l.startsWith "decl " then some (l.drop 5).trim.toName else none
   let stops := lines.filterMap fun l => if l.startsWith "stop " then some (l.drop 5).trim.toName else none
+  let sames := lines.filterMap fun l =>
+    if l.startsWith "same " then
+      match ((l.drop 5).trim.splitOn " ").filter (· ≠ "") with
+      | [a, b] => some (a.toName, b.toName)
+      | _ => none
+    else none
   for n in decls do
     IO.println (← inspectOne stops n).compress
+  for (a, b) in sames do
+    IO.println (← sameOne a b).compress

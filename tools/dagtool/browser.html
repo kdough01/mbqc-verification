@@ -369,8 +369,10 @@ a { color: var(--accent); }
     $("#ladderlegend").innerHTML = TRUTH.filter(t => counts[t]).map(t =>
       `<span title="${esc(TRUTH_HELP[t])}"><i class="sw" style="background:${tcolor(t)}"></i>${TRUTH_LABEL[t]} <b>${counts[t]}</b></span>`).join("");
     const f = META.counts.faithfulness;
+    const lp = META.lean_proofs;
     $("#faithline").innerHTML = `Faithfulness: ${["human_reviewed", "tested", "unreviewed"].filter(k => f[k]).map(k =>
-      `${faithDot(k)} ${FAITH_LABEL[k]} <b>${f[k]}</b>`).join(" &nbsp; ")}`;
+      `${faithDot(k)} ${FAITH_LABEL[k]} <b>${f[k]}</b>`).join(" &nbsp; ")}` + (lp ? ` &nbsp;·&nbsp; Lean proofs <b>${lp.total}</b>`
+      + ` (${lp.verified} passing; ${lp.theorems_with_several} theorem${lp.theorems_with_several === 1 ? "" : "s"} with more than one)` : "");
   }
   function faithDot(f) {
     const inner = f === "human_reviewed" ? `<circle cx="6" cy="6" r="4.5" fill="var(--ink-2)"/>`
@@ -862,6 +864,15 @@ a { color: var(--accent); }
     return `<div class="section"><h4>Circuit</h4><p class="prose">Smallest instance: ${esc(inst.label)}. The circuit is drawn as built in Qiskit; the patterns are what the compiler produces from it.</p>
       <div class="circbtns"><button data-circ="circuit">Qiskit circuit</button><button data-circ="unopt">MBQC pattern</button><button data-circ="opt">Optimized pattern</button></div></div>`;
   }
+  function proofSection(n) {
+    const p = n.proofs;
+    if (!p || !p.count) return "";
+    const rows = p.list.map(r => `<div class="flag"><span class="pill ${r.fresh ? r.outcome : "stale"}" style="align-self:flex-start;white-space:nowrap">proof ${r.index}</span>
+      <span><span class="mono">${esc(r.decl || "")}</span>${r.approach ? ` — ${esc(r.approach)}` : r.index === 1 ? " — the main declaration" : ""}
+      <span class="faint">${esc(r.summary || "")}</span></span></div>`).join("");
+    return `<div class="section"><h4>Lean proofs: ${p.count} (${p.verified} passing)</h4>
+      <p class="prose">${p.count > 1 ? "Each further proof states the theorem exactly as the main declaration does, is compiled separately, cannot import the other proofs, and has a different proof term (lean_proof check)." : "One proof so far. Another can be proposed (dagtool proof-targets)."}</p>${rows}</div>`;
+  }
   function sheet() {
     const el = $("#sheet");
     if (!state.sel) {
@@ -909,6 +920,7 @@ a { color: var(--accent); }
       ${n.flags.length ? `<div class="section"><h4>Flags</h4>${n.flags.map(f => `<div class="flag"><span class="pill ${f.level}">${esc(f.code.replace(/_/g, " "))}</span><span>${esc(f.message)}</span></div>`).join("")}</div>` : ""}
       ${n.description ? `<p class="prose">${esc(n.description)}</p>` : ""}
       ${circuitSection(n)}
+      ${proofSection(n)}
       <div class="section"><h4>Evidence</h4>${evs || `<p class="prose">No checks are attached yet${n.kind === "definition" ? "; definitions are settled by review" : ""}.</p>`}</div>
       <div class="section"><h4>Relies on</h4><div class="links">${up.length ? up.map(e => nodeLink(e.src, e.kind)).join("") : `<span class="faint">nothing: a root</span>`}</div></div>
       <div class="section"><h4>Used by</h4><div class="links">${down.length ? down.map(e => nodeLink(e.dst, e.kind)).join("") : `<span class="faint">nothing yet</span>`}</div></div>

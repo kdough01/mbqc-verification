@@ -40,6 +40,9 @@ CHECK_KINDS: dict[str, KindMeta] = {
     # truth: is the statement true?
     "lean":         KindMeta("truth", "proved", "truth/lean",
                              "Lean proof; #print axioms lists only standard axioms and declared assumptions"),
+    "lean_proof":   KindMeta("truth", "proved", "truth/lean",
+                             "Another Lean proof of the same statement, written separately: identical statement, "
+                             "a different proof term, no access to the other proofs"),
     "finite":       KindMeta("truth", "bounded", "truth/finite",
                              "Exhaustive check on a stated finite domain"),
     "symbolic":     KindMeta("truth", "empirical", "truth/symbolic",
@@ -68,7 +71,7 @@ EXTRA_FOLDERS = {
 }
 
 # Kinds whose verdict depends on the Lean sources (hashed into their evidence).
-LEAN_KINDS = ("lean", "vocabulary", "nonvacuity", "differential")
+LEAN_KINDS = ("lean", "lean_proof", "vocabulary", "nonvacuity", "differential")
 
 # Faithfulness checks a node of each kind needs before it counts as `tested`.
 # A check in this list is required when the node declares it, and the Lean-only

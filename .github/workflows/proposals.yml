@@ -4,7 +4,8 @@
 #   check   runs from the base branch's copy of this workflow and tools (pull_request_target), with read-only
 #           permissions and no credentials on disk. It refuses the pull request if it touches anything outside
 #           proposals/, copies the proposal files out as data, and runs `dagtool apply-proposals`, which scans
-#           and compiles the Lean, runs the node's fixed checks, and keeps only what passes.
+#           and compiles the Lean, runs the node's fixed checks, and keeps only what passes. A proposal with
+#           outcome `proof` adds another Lean proof to a formalized theorem (the lean_proof check).
 #   apply   commits what passed to the base branch and comments the verdict on the pull request. Accepted
 #           proposals close the pull request; if nothing passed, it stays open for a revised proposal.
 #   verify  the usual verify run, which publishes dag.json for the review site.

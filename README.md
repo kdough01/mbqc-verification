@@ -108,6 +108,15 @@ module becomes a DAG theorem, and the site's **Theorem DAG** tab shows this DAG.
   with the verdict; honest non-results are recorded as `unproved`, `not-formalizable` or `counterexample-suspected`; a
   rejected proposal changes nothing and its pull request stays open for a revision. Faithfulness stays below
   human-reviewed until someone approves the statement.
+- **More than one Lean proof**: a formalized theorem can take further proofs. `dagtool proof-targets --json` gives
+  the main declaration and its source (to restate the theorem exactly), the proofs so far with their approaches, and
+  the namespace and file for the next one (`<namespace>.Proof_<k>`, `lean/MBQC/Papers/<paper>/<theorem>/Proof_<k>.lean`).
+  The proposal is `outcome: proof` with an `approach` line. The gate adds it as a `lean_proof` check, which passes when
+  the declaration is a theorem from standard axioms and declared assumptions only, its statement is *syntactically*
+  the main theorem's (definitional equality is not enough), and its proof term differs from every earlier proof's. The
+  file cannot import other proofs. The node's sheet and `dag.json` (`proofs`, `meta.lean_proofs`) show how many Lean
+  proofs it has and how many pass. What this does not show: that the proofs use different mathematical ideas; the
+  approach text says that, and a person judges it.
 - **Reproduction candidates**: for numerical claims, a candidate configuration chosen from
   `experiments/rre/settings_space.yaml` runs with `experiments/rre/run_candidate.py`, and
   `dagtool feedback --node ID --results-root DIR` scores it against the node's frozen expected values.

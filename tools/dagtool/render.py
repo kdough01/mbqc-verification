@@ -137,6 +137,18 @@ def node_method(node) -> str | None:
     return None
 
 
+def lean_proofs(node, status) -> dict:
+    """How many Lean proofs the node records (its lean_decl, then each lean_proof check) and how many pass now."""
+    from .proposals import proofs_of
+    ev = {e.name: e for e in status.evidence}
+    rows = []
+    for p in proofs_of(node):
+        e = ev.get(p["check"])
+        rows.append({**p, "outcome": e.outcome if e else "not_run", "fresh": bool(e and e.fresh),
+                     "summary": e.summary if e else "not run yet"})
+    return {"count": len(rows), "verified": sum(r["outcome"] == "pass" and r["fresh"] for r in rows), "list": rows}
+
+
 def build_data(dag: Dag, circuits: bool = True) -> dict:
     st = compute(dag)
     pos = layout(dag)
@@ -156,6 +168,7 @@ def build_data(dag: Dag, circuits: bool = True) -> dict:
             "assumptions": n.assumptions, "source": n.source, "tags": n.tags,
             "path": n.path.relative_to(dag.root).as_posix(), "x": x, "y": y, "col": c,
             "paper": n.raw.get("paper"), "checks": [{"kind": ck.kind, "name": ck.name} for ck in n.checks],
+            "proofs": lean_proofs(n, s),
             "verdict": verdict(dag, i, st),
             "status": {
                 "truth": s.display_truth, "own_truth": s.own_truth, "domain": s.own_domain,
@@ -170,6 +183,9 @@ def build_data(dag: Dag, circuits: bool = True) -> dict:
         })
     return {
         "meta": {"generated": now_utc(), **git_commit(dag.root), "counts": summary_counts(st),
+                 "lean_proofs": {"total": sum(n["proofs"]["count"] for n in nodes),
+                                 "verified": sum(n["proofs"]["verified"] for n in nodes),
+                                 "theorems_with_several": sum(n["proofs"]["count"] > 1 for n in nodes)},
                  "node_w": NODE_W, "node_h": NODE_H,
                  "width": max(p[0] for p in pos.values()) + NODE_W + 24,
                  "height": max(p[1] for p in pos.values()) + NODE_H + 24,

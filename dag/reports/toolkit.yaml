@@ -93,6 +93,12 @@ strategies:
     why: A search that stops at the first pass is indistinguishable from overfitting.
     example: "48 combinations declared in `calibrate.py`, all run; the best scores 26/27 and the runner-up 22, and every alternative value of each setting scores lower."
     how: "The grid lives in the verifier; checks require a unique best point by a margin."
+  - group: independence
+    title: More than one proof of the same statement
+    what: A formalized theorem can take further Lean proofs, each in its own file and namespace, each a separate `lean_proof` check. The site shows how many proofs a theorem has and how many pass.
+    why: One proof can lean on a lucky tactic or a definition that happens to unfold conveniently; a second proof that reaches the same exact statement another way makes a mistaken formalization less likely to go unnoticed, and keeps the theorem proved if one proof breaks.
+    example: "The tests prove `a + (b - a) = b` by `omega` and again by `Nat.add_sub_of_le`; restating it as `b = a + (b - a)`, or as the definitionally equal `a + (b - a) + 0 = b`, is refused, and so is the same proof term in brackets."
+    how: "`dagtool proof-targets`, a proposal with `outcome: proof` and an `approach` line; the check compares the statements syntactically and the proof terms in Lean (`same` requests in `lean/scripts/Inspect.lean`). Independent statements of the same claim (the `equivalence` kind) are a separate, not yet implemented check."
   - group: numerical
     title: Run the authors' own pipeline, pinned
     what: Before judging a number, rebuild exactly what produced it — the code at the commit the paper cites, its dependencies, the inputs.
@@ -202,7 +208,7 @@ tools:
     checks: Kernel-checked proofs of exact statements; `#print axioms` lists only standard axioms and declared assumptions; vetted definitions, mutation and non-vacuity keep the statement faithful.
     applies: Exact theorems about patterns, counts and constructions, including submitted ones.
     limits: Proved only modulo declared assumptions; the statement's faithfulness still needs review.
-    check_kinds: [lean, vocabulary, nonvacuity, differential, equivalence]
+    check_kinds: [lean, lean_proof, vocabulary, nonvacuity, differential, equivalence]
   - id: sympy
     name: SymPy
     url: https://www.sympy.org
