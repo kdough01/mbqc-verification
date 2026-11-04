@@ -1,5 +1,5 @@
 {
- "input_hash": "99ab9c8daf61a7d0",
+ "input_hash": "6af38d548edaad25",
  "inputs": {
   "check_code": {
    "verification/truth/scaling/check.py": "ef885ffc8ea324e15bae0281a893be69bfe6a0979819878f65123841873c8455",
@@ -16,7 +16,7 @@
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
-  "lean_sources": "aad561f2c225afa88fe054415bc7c2f411c664e6910d244562d67f5de520a53d",
+  "lean_sources": "3465b8deeb630b44fd9e8f5453c13d07a5677a7c885066d92ec8686dab559920",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
    "assume.hamsim.qsvt_opt_N": "cdb29c0671ff4200:a442d378",
@@ -41,15 +41,15 @@
   "quantity": "N"
  },
  "provenance": {
-  "commit": "f15d921491b600ed59c6b4b1b802295fc0d1b7ca",
+  "commit": "93dd8cc7b9ea9da501e8f184e599ff1aaa45a8ff",
   "dirty": true,
-  "finished": "2026-10-29T15:10:21+00:00",
+  "finished": "2026-11-04T18:11:21+00:00",
   "quick": false,
-  "seconds": 0.01,
+  "seconds": 0.03,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
-   "python": "3.13.17",
+   "python": "3.13.18",
    "qiskit": "2.5.0",
    "scipy": "1.18.1",
    "sympy": "1.14.0"
