@@ -8,13 +8,15 @@ Inspect declarations for the Lean checks (verification/truth/lean and friends).
 
 Request lines: `decl <Name>` to inspect a declaration, `stop <Prefix>` to name a
 DAG node's declarations (a name or namespace), `same <A> <B>` to compare two proofs of one
-statement (lean_proof check). For each `decl`, prints one JSON
+statement (lean_proof check), `iff <A> <B> <P>` to check that P proves stmt(A) ↔ stmt(B) without using
+the proofs of A or B (equivalence check). For each `decl`, prints one JSON
 line with: kind, module, axioms (`#print axioms`), the constants its statement
 uses with their modules (vocabulary check), the `stop` prefixes its proof
 reaches through MBQC code (edge extraction), its Prop hypotheses, and, for an
 `∃ …, A ∧ B` statement, its conjuncts (non-vacuity check). For each `same`, prints whether B's
 statement is syntactically A's, whether it is definitionally equal to A's, and whether the two proof terms
-are identical.
+are identical. For each `iff`, prints whether P's type is exactly `type(A) ↔ type(B)` (and whether it is
+definitionally), P's axioms, and which of A, B its proof reaches through MBQC code.
 -/
 
 open Lean Meta Elab Command
@@ -99,6 +101,25 @@ def sameOne (a b : Name) : CommandElabM Json := do
   return Json.mkObj (base ++ [("type_equal", toJson (ca.type == tb)), ("defeq", toJson defeq),
     ("value_equal", toJson (va.isSome && va == vb))])
 
+/-- Does `p` prove `type(a) ↔ type(b)`, and without reaching the proofs of `a` or `b`? -/
+def iffOne (a b p : Name) : CommandElabM Json := do
+  let env ← getEnv
+  let base := [("iff", toJson #[a.toString, b.toString, p.toString])]
+  let some ca := env.find? a | return Json.mkObj (base ++ [("missing", toJson a.toString)])
+  let some cb := env.find? b | return Json.mkObj (base ++ [("missing", toJson b.toString)])
+  let some cp := env.find? p | return Json.mkObj (base ++ [("missing", toJson p.toString)])
+  if !(ca.levelParams.isEmpty && cb.levelParams.isEmpty && cp.levelParams.isEmpty) then
+    return Json.mkObj (base ++ [("type_equal", toJson false), ("defeq", toJson false),
+      ("note", toJson "universe-polymorphic statements are not supported")])
+  let expected := mkApp2 (mkConst ``Iff) ca.type cb.type
+  let defeq ← liftTermElabM do
+    try Meta.isDefEq cp.type expected catch _ => pure false
+  let axioms ← collectAxioms p
+  let reaches := walk env [a, b] (usedBy cp).toList {} {}
+  return Json.mkObj (base ++ [("type_equal", toJson (cp.type == expected)), ("defeq", toJson defeq),
+    ("kind", toJson (kindOf cp)), ("axioms", toJson (axioms.map Name.toString)),
+    ("uses", toJson (reaches.toList.map Name.toString))])
+
 #eval show CommandElabM Unit from do
   let some path ← IO.getEnv "MBQC_INSPECT" | throwError "set MBQC_INSPECT to a request file"
   let lines := ((← IO.FS.readFile path).splitOn "\n").map String.trim |>.filter (· ≠ "")
@@ -114,3 +135,11 @@ def sameOne (a b : Name) : CommandElabM Json := do
     IO.println (← inspectOne stops n).compress
   for (a, b) in sames do
     IO.println (← sameOne a b).compress
+  let iffs := lines.filterMap fun l =>
+    if l.startsWith "iff " then
+      match ((l.drop 4).trim.splitOn " ").filter (· ≠ "") with
+      | [a, b, p] => some (a.toName, b.toName, p.toName)
+      | _ => none
+    else none
+  for (a, b, p) in iffs do
+    IO.println (← iffOne a b p).compress

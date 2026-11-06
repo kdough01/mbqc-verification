@@ -30,6 +30,9 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    # HELDOUT_KEY lives in the `heldout` environment, whose deployment branch rule allows only main: a branch
+    # (even one that edits this file) cannot read it. Other refs use `branches`, which holds no secrets.
+    environment: ${{ github.ref == 'refs/heads/main' && 'heldout' || 'branches' }}
     # One run per branch at a time, so evidence commits never race. Runs queue, they are not cancelled.
     concurrency:
       group: dag-${{ github.ref }}
@@ -59,6 +62,8 @@ jobs:
         continue-on-error: true
         env:
           RERUN: ${{ inputs.rerun || 'stale' }}
+          # held-out expected values (dag/heldout/) open only here, on main; empty elsewhere (the checks skip)
+          HELDOUT_KEY: ${{ secrets.HELDOUT_KEY }}
         run: |
           if [ "$RERUN" = all ]; then
             dagtool run --report "$RUNNER_TEMP/ran.json"

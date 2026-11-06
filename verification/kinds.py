@@ -59,19 +59,27 @@ CHECK_KINDS: dict[str, KindMeta] = {
                              "Imported result: citation, exact form, convention map"),
     "reproduction": KindMeta("truth", "empirical", "truth/reproduction",
                              "A recorded run of a pinned pipeline agrees with the claimed value"),
+    "tool":         KindMeta("truth", "empirical", "truth/tool",
+                             "A pinned external tool (Stim, PyMatching, sinter, gridsynth, Qualtran, Azure Resource "
+                             "Estimator) computes the value in CI and it agrees with the frozen claim"),
 }
 
 # Other check folders whose code a kind's verdict also depends on (hashed into its evidence).
 EXTRA_FOLDERS = {
     "mutation": ["truth/scaling"],
-    "refuter": ["truth/scaling"],
+    "reproduction": ["truth/heldout"],
+    "tool": ["truth/heldout"],
+    "refuter": ["truth/scaling", "truth/finite"],
     "differential": ["truth/scaling", "truth/lean"],
     "vocabulary": ["truth/lean"],
     "nonvacuity": ["truth/lean"],
 }
 
+# Kinds that call the pinned external tools of requirements-tools.txt (hashed into their evidence).
+TOOL_KINDS = ("tool", "refuter", "reproduction", "finite")
+
 # Kinds whose verdict depends on the Lean sources (hashed into their evidence).
-LEAN_KINDS = ("lean", "lean_proof", "vocabulary", "nonvacuity", "differential")
+LEAN_KINDS = ("lean", "lean_proof", "vocabulary", "nonvacuity", "differential", "equivalence")
 
 # Faithfulness checks a node of each kind needs before it counts as `tested`.
 # A check in this list is required when the node declares it, and the Lean-only

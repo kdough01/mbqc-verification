@@ -70,8 +70,10 @@ def inspect(ctx) -> dict[str, dict]:
                 earlier.append(c.params["decl"])
     sames = sorted(sames)
     decls |= {b for _, b in sames}
+    iffs = sorted({(n.lean_decl, c.params["other"], c.params["proof"]) for n in dag.nodes.values() for c in n.checks
+                   if c.kind == "equivalence" and n.lean_decl and c.params.get("other") and c.params.get("proof")})
     lines = [f"decl {d}" for d in sorted(decls)] + [f"stop {p}" for p in sorted(node_prefixes(dag))] \
-        + [f"same {a} {b}" for a, b in sames]
+        + [f"same {a} {b}" for a, b in sames] + [f"iff {a} {b} {p}" for a, b, p in iffs]
     with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False, encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
         req = f.name
@@ -88,7 +90,9 @@ def inspect(ctx) -> dict[str, dict]:
         line = line.strip()
         if line.startswith("{"):
             d = json.loads(line)
-            out["same:" + "|".join(d["same"]) if "same" in d else d["name"]] = d
+            key = ("same:" + "|".join(d["same"]) if "same" in d else
+                   "iff:" + "|".join(d["iff"]) if "iff" in d else d["name"])
+            out[key] = d
     ctx.cache["lean_inspect"] = out
     return out
 

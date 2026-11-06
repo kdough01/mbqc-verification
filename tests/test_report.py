@@ -108,8 +108,13 @@ def test_toolkit_is_consistent(spec):
     for tl in tk["tools"]:
         assert tl["status"] in ("verifier", "used", "candidate")
         assert set(tl.get("check_kinds", [])) <= set(CHECK_KINDS), tl["id"]
-        if tl["status"] == "verifier":
+        if tl["status"] == "verifier" and tl.get("category") != "Repository controls":
             assert tl.get("check_kinds"), tl["id"]      # a verifier tool backs an implemented check kind
+    from verification.base import load_all
+    implemented = set(load_all())
+    for tl in tk["tools"]:
+        if tl["status"] == "verifier":                  # and every kind it names is implemented, not only declared
+            assert set(tl.get("check_kinds", [])) <= implemented, (tl["id"], set(tl["check_kinds"]) - implemented)
 
 
 def test_toolkit_page_and_report_sections(dag, page):

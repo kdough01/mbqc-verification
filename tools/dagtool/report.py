@@ -631,7 +631,8 @@ def tools_html(toolkit: dict, used: list | None = None) -> str:
         kinds = " ".join(f"<code>{esc(k)}</code>" for k in tl.get("check_kinds", []) or [])
         name = f'<a href="{esc(tl["url"])}">{esc(tl["name"])}</a>' if tl.get("url") else esc(tl["name"])
         rows = "".join(f"<dt>{lab}</dt><dd>{inline(tl[key])}</dd>" for key, lab in
-                       (("checks", "Checks"), ("applies", "Applies when"), ("limits", "Limits")) if tl.get(key))
+                       (("checks", "Checks"), ("applies", "Applies when"), ("limits", "Limits"), ("how", "Use it"))
+                       if tl.get(key))
         if kinds:
             rows += f"<dt>Check kinds</dt><dd>{kinds}</dd>"
         cards.append(f'<article class="tool {esc(st)}" id="tool-{esc(tl["id"])}"><h3>{name} '

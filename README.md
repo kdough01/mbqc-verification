@@ -13,20 +13,25 @@ The first worked example is the slide *Hamiltonian simulation: explicit costs an
 src/mbqc_verify/          the objects: circuits, QSP angles, circuit -> MBQC compiler, conventions
 lean/                     Lean 4 project (core Lean, no Mathlib): definitions, proofs, assumption axioms
 verification/             the checks, sorted by the question each answers
-  faithfulness/           does the statement mean what we intend?   vocabulary, differential, mutation, nonvacuity, review
-  truth/                  is it true?   lean, symbolic, translation, numerical, scaling, refuter, literature, reproduction
+  faithfulness/           does the statement mean what we intend?   vocabulary, differential, mutation, nonvacuity,
+                          equivalence, review
+  truth/                  is it true?   lean, lean_proof, finite, symbolic, translation, numerical, scaling, refuter,
+                          literature, reproduction, tool (pinned external tools), heldout (sealed expected values)
   graph/                  properties of the DAG: conventions, Lean-extracted edges, propagation, staleness, repro
 dag/
   nodes/<area>/<id>.yaml  one claim per file, hand-written (schema: dag/schema/node.schema.json)
   reviews/<id>.yaml       human statement reviews, pinned to the statement hash
   reports/<id>.yaml       narrative for a per-paper verification report (dagtool report)
   evidence/<id>/*.json    written by checks, committed
+  heldout/<id>.json       sealed expected values (open only in CI on main)
 tools/dagtool/            CLI: validate, run, status, show, queue, review, repro, render, report, check
 experiments/hamsim/       the full report (run_all.py), plots, results/hamsim_results.json, figures/
 experiments/rre/          reproduction of Saadatmand et al. (arXiv:2406.06015) with their pinned pipeline
 docs/                     write-ups and images
 .github/                  CI: verify (every push), papers (pull site theorems), proposals (gate for submitted proofs), reproduce (manual), review, repro (weekly), setup
 tests/                    unit tests for the status rules and check logic
+requirements-tools.txt    pinned external tools the checks call (Stim, PyMatching, sinter, Hypothesis, Qualtran, ...)
+scripts/protect-main.sh   applies the main ruleset (.github/rulesets/main.json) that enforces .github/CODEOWNERS
 ```
 
 ## How it runs
@@ -68,20 +73,26 @@ miss marked, and a data table underneath. The circuit drawings come from `src/mb
 
 - **Pages:** Settings → Pages → Source: **GitHub Actions**. Until then the `pages` job fails without failing the run.
   Pages on a private repository needs a paid GitHub plan; the browser is always available as a run artifact.
-- **Branch protection:** if `main` requires pull requests, the bot cannot push evidence to it. Either allow
-  `github-actions[bot]` to bypass, or work on branches (evidence is committed to whichever branch you push).
+- **Branch protection:** use the ruleset in `.github/rulesets/main.json` (`scripts/protect-main.sh`, or Settings →
+  Rules → Rulesets → New ruleset → Import a ruleset). It requires the code owner's review for the paths in
+  `.github/CODEOWNERS`, lets GitHub Actions keep pushing evidence and applied proposals to `main`, and lets admins
+  bypass only through a pull request.
+- **Held-out values:** `dagtool heldout keygen`, then Settings → Environments → New environment `heldout`,
+  deployment branches: `main` only, secret `HELDOUT_KEY` = the key. Keep a copy offline; it is not stored anywhere
+  else. After adding it, run the verify workflow with `rerun: all` so checks that skipped without it re-run.
 
 ### Running locally (optional)
 
 ```bash
 pip install -r requirements.txt && pip install -e .     # Python 3.11+
+pip install --no-deps -r requirements-tools.txt         # the pinned external tools (every dependency listed)
 cd lean && lake build && cd ..                          # needs elan
 dagtool run --stale && dagtool status && dagtool check
 ```
 
 Other commands: `dagtool show <id>`, `dagtool queue`, `dagtool render`, `dagtool summary`, `dagtool repro`,
 `dagtool pull-papers`, `dagtool export`, `dagtool report`, `dagtool open-theorems`, `dagtool feedback`,
-`dagtool apply-proposals`, `dagtool lean-check`.
+`dagtool apply-proposals`, `dagtool lean-check`, `dagtool proof-targets`, `dagtool heldout`, `dagtool tool`.
 `python experiments/hamsim/run_all.py` prints the full Hamiltonian-simulation report.
 
 ## Papers from the Thrust 2 review site
@@ -196,6 +207,27 @@ its code returns. Status then propagates down the DAG:
 - Effective faithfulness is capped by the `definition` and `core` nodes a claim rests on.
 - Evidence records a hash of everything it depends on (statement, definitions, parents, code files, check code,
   requirements, Lean sources). When any of these change, the evidence goes stale and stops counting until it is re-run.
+
+## Tools a check can call
+
+Every tool on the [toolkit page](https://kdough01.github.io/mbqc-verification/reports/toolkit.html) is pinned and
+runs in CI. A node uses one by naming a check kind and its parameters; nothing else is needed.
+
+| Tool | Check | Example parameters |
+| --- | --- | --- |
+| Stim + PyMatching + sinter | `tool`, `tool: surface_code.memory` / `surface_code.fit` | `args: {distance: 5, p: 0.003, shots: 100000, seed: 1}`, `path: per_round` (also `interval`, `kappa`, `p_th`) |
+| gridsynth (Ross–Selinger) | `tool`, `tool: gridsynth.rz` | `args: {angles: [0.3, 1.1], epsilon: "1e-6"}`, `path: mean_t_count` (each circuit's error is recomputed) |
+| Qualtran | `tool`, `tool: qualtran.cost` | `args: {bloq: qualtran.bloqs.qft.QFTTextBook, kwargs: {bitsize: 8}}`, `path: total_t_count` |
+| Azure Resource Estimator (local, `qdk`) | `tool`, `tool: azure_re.logical_counts` / `azure_re.qsharp` | `args: {counts: {numQubits: 100, tCount: 1000000}}`, `path: physical_qubits` |
+| Hypothesis | `refuter`, `source: hypothesis` | `predicate: experiments/x/claims.py:holds`, `strategy: {n: {integers: [2, 500]}}`, `max_examples: 500` |
+| (exhaustive) | `finite` | `predicate: …`, `domain: {n: {range: [2, 50]}, d: {values: [3, 5, 7]}}` — grants `bounded` |
+| Lean | `equivalence` | `other: <second formalization>`, `proof: <theorem stmt(main) ↔ stmt(other)>` that uses neither proof |
+| Held-out values | any `tool` or `reproduction` check | `expect: {heldout: ID}` after `dagtool heldout seal ID VALUE` |
+
+`tool` checks compare `path` of the tool's output with `expect` (a number, `{results: FILE, path: P}` in a frozen
+file, or `{heldout: ID}`) by `op` (`approx` with `rel_tol`, `eq`, `ge`, `le`, `within [low, high]`), grant at most
+`empirical` on `domain`, and record the tool versions. `dagtool tool NAME --args '{...}'` prints a tool's output
+without a node. A predicate file must be listed under the node's `code:`, so editing it re-runs the check.
 
 ## Adding a claim
 
