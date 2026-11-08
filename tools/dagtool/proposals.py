@@ -15,6 +15,8 @@ repositories, such as the Quantum Genesis dashboard) and reach the verifier as d
     proposals/<node id>/proposal.json   outcome, Lean declaration, witness, dependency edges, notes
     proposals/<node id>/theorem.lean    the statement, its proof and a witness, in the node's own namespace
     proposals/<node id>/attempts.json   optional: every attempt the proposer made and why (kept as a record)
+    proposals/<node id>/suite.json      required for a formalization: claim type and proposed checks (suites.py)
+    proposals/<node id>/checks.py       optional: predicates the suite's finite/refuter checks call (scanned)
 
 A proposal with outcome `proof` adds another Lean proof to a theorem that is already formalized. It goes in its
 own file and namespace (lean/MBQC/Papers/<paper>/<theorem>/Proof_<k>.lean, <namespace>.Proof_<k>), cannot import
@@ -23,8 +25,9 @@ the other proofs, must state the theorem exactly as the main declaration does an
 
 What a proposal can and cannot do:
   * It may write one Lean file at the node's own path and propose dependency edges to existing nodes.
-  * It may not choose checks, tolerances or expected values. The checks for a formalized theorem are fixed here
-    (lean, vocabulary, nonvacuity); `extra_checks` is rejected.
+  * It proposes a test suite, but the verifier decides it: the fixed Lean checks (lean, vocabulary, nonvacuity) are
+    always added, the suite must meet its claim type's minimum and stay within dag/suites/policy.yaml, and expected
+    values come only from frozen files or held-out values. `extra_checks` is rejected.
   * The Lean file is scanned first (no axiom, sorry, IO, metaprogramming, imports outside MBQC) and compiled with
     no credentials in the environment.
   * `feedback` runs exactly what `apply-proposals` runs and then restores every file, so a proposer can iterate on
@@ -50,7 +53,7 @@ from .model import EDGE_KINDS, Dag, Node, load_dag
 DONE_TAGS = ("formalized", "not-formalizable", "counterexample-suspected", "unproved")
 OUTCOMES = ("formalized", "unproved", "not_formalizable", "counterexample")
 PROOF_OUTCOME = "proof"      # another Lean proof of a formalized theorem
-PROPOSAL_FILES = ("proposal.json", "theorem.lean", "attempts.json")
+PROPOSAL_FILES = ("proposal.json", "theorem.lean", "attempts.json", "suite.json", "checks.py")
 SECRET_ENV = ("GITHUB_TOKEN", "GH_TOKEN", "ACTIONS_RUNTIME_TOKEN", "ACTIONS_ID_TOKEN_REQUEST_TOKEN",
               "ACTIONS_ID_TOKEN_REQUEST_URL")
 SECRET_PATTERN = re.compile(r"(TOKEN|SECRET|PASSWORD|API_KEY|CREDENTIAL)", re.I)
@@ -137,10 +140,14 @@ def describe(dag: Dag, node: Node) -> dict:
         "node": node.id, "title": node.title, "statement": node.statement.strip(), "paper": node.raw.get("paper"),
         "namespace": ns, "lean_file": path.as_posix(),
         "vocabulary": sorted(vocab, key=lambda r: r["id"]), "building_blocks": sorted(blocks, key=lambda r: r["id"]),
-        "checks_run": ["lean", "vocabulary", "nonvacuity"],
+        "checks_run": ["lean", "vocabulary", "nonvacuity", "+ the suite's checks"],
+        "suite_policy": _suite_brief(dag.root),
         "proposal_format": {
             "directory": f"proposals/{node.id}/",
             "files": {"proposal.json": "required", "theorem.lean": "required when outcome is formalized",
+                      "suite.json": "required when outcome is formalized: {claim_type, checks: [{kind, name, params, "
+                                    "rationale}]}",
+                      "checks.py": "optional: predicates for finite/refuter checks, referenced as checks.py:FUNCTION",
                       "attempts.json": "optional record of every attempt and its rationale"},
             "proposal.json": {"node": node.id, "outcome": list(OUTCOMES), "reason": "text",
                               "lean_decl": f"{ns}.<theorem name>", "witness": f"{ns}.<witness name> or null",
@@ -186,6 +193,29 @@ def _normalized(text: str) -> str:
     code = re.sub(r"--[^\n]*", "", code)
     code = re.sub(r"^\s*(namespace|end)\b[^\n]*$", "", code, flags=re.M)
     return re.sub(r"\s+", " ", code).strip()
+
+
+def _suite_brief(root: Path) -> dict:
+    """The policy plus what a suite may reference: frozen result files and held-out ids (never their values)."""
+    from .suites import load_policy
+    frozen = []
+    for base in ("experiments", "dag/transcriptions"):
+        if (root / base).exists():
+            frozen += [p.relative_to(root).as_posix() for p in (root / base).rglob("*.json")
+                       if "results" in p.parts or base == "dag/transcriptions"]
+    held = sorted(p.stem for p in (root / "dag" / "heldout").glob("*.json")) if (root / "dag" / "heldout").exists() else []
+    return {**load_policy(root), "frozen_files": sorted(frozen)[:200], "heldout_ids": held,
+            "examples": {
+                "finite": {"kind": "finite", "name": "small-n", "params": {"predicate": "checks.py:holds",
+                           "domain": {"n": {"range": [1, 60]}}}, "rationale": "every n up to 60, exhaustively"},
+                "refuter": {"kind": "refuter", "name": "random-n", "params": {"source": "hypothesis",
+                            "predicate": "checks.py:holds", "strategy": {"n": {"integers": [1, 100000]}},
+                            "max_examples": 1000}, "rationale": "large n the finite check does not reach"},
+                "equivalence": {"kind": "equivalence", "name": "restated", "params": {"other": "<ns>.restated",
+                                "proof": "<ns>.restated_iff"}, "rationale": "a second, independently written statement"},
+                "tool": {"kind": "tool", "name": "tcount", "params": {"tool": "qualtran.cost", "args": {"bloq":
+                         "qualtran.bloqs.basic_gates.Toffoli"}, "path": "total_t_count", "expect": {"heldout": "<id>"},
+                         "op": "eq", "domain": "one Toffoli"}, "rationale": "an independent count"}}}
 
 
 # ---------------------------------------------------------------- checking
@@ -298,8 +328,10 @@ def _note(raw: dict, text: str) -> None:
 class _Snapshot:
     """Every file a proposal can touch, so a dry run (feedback) or a rejected proposal restores them exactly."""
 
-    def __init__(self, root: Path, node: Node, lean_file: Path):
+    def __init__(self, root: Path, node: Node, lean_file: Path, extra: tuple[Path, ...] = ()):
         self.root = root
+        self.extra = {p: (p.read_bytes() if p.exists() else None) for p in extra}
+        self.new_dirs = [d for p in extra for d in (p.parent, p.parent.parent) if not d.exists()]
         # Bytes, not text: a text round trip rewrites CRLF checkouts as LF.
         self.files = {node.path: node.path.read_bytes(),
                       root / "lean" / "MBQC.lean": (root / "lean" / "MBQC.lean").read_bytes()}
@@ -313,6 +345,14 @@ class _Snapshot:
         for p, data in self.files.items():
             if p.read_bytes() != data:
                 p.write_bytes(data)
+        for p, data in self.extra.items():
+            if data is None:
+                p.unlink(missing_ok=True)
+            elif p.read_bytes() != data:
+                p.write_bytes(data)
+        for d in self.new_dirs:             # folders the proposal created, deepest first, only if left empty
+            if d.exists() and not any(d.iterdir()):
+                d.rmdir()
         if self.lean_before is None:
             self.lean.unlink(missing_ok=True)
         elif self.lean.read_bytes() != self.lean_before:
@@ -375,12 +415,29 @@ def apply_one(root: Path, node_id: str, src: Path, run_checks: bool = True, dry_
     problems = scan_lean(text)
     if problems or f"namespace {ns}" not in text:
         return {**row, "outcome": "rejected", "reason": "Lean file rejected: " + "; ".join(problems or [f"not inside namespace {ns}"])}
+    from .suites import validate_suite
+    if not (src / "suite.json").exists():
+        return {**row, "outcome": "rejected", "reason": "suite.json is required with a formalization: the claim type "
+                                                          "and the checks proposed beyond the fixed Lean ones"}
+    try:
+        suite = json.loads((src / "suite.json").read_text(encoding="utf-8"))
+    except ValueError:
+        return {**row, "outcome": "rejected", "reason": "suite.json is not JSON"}
+    checks_py = (src / "checks.py").read_text(encoding="utf-8") if (src / "checks.py").exists() else None
+    suite_errs, suite_checks = validate_suite(root, node_id, ns, suite, checks_py)
+    if suite_errs:
+        return {**row, "outcome": "rejected", "reason": "suite rejected: " + "; ".join(suite_errs), "suite_errors": suite_errs}
+    pred_file = root / "checks" / "papers" / f"{node_id}.py"
+    snap = _Snapshot(root, node, lean_file, extra=(pred_file,))
 
     # apply: the Lean file, the import, the node's fixed checks and the proposed edges (never its statement)
     target = root / lean_file
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(text, encoding="utf-8")
     _set_import(root, lean_file, True)
+    if checks_py is not None:
+        pred_file.parent.mkdir(parents=True, exist_ok=True)
+        pred_file.write_text(checks_py, encoding="utf-8")
 
     def reject(why: str, **extra) -> dict:
         snap.restore()
@@ -399,8 +456,12 @@ def apply_one(root: Path, node_id: str, src: Path, run_checks: bool = True, dry_
             for d in prop.get("depends_on") or []]
     if deps:
         raw["depends_on"] = deps
-    raw["checks"] = [{"kind": "lean"}, {"kind": "vocabulary"},
-                     {"kind": "nonvacuity", "params": {"witness": prop["witness"]}} if prop.get("witness") else {"kind": "nonvacuity"}]
+    fixed = [{"kind": "lean"}, {"kind": "vocabulary"},
+             {"kind": "nonvacuity", "params": {"witness": prop["witness"]}} if prop.get("witness") else {"kind": "nonvacuity"}]
+    raw["checks"] = [{**c, "origin": "verifier"} for c in fixed] + suite_checks
+    if checks_py is not None:
+        raw["code"] = sorted(set(raw.get("code") or []) | {pred_file.relative_to(root).as_posix()})
+    raw["tags"] = [t for t in raw.get("tags", []) if not t.startswith("claim:")] + [f"claim:{suite['claim_type']}"]
     if prop.get("statement_tex"):
         raw["statement_tex"] = str(prop["statement_tex"])[:4000]
     raw["tags"] = [t for t in raw.get("tags", []) if t not in ("open",) + DONE_TAGS] + ["formalized"]
@@ -419,7 +480,7 @@ def apply_one(root: Path, node_id: str, src: Path, run_checks: bool = True, dry_
     from .runner import plan, run
     records = run(dag, plan(dag, node_ids={node_id}), echo=lambda *a, **k: None)
     checks = [{"name": r["name"], "kind": r["kind"], "outcome": r["result"]["outcome"], "grants": r["result"]["grants"],
-               "summary": r["result"]["summary"]} for r in records]
+               "summary": r["result"]["summary"], "origin": _origin(raw, r["name"])} for r in records]
     bad = [c for c in checks if c["outcome"] in ("fail", "error")]
     if bad:
         return reject("checks did not pass: " + "; ".join(f"{c['name']}: {c['summary']}" for c in bad), checks=checks)
@@ -435,6 +496,14 @@ def apply_one(root: Path, node_id: str, src: Path, run_checks: bool = True, dry_
         keep_record()
         echo(f"{node_id}: formalized; " + ", ".join(f"{c['name']} {c['outcome']}" for c in checks))
     return {**row, "outcome": "formalized", "reason": reason, "accepted": True, "checks": checks}
+
+
+def _origin(raw: dict, name: str) -> str:
+    """Who asked for a check: the verifier (fixed) or the proposal's suite."""
+    for c in raw.get("checks") or []:
+        if (c.get("name") or c.get("kind")) == name:
+            return c.get("origin", "verifier")
+    return "verifier"
 
 
 def apply_proof(root: Path, dag: Dag, node: Node, src: Path, prop: dict, run_checks: bool = True,

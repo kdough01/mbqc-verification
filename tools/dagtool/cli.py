@@ -24,6 +24,8 @@ dagtool — validate, run and inspect the theorem DAG.
     dagtool lean-check FILE              scan and compile one Lean file under lean/MBQC/Papers/
     dagtool heldout keygen | seal ID VALUE [--note T] | list   sealed expected values (HELDOUT_KEY)
     dagtool tool NAME --args JSON        run one pinned tool (Stim, gridsynth, Qualtran, Azure RE...) and print it
+    dagtool suite-policy [--json]        what a proposal's test suite must and may contain (dag/suites/policy.yaml)
+    dagtool suite-diff OLD NEW           added / removed / tightened / loosened / modified checks between two suites
 
 Run from the repository root (or pass --root).
 """
@@ -297,6 +299,28 @@ def cmd_tool(dag, args):
     return 0
 
 
+def cmd_suite_policy(dag, args):
+    from .proposals import _suite_brief
+    data = _suite_brief(dag.root)
+    if args.json:
+        print(json.dumps(data, indent=1, ensure_ascii=False))
+    else:
+        print(f"always added: {', '.join(data['required'])}")
+        for name, spec in data["claim_types"].items():
+            need = "; ".join(" or ".join(g) for g in spec.get("require_one_of", []))
+            print(f"{name}: needs {need}; may use {', '.join(spec['allowed'])} — {spec['describe']}")
+    return 0
+
+
+def cmd_suite_diff(dag, args):
+    from .suites import suite_diff
+
+    def load(p):
+        return json.loads(Path(p).read_text(encoding="utf-8")) if p != "-" else None
+    print(json.dumps(suite_diff(load(args.old), load(args.new)), indent=1))
+    return 0
+
+
 def cmd_proof_targets(dag, args):
     from . import proposals as pr
     todo = pr.proof_targets(dag, only=set(args.node or []) or None)
@@ -417,6 +441,11 @@ def main(argv=None) -> int:
     p.add_argument("action", choices=["keygen", "seal", "list"])
     p.add_argument("rest", nargs="*")
     p.add_argument("--note")
+    p = sub.add_parser("suite-policy", help="what a proposal's test suite must and may contain")
+    p.add_argument("--json", action="store_true")
+    p = sub.add_parser("suite-diff", help="compare two suite.json files (OLD may be '-' for none)")
+    p.add_argument("old")
+    p.add_argument("new")
     p = sub.add_parser("tool", help="run one pinned tool and print its output")
     p.add_argument("name")
     p.add_argument("--args", default="{}")

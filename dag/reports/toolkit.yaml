@@ -58,6 +58,12 @@ strategies:
     example: "`experiments/rre/settings_space.yaml` lists the failure budget, factory table, gate time, widget levels and ancilla allocation; `run_candidate.py` validates a candidate against it."
     how: "`experiments/rre/candidates.py validate` before any run; every attempt and its rationale is kept with the proposal."
   - group: independence
+    title: Proposers suggest tests; the verifier sets the floor
+    what: A formalization comes with a test suite (`suite.json`) chosen for its claim type. The verifier adds its own Lean checks, requires each claim type's minimum, allows only listed kinds and parameter ranges, and takes expected values only from frozen files or held-out values. A revision must say what went wrong (proof, claim wrong, test misspecified, coverage thin); adding or tightening tests is free, removing, loosening or modifying one needs a person's sign-off.
+    why: An agent that knows the claim can write tests the verifier would not think of, but one that may write its own tests freely can write easy ones, and one that may change them after failing can edit tests until they pass.
+    example: "End to end, a predicate that dropped `a ≤ b` failed at (a, b) = (1, 0) while the Lean checks passed; fixing it counted as `modified` (sign-off), adding a Hypothesis search counted as `added` (free)."
+    how: "`dag/suites/policy.yaml`, `dagtool suite-policy`, `dagtool suite-diff`; `checks.py` passes an allow-list scan before it runs; every theorem's sheet lists each test, who asked for it, and whether it passed, failed or was skipped."
+  - group: independence
     title: Feedback without the answer key
     what: Return enough to act on — which check failed, the measured value against the claim, the ratio — but keep some checks hidden from the proposer, chosen before any attempt.
     why: A proposer that sees every test can fit to them. Held-out checks measure whether it generalized.

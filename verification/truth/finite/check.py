@@ -14,9 +14,9 @@ first failure in lexicographic order is recorded).
 
 from __future__ import annotations
 
-import importlib.util
 import itertools
 import sys
+import types
 from pathlib import Path
 
 from verification.base import Check, CheckResult, register
@@ -32,11 +32,12 @@ def load_predicate(node, spec: str, root: Path):
     path = (root / file).resolve()
     if root.resolve() not in path.parents or path.suffix != ".py" or not path.exists():
         raise ValueError(f"{file} is not a Python file in the repository")
-    name = "_predicate_" + "_".join(Path(file).with_suffix("").parts)
-    mod_spec = importlib.util.spec_from_file_location(name, path)
-    mod = importlib.util.module_from_spec(mod_spec)
+    # compiled from source each time: no __pycache__ in the repository, and never a stale copy of the predicate
+    name = "_predicate_" + "_".join(Path(file).with_suffix("").parts).replace(".", "_")
+    mod = types.ModuleType(name)
+    mod.__file__ = str(path)
     sys.modules[name] = mod
-    mod_spec.loader.exec_module(mod)
+    exec(compile(path.read_text(encoding="utf-8"), str(path), "exec"), mod.__dict__)  # noqa: S102 - repository code
     return getattr(mod, fn)
 
 

@@ -41,6 +41,8 @@ def write(root, rel, text):
 def repo(tmp_path):
     (tmp_path / "dag" / "schema").mkdir(parents=True)
     shutil.copy(REPO / "dag" / "schema" / "node.schema.json", tmp_path / "dag" / "schema")
+    (tmp_path / "dag" / "suites").mkdir(parents=True)
+    shutil.copy(REPO / "dag" / "suites" / "policy.yaml", tmp_path / "dag" / "suites")
     (tmp_path / "requirements.txt").write_text("numpy==1\n")
     write(tmp_path, ".gitignore", "dag/build/\n")
     write(tmp_path, "lean/MBQC.lean", "import MBQC.Defs.Pattern\n")
@@ -66,9 +68,23 @@ def proposal(**kw):
     return p
 
 
-def submit(tmp, lean=GOOD_LEAN, prop=None, attempts=None):
+# The suite every test proposal carries unless it says otherwise: the claim checked exhaustively on a small domain.
+CHECKS_PY = """def counts_add(a, b):
+    return a > b or a + (b - a) == b
+"""
+SUITE = {"claim_type": "exact_statement", "checks": [
+    {"kind": "finite", "name": "small", "params": {"predicate": "checks.py:counts_add",
+                                                   "domain": {"a": {"range": [0, 12]}, "b": {"range": [0, 12]}}},
+     "rationale": "the identity on every a, b up to 12"}]}
+
+
+def submit(tmp, lean=GOOD_LEAN, prop=None, attempts=None, suite=None, checks=CHECKS_PY):
     d = tmp / "in" / TID
     d.mkdir(parents=True, exist_ok=True)
+    if suite is not False:
+        (d / "suite.json").write_text(json.dumps(suite or SUITE), encoding="utf-8")
+    if checks is not None:
+        (d / "checks.py").write_text(checks, encoding="utf-8")
     if lean is not None:
         (d / "theorem.lean").write_text(lean, encoding="utf-8")
     if prop is not False:
@@ -100,7 +116,8 @@ def test_open_theorems_and_what_a_proposal_needs(repo):
     assert [n.id for n in pr.open_theorems(dag)] == [TID]
     d = pr.describe(dag, dag.nodes[TID])
     assert d["namespace"] == NS and d["lean_file"] == "lean/MBQC/Papers/Paper_p_abc/T_theorem_1_counts_add.lean"
-    assert d["statement"] == "Theorem 1. Counts add up." and d["checks_run"] == ["lean", "vocabulary", "nonvacuity"]
+    assert d["statement"] == "Theorem 1. Counts add up." and d["checks_run"][:3] == ["lean", "vocabulary", "nonvacuity"]
+    assert "exact_statement" in d["suite_policy"]["claim_types"] and d["proposal_format"]["files"]["suite.json"].startswith("required")
     assert [v["id"] for v in d["vocabulary"]] == ["def.pattern"]
     assert d["proposal_format"]["directory"] == f"proposals/{TID}/"
 
@@ -126,8 +143,13 @@ def test_apply_formalized_without_checks_keeps_the_attempt_record(repo):
     r = raw(repo)
     assert r["statement"] == "Theorem 1. Counts add up."                      # never touched
     assert r["lean_decl"] == f"{NS}.counts_add"
-    assert r["checks"] == [{"kind": "lean"}, {"kind": "vocabulary"},
-                           {"kind": "nonvacuity", "params": {"witness": f"{NS}.counts_add_nonvacuous"}}]
+    pred = "checks/papers/paper.p_abc.theorem_1_counts_add.py"
+    assert r["checks"] == [{"kind": "lean", "origin": "verifier"}, {"kind": "vocabulary", "origin": "verifier"},
+                           {"kind": "nonvacuity", "params": {"witness": f"{NS}.counts_add_nonvacuous"}, "origin": "verifier"},
+                           {"kind": "finite", "name": "small", "params": {"predicate": f"{pred}:counts_add",
+                            "domain": {"a": {"range": [0, 12]}, "b": {"range": [0, 12]}}}, "origin": "proposal",
+                            "rationale": "the identity on every a, b up to 12"}]
+    assert r["code"] == [pred] and (repo / pred).read_text() == CHECKS_PY and "claim:exact_statement" in r["tags"]
     assert r["depends_on"] == [{"node": "core.additivity", "kind": "uses"}]
     assert "formalized" in r["tags"] and "open" not in r["tags"] and "awaits human review" in r["notes"]
     assert (repo / "lean/MBQC/Papers/Paper_p_abc/T_theorem_1_counts_add.lean").read_text(encoding="utf-8") == GOOD_LEAN

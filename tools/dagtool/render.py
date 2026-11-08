@@ -149,6 +149,37 @@ def lean_proofs(node, status) -> dict:
     return {"count": len(rows), "verified": sum(r["outcome"] == "pass" and r["fresh"] for r in rows), "list": rows}
 
 
+TEST_STATES = ("passed", "failed", "skipped", "stale", "not_run")
+
+
+def tests_of(node, status) -> dict:
+    """Every check the node declares, as a test: who asked for it, and whether it passed, failed or was skipped in
+    its current evidence (stale: the evidence predates a change; not_run: no evidence yet)."""
+    from verification.kinds import CHECK_KINDS
+    ev = {e.name: e for e in status.evidence}
+    raw_checks = node.raw.get("checks") or []
+    rows = []
+    for i, spec in enumerate(node.checks):
+        r = raw_checks[i] if i < len(raw_checks) and isinstance(raw_checks[i], dict) else {}
+        e = ev.get(spec.name)
+        if e is None:
+            state = "not_run"
+        elif not e.fresh:
+            state = "stale"
+        else:
+            state = {"pass": "passed", "fail": "failed", "error": "failed", "skip": "skipped"}.get(e.outcome, "failed")
+        meta = CHECK_KINDS.get(spec.kind)
+        rows.append({"name": spec.name, "kind": spec.kind, "question": meta.summary if meta else "",
+                     "origin": r.get("origin") or "author", "rationale": r.get("rationale"),
+                     "state": state, "outcome": e.outcome if e else None, "grants": e.grants if e else None,
+                     "domain": e.domain if e else None, "summary": e.summary if e else "not run yet",
+                     "expected_failure": bool(e and e.outcome == "fail" and "refuted" in node.acknowledged)})
+    counts = {k: sum(r["state"] == k for r in rows) for k in TEST_STATES}
+    claim = next((t.split(":", 1)[1] for t in node.tags if t.startswith("claim:")), None)
+    return {"total": len(rows), "performed": counts["passed"] + counts["failed"] + counts["skipped"],
+            **counts, "claim_type": claim, "list": rows}
+
+
 def build_data(dag: Dag, circuits: bool = True) -> dict:
     st = compute(dag)
     pos = layout(dag)
@@ -180,9 +211,11 @@ def build_data(dag: Dag, circuits: bool = True) -> dict:
             },
             "flags": [f.__dict__ for f in s.flags],
             "evidence": [_evidence_payload(e) for e in s.evidence],
+            "tests": tests_of(n, s),
         })
     return {
         "meta": {"generated": now_utc(), **git_commit(dag.root), "counts": summary_counts(st),
+                 "tests": {k: sum(n["tests"][k] for n in nodes) for k in ("total", "performed") + TEST_STATES},
                  "lean_proofs": {"total": sum(n["proofs"]["count"] for n in nodes),
                                  "verified": sum(n["proofs"]["verified"] for n in nodes),
                                  "theorems_with_several": sum(n["proofs"]["count"] > 1 for n in nodes)},

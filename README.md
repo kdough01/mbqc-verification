@@ -119,6 +119,15 @@ module becomes a DAG theorem, and the site's **Theorem DAG** tab shows this DAG.
   with the verdict; honest non-results are recorded as `unproved`, `not-formalizable` or `counterexample-suspected`; a
   rejected proposal changes nothing and its pull request stays open for a revision. Faithfulness stays below
   human-reviewed until someone approves the statement.
+- **Test suites**: a formalization carries `suite.json`, the claim type and the checks the proposer suggests beyond the
+  fixed `lean`, `vocabulary` and `nonvacuity` (which the verifier always adds), with a rationale each; predicates for
+  `finite` and `refuter` checks go in `checks.py`. `dag/suites/policy.yaml` sets each claim type's minimum
+  (`require_one_of`), the kinds it may use and their parameter limits; expected values must name a frozen file or a
+  held-out value; `checks.py` passes an allow-list scan (no I/O, no `eval`, no names starting with `_`, only the listed
+  imports) before it runs, and is stored as `checks/papers/<node>.py`. `dagtool suite-policy` prints the policy;
+  `dagtool suite-diff OLD NEW` classifies a revision's changes as added, removed, tightened, loosened or modified (the
+  dashboard uses it to hold each revision to its diagnosis). Recorded checks carry `origin` (verifier, proposal or
+  author), and every theorem's sheet lists its tests with their result.
 - **More than one Lean proof**: a formalized theorem can take further proofs. `dagtool proof-targets --json` gives
   the main declaration and its source (to restate the theorem exactly), the proofs so far with their approaches, and
   the namespace and file for the next one (`<namespace>.Proof_<k>`, `lean/MBQC/Papers/<paper>/<theorem>/Proof_<k>.lean`).
