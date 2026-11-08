@@ -1,10 +1,10 @@
 {
- "input_hash": "8d8150d138f9a0ea",
+ "input_hash": "c66fee09ef622761",
  "inputs": {
   "check_code": {
    "verification/faithfulness/differential/check.py": "de20c4cbe92ef720ed4bdc04054eabbdc3524a686c5ee9a6735b93e1018c197d",
    "verification/truth/lean/check.py": "7d80b6820748d5428f83693c97f8a28bf2a0343a469ad283155dbdaf1a514af1",
-   "verification/truth/lean/leanrun.py": "6d4e2e44d68694475c040f238a2e5eb0b2a06be40a521d75ce885ce5f54644b1",
+   "verification/truth/lean/leanrun.py": "140e3dbe3f2f98ad8fa172e5833f3b5bc08e07d2e82abbce0c755e2eba102f9c",
    "verification/truth/lean/proof.py": "6525c42aa321ab57f1107009507be1bb1cd81ebd4f58d40fa8f73866e082e7c5",
    "verification/truth/scaling/check.py": "ef885ffc8ea324e15bae0281a893be69bfe6a0979819878f65123841873c8455",
    "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
@@ -18,7 +18,7 @@
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
-  "lean_sources": "3465b8deeb630b44fd9e8f5453c13d07a5677a7c885066d92ec8686dab559920",
+  "lean_sources": "2ae7e14ff97f62a25967c9b04792ede9c324c71f296cb881a9a5c2642a01fb87",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
    "def.pattern": "20379a417004e168:4f53cda1",
@@ -65,11 +65,11 @@
   ]
  },
  "provenance": {
-  "commit": "93dd8cc7b9ea9da501e8f184e599ff1aaa45a8ff",
+  "commit": "51d996c639f8bb97ed0f1d96444e632bd3f07538",
   "dirty": true,
-  "finished": "2026-11-04T18:11:20+00:00",
+  "finished": "2026-11-08T17:49:23+00:00",
   "quick": false,
-  "seconds": 0.96,
+  "seconds": 0.85,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",

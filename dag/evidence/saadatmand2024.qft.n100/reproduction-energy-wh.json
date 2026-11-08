@@ -1,8 +1,10 @@
 {
- "input_hash": "1834108cc3aa329a",
+ "input_hash": "274e5bc1a8417d9f",
  "inputs": {
   "check_code": {
-   "verification/truth/reproduction/check.py": "e11ac8c119802bde94887e7522da4b59e58dc47b14883d4a3b770aa6f0d0a1ae"
+   "requirements-tools.txt": "10d7364009957536e3eafb782d1920d29f038968b0e734b33737e6f82d92f630",
+   "verification/truth/heldout/heldout.py": "2975e24a77dcab506d8ba50c9f7293c72e0c33fa6414d2b37102fec397faf178",
+   "verification/truth/reproduction/check.py": "adc218c52056ec69b53ed81fb1d87de902c0d85a7116f410bd3d4d0c90b0fe3e"
   },
   "check_params": "e023ff17d41f32b3",
   "code": {
@@ -38,11 +40,11 @@
   "results": "experiments/rre/results/calibrated/table2_qft_N-100.json"
  },
  "provenance": {
-  "commit": "74cf69002845257340c3fcd71b475e888aa6a37d",
+  "commit": "51d996c639f8bb97ed0f1d96444e632bd3f07538",
   "dirty": true,
-  "finished": "2026-11-03T19:08:32+00:00",
+  "finished": "2026-11-08T17:49:26+00:00",
   "quick": false,
-  "seconds": 1.11,
+  "seconds": 0.02,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
