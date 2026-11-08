@@ -1,9 +1,9 @@
 {
- "input_hash": "9850e6dc13643efb",
+ "input_hash": "bbd353b8b40b8d25",
  "inputs": {
   "check_code": {
    "requirements-tools.txt": "10d7364009957536e3eafb782d1920d29f038968b0e734b33737e6f82d92f630",
-   "verification/truth/finite/check.py": "fd2bc56b52f1960404beecf36a7073583af104eb11029c3f6dda377050a59edc",
+   "verification/truth/finite/check.py": "1863938a1758c22ee135df3f39480deaac2ec54a3bbb1eb3ee338afe4a3105e6",
    "verification/truth/refuter/check.py": "e8dcd3592d5cebd490e18b127c6919baefe2f05c629ca1e17d2eaeda7a409fd3",
    "verification/truth/scaling/check.py": "ef885ffc8ea324e15bae0281a893be69bfe6a0979819878f65123841873c8455",
    "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
@@ -38,11 +38,11 @@
   "source": "formula"
  },
  "provenance": {
-  "commit": "51d996c639f8bb97ed0f1d96444e632bd3f07538",
+  "commit": "974c33a799e6a4968fded220d703793704238d16",
   "dirty": true,
-  "finished": "2026-11-08T17:49:51+00:00",
+  "finished": "2026-11-08T18:26:38+00:00",
   "quick": false,
-  "seconds": 0.02,
+  "seconds": 0.03,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
