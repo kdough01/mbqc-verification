@@ -1,5 +1,5 @@
 {
- "input_hash": "79a57e971c7bf48e",
+ "input_hash": "443e56fb84a0d1f3",
  "inputs": {
   "check_code": {
    "requirements-tools.txt": "10d7364009957536e3eafb782d1920d29f038968b0e734b33737e6f82d92f630",
@@ -20,11 +20,11 @@
    "def.resource_counts": "b75d507a2b247ac8"
   },
   "parents": {
-   "hamsim.B.gqsp.N.opt": "d2fe577177b7638b:f1d24151",
-   "hamsim.B.qsvt.N.opt": "083816082dc7a3c4:1db8577b"
+   "hamsim.B.gqsp.N.opt": "3c3772d0101ab166:f1d24151",
+   "hamsim.B.qsvt.N.opt": "42128ef7c94bc07e:1db8577b"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
-  "statement": "89ec62e633fcb646"
+  "statement": "de242e013003312e"
  },
  "kind": "refuter",
  "name": "refuter",
@@ -38,9 +38,9 @@
   "source": "formula"
  },
  "provenance": {
-  "commit": "974c33a799e6a4968fded220d703793704238d16",
+  "commit": "9609ae9dafc3325bcf9784b0dcc4aa6114a2db8e",
   "dirty": true,
-  "finished": "2026-11-08T18:26:38+00:00",
+  "finished": "2026-11-09T15:38:43+00:00",
   "quick": false,
   "seconds": 0.03,
   "versions": {

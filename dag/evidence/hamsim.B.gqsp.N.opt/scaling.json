@@ -1,5 +1,5 @@
 {
- "input_hash": "298fb590495bd7ed",
+ "input_hash": "b645a88e48a9d26e",
  "inputs": {
   "check_code": {
    "verification/truth/scaling/check.py": "ef885ffc8ea324e15bae0281a893be69bfe6a0979819878f65123841873c8455",
@@ -21,7 +21,7 @@
    "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
-  "statement": "d2fe577177b7638b"
+  "statement": "3c3772d0101ab166"
  },
  "kind": "scaling",
  "name": "scaling",
@@ -38,15 +38,15 @@
   "quantity": "N"
  },
  "provenance": {
-  "commit": "f15d921491b600ed59c6b4b1b802295fc0d1b7ca",
+  "commit": "9609ae9dafc3325bcf9784b0dcc4aa6114a2db8e",
   "dirty": true,
-  "finished": "2026-10-29T15:10:21+00:00",
+  "finished": "2026-11-09T15:38:40+00:00",
   "quick": false,
-  "seconds": 0.01,
+  "seconds": 0.03,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
-   "python": "3.13.17",
+   "python": "3.13.18",
    "qiskit": "2.5.0",
    "scipy": "1.18.1",
    "sympy": "1.14.0"

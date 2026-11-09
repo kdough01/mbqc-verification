@@ -1,5 +1,5 @@
 {
- "input_hash": "8438b5901a72179e",
+ "input_hash": "6fd588a3de1c42d7",
  "inputs": {
   "check_code": {
    "verification/faithfulness/nonvacuity/check.py": "5ad89e0eb7bad489bde10d115ea53868f859c42a1ee8a4911ec93ca7843a43d9",
@@ -21,12 +21,12 @@
   "lean_sources": "2ae7e14ff97f62a25967c9b04792ede9c324c71f296cb881a9a5c2642a01fb87",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
-   "assume.hamsim.qsvt_opt_N": "cdb29c0671ff4200:a442d378",
+   "assume.hamsim.qsvt_opt_N": "6fc9f14eff2d7f06:a442d378",
    "lemma.bilinear_interpolation": "7dbe5f6a13a24a28:6d232117",
    "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
-  "statement": "083816082dc7a3c4"
+  "statement": "42128ef7c94bc07e"
  },
  "kind": "nonvacuity",
  "name": "nonvacuity",
@@ -35,11 +35,11 @@
   "witness": "MBQC.Results.HamSim.qsvt_vertices_opt_nonvacuous"
  },
  "provenance": {
-  "commit": "51d996c639f8bb97ed0f1d96444e632bd3f07538",
+  "commit": "9609ae9dafc3325bcf9784b0dcc4aa6114a2db8e",
   "dirty": true,
-  "finished": "2026-11-08T17:49:27+00:00",
+  "finished": "2026-11-09T15:38:42+00:00",
   "quick": false,
-  "seconds": 0.02,
+  "seconds": 0.03,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
