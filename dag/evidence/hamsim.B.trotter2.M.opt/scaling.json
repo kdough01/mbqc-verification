@@ -1,9 +1,9 @@
 {
- "input_hash": "5c5024780a3df006",
+ "input_hash": "11b925c4f209a4d1",
  "inputs": {
   "check_code": {
-   "verification/truth/scaling/check.py": "ef885ffc8ea324e15bae0281a893be69bfe6a0979819878f65123841873c8455",
-   "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
+   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
+   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
   },
   "check_params": "27963d0eb0ef408a",
   "code": {
@@ -16,12 +16,15 @@
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
+  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
-   "def.resource_counts": "b75d507a2b247ac8:4f53cda1",
+   "assume.hamsim.trotter2_opt_M": "ccae89dc29603b64:7a347b66",
+   "lemma.bilinear_interpolation": "7dbe5f6a13a24a28:6d232117",
    "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
-  "statement": "7edd0d859e39cd77"
+  "statement": "90a5f702122dbb43"
  },
  "kind": "scaling",
  "name": "scaling",
@@ -38,11 +41,11 @@
   "quantity": "M"
  },
  "provenance": {
-  "commit": "490da67a64b039b4ce5fa5640da725cfa33d2506",
+  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
   "dirty": true,
-  "finished": "2026-11-09T15:37:31+00:00",
+  "finished": "2026-11-09T16:40:37+00:00",
   "quick": false,
-  "seconds": 0.23,
+  "seconds": 0.01,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
@@ -55,6 +58,7 @@
  "result": {
   "domain": "n in [2, 3, 4, 5], k in [1, 2, 3, 4] (training) + held-out [(7, 6), (9, 3)]",
   "evidence": {
+   "compiler": "graphix_opt",
    "counts": [
     {
      "M": 9,

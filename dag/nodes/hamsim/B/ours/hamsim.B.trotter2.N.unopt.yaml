@@ -5,13 +5,16 @@ title: second-order Trotter N formula (unoptimized)
 statement: |
   Compiling the second-order Trotter circuit for n ≥ 2 data qubits gate by gate (unoptimized), with r ≥ 1, gives a pattern with N = (10n − 6)r + 3n vertices.
 statement_tex: N = (10n - 6)r + 3n
+lean_decl: MBQC.Results.HamSim.trotter2_vertices_unopt
 code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
-conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps}
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps, compiler: graphix}
 depends_on:
 - {node: transfer.gate_to_mbqc, kind: instantiates}
-- {node: transfer.gate_to_mbqc_counts, kind: instantiates}
-- {node: def.resource_counts, kind: uses}
 - {node: def.jcz_construction, kind: uses}
+- {node: def.graphix_gates, kind: uses}
+- {node: transfer.gate_counts, kind: uses}
+- {node: transfer.gate_to_mbqc_counts, kind: uses}
+- {node: assume.hamsim.trotter2_unopt_gates, kind: assumes}
 checks:
 - kind: scaling
   params:
@@ -23,4 +26,8 @@ checks:
   params: {target: scaling}
 - kind: differential
   params: {method: trotter2}
+- {kind: lean}
+- {kind: vocabulary}
+- kind: nonvacuity
+  params: {witness: MBQC.Results.HamSim.trotter2_unopt_nonvacuous}
 tags: [hamsim, trotter2, resources, unoptimized]

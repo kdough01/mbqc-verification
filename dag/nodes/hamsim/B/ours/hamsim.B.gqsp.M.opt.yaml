@@ -5,13 +5,15 @@ title: GQSP M formula (Graphix-optimized)
 statement: |
   Compiling the GQSP circuit for n ≥ 2 data qubits after standardizing and removing Pauli measurements (Graphix-optimized), with d ≥ 1, gives a pattern with M = (80n − 40)d + 4n + 2 measurements.
 statement_tex: M = (80n - 40)d + 4n + 2
+lean_decl: MBQC.Results.HamSim.gqsp_measurements_opt
 description: |
   Optimization trades vertices for memory: peak live qubits rise from about 10–22 to 55–991 on the grid.
 code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
-conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: gqsp_laurent_degree}
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: gqsp_laurent_degree, compiler: graphix_opt}
 depends_on:
 - {node: transfer.gate_to_mbqc, kind: instantiates}
-- {node: def.resource_counts, kind: uses}
+- {node: lemma.bilinear_interpolation, kind: uses}
+- {node: assume.hamsim.gqsp_opt_M, kind: assumes}
 checks:
 - kind: scaling
   params:
@@ -21,4 +23,8 @@ checks:
     coef: [80, -40, 4, 2]
 - kind: mutation
   params: {target: scaling}
+- {kind: lean}
+- {kind: vocabulary}
+- kind: nonvacuity
+  params: {witness: MBQC.Results.HamSim.gqsp_measurements_opt_nonvacuous}
 tags: [hamsim, gqsp, resources, Graphix-optimized]

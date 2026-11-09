@@ -1,0 +1,20 @@
+id: transfer.gate_counts
+kind: transfer
+title: Transfer theorem, from gate counts
+statement: |
+  For any circuit of Graphix gates, its J/CZ stream has #J = 2·CNOT + 6·RZZ + 30·CCX + H + 2·X + 2·RX + 4·RY + 2·RZ + 4·U and #CZ = CNOT + CZ + 2·RZZ + 6·CCX, and if no CZ of the stream cancels an edge, the pattern built on w qubits has exactly #J + #CZ edges.
+statement_tex: \#J = \textstyle\sum_g j_g \cdot \mathrm{count}_g,\quad \#CZ = \sum_g z_g \cdot \mathrm{count}_g,\quad E =
+  \#J + \#CZ\ \text{(no cancellation)}
+description: |
+  With transfer.gate_to_mbqc_counts this turns how many gates of each kind a circuit has into N, M and E of its unoptimized pattern, which is how the unoptimized Hamiltonian-simulation formulas are proved.
+lean_decl: [MBQC.Transfer.gate_counts, MBQC.Transfer.countJ_gates, MBQC.Transfer.countCZ_gates, MBQC.Transfer.compile_edges,
+  MBQC.Transfer.edges_of_noCancel, MBQC.Transfer.countJ_append, MBQC.Transfer.countCZ_append]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped}
+depends_on:
+- {node: def.graphix_gates, kind: uses}
+- {node: def.jcz_construction, kind: uses}
+checks:
+- {kind: lean}
+- {kind: vocabulary}
+- {kind: nonvacuity}
+tags: [mbqc, transfer, resources]

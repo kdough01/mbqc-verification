@@ -1,10 +1,10 @@
 {
- "input_hash": "725ccd40de6d3746",
+ "input_hash": "64aae8f541452a32",
  "inputs": {
   "check_code": {
    "verification/faithfulness/vocabulary/check.py": "043cd0322eeb6b9af020e475ec4d988fe5fcd08222d528e91a73e8c7422cffe2",
-   "verification/truth/lean/check.py": "7d80b6820748d5428f83693c97f8a28bf2a0343a469ad283155dbdaf1a514af1",
-   "verification/truth/lean/leanrun.py": "140e3dbe3f2f98ad8fa172e5833f3b5bc08e07d2e82abbce0c755e2eba102f9c",
+   "verification/truth/lean/check.py": "029219c782e5286887cdcfb44b0b501ccf6fbfc576d524fddc51a7afb4b31807",
+   "verification/truth/lean/leanrun.py": "6cea0e6e8353cc39b75cc5e8e95ada1dba194a8cdf6dc71a55324b54fc69fb96",
    "verification/truth/lean/proof.py": "6525c42aa321ab57f1107009507be1bb1cd81ebd4f58d40fa8f73866e082e7c5"
   },
   "check_params": "44136fa355b3678a",
@@ -14,7 +14,7 @@
   "definitions": {
    "def.hamsim.slide_formulas": "5c1e5f2f83715021"
   },
-  "lean_sources": "2ae7e14ff97f62a25967c9b04792ede9c324c71f296cb881a9a5c2642a01fb87",
+  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
    "def.hamsim.slide_formulas": "5c1e5f2f83715021:4f53cda1"
@@ -27,11 +27,11 @@
  "node": "hamsim.C.slide.d_ge_g.E",
  "params": {},
  "provenance": {
-  "commit": "51d996c639f8bb97ed0f1d96444e632bd3f07538",
+  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
   "dirty": true,
-  "finished": "2026-11-08T17:49:23+00:00",
+  "finished": "2026-11-09T16:40:26+00:00",
   "quick": false,
-  "seconds": 0.02,
+  "seconds": 0.01,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",

@@ -1,0 +1,18 @@
+id: hamsim.B.gqsp.E.cabaliser
+kind: theorem
+layer: B
+title: 'GQSP: Cabaliser E has no bilinear formula'
+statement: |
+  Compiling the GQSP circuit with Cabaliser, the number of graph edges E is not of the form (an + b)d + cn + e for any rationals a, b, c, e.
+description: |
+  The same circuit as the Graphix nodes (Qiskit transpile, level 1, here to Clifford + Rz with Rz by multiples of π/2 passed as Cliffords), compiled by Cabaliser in one widget with its inputs teleported in. As for the Graphix-optimized pattern (hamsim.B.gqsp.E.opt), the edges depend on the graph's details, not just on how many rotations there are. Counts are recorded by experiments/compilers/run.py in the pinned RRE environment (Cabaliser 10f5c4e).
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/analysis.py, src/mbqc_verify/compile/compilers.py, src/mbqc_verify/compile/cabaliser_adapter.py,
+  experiments/compilers/results/cabaliser.json]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: gqsp_laurent_degree, compiler: cabaliser}
+depends_on:
+- {node: hamsim.B.gqsp.E.opt, kind: variant_of}
+- {node: hamsim.B.cabaliser_graphs_match, kind: uses}
+checks:
+- kind: scaling
+  params: {method: gqsp, compiler: cabaliser, quantity: E, claim: not_bilinear}
+tags: [hamsim, gqsp, resources, cabaliser, compiler-variant]

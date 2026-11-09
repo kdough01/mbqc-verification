@@ -15,6 +15,9 @@ that the edge names a converter from CONVERTERS below.
             trotter_steps |                 Trotter steps r,
             slide_polynomial_degree         or the slide's d_eps / g_eps (polynomial degree, undefined
                                             relative to ours; see docs/hamsim.md)
+    compiler graphix | graphix_opt |        which circuit-to-MBQC compiler a count is about
+            cabaliser                       (mbqc_verify.compile.compilers; a count is a claim about
+                                            one compiler, and a variant_of edge compares two)
 """
 
 from __future__ import annotations
@@ -51,12 +54,19 @@ class Degree(str, Enum):
     SLIDE_POLYNOMIAL_DEGREE = "slide_polynomial_degree"
 
 
+class Compiler(str, Enum):      # one value per entry of mbqc_verify.compile.compilers.COMPILERS
+    GRAPHIX = "graphix"
+    GRAPHIX_OPT = "graphix_opt"
+    CABALISER = "cabaliser"
+
+
 AXES: dict[str, type[Enum]] = {
     "angle": Angle,
     "endian": Endian,
     "input": InputState,
     "phase": Phase,
     "degree": Degree,
+    "compiler": Compiler,
 }
 
 
@@ -67,6 +77,7 @@ class Conventions:
     input: InputState | None = None
     phase: Phase | None = None
     degree: Degree | None = None
+    compiler: Compiler | None = None
 
     @staticmethod
     def parse(d: dict | None) -> "Conventions":

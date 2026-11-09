@@ -1,10 +1,10 @@
 {
- "input_hash": "925809f18c86f1bd",
+ "input_hash": "b727e7f5851c8fe8",
  "inputs": {
   "check_code": {
-   "verification/faithfulness/mutation/check.py": "f1e94c6d30a1fb0d706270c49b3e2e3648fdf20c6871c0670ec02f2b62b431d6",
-   "verification/truth/scaling/check.py": "ef885ffc8ea324e15bae0281a893be69bfe6a0979819878f65123841873c8455",
-   "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
+   "verification/faithfulness/mutation/check.py": "cbea16855919e7fa8b0abbd788652210b6a7126b2acda49c2c88d78d136fd97d",
+   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
+   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
   },
   "check_params": "cdb6ce06dd262a68",
   "code": {
@@ -14,18 +14,23 @@
   },
   "definitions": {
    "def.graph_state": "49d988a8e94f1186",
+   "def.graphix_gates": "17ace17c95ba5577",
    "def.jcz_construction": "392cb6fd4770bc56",
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
+  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
+   "assume.hamsim.qsvt_unopt_gates": "2ef8d14e50a46ab9:05d94ceb",
+   "def.graphix_gates": "17ace17c95ba5577:6029ded9",
    "def.jcz_construction": "392cb6fd4770bc56:b8ffd8b5",
-   "def.resource_counts": "b75d507a2b247ac8:4f53cda1",
+   "transfer.gate_counts": "9740a55b0cf730e9:964b423a",
    "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1",
    "transfer.gate_to_mbqc_counts": "34befe39e1070a89:964b423a"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
-  "statement": "a5eec036b0d93dc9"
+  "statement": "68c6e5706a1042aa"
  },
  "kind": "mutation",
  "name": "mutation",
@@ -34,15 +39,15 @@
   "target": "scaling"
  },
  "provenance": {
-  "commit": "f15d921491b600ed59c6b4b1b802295fc0d1b7ca",
+  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
   "dirty": true,
-  "finished": "2026-10-29T15:10:31+00:00",
+  "finished": "2026-11-09T16:40:42+00:00",
   "quick": false,
   "seconds": 0.01,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
-   "python": "3.13.17",
+   "python": "3.13.18",
    "qiskit": "2.5.0",
    "scipy": "1.18.1",
    "sympy": "1.14.0"

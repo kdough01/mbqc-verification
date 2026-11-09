@@ -1,0 +1,20 @@
+id: assume.hamsim.trotter2_opt_N
+kind: assumption
+title: 'Graphix-optimized second-order Trotter vertex counts: structure and corners'
+statement: |
+  Let N(n, r) be the vertex count of the Graphix-optimized second-order Trotter pattern (n ≥ 2, r ≥ 1). (i) N(n, r + 1) − N(n, r) does not depend on r; (ii) N(n + 1, r) − N(n, r) does not depend on n; (iii) N(2, 1) = 11, N(2, 2) = 16, N(3, 1) = 17, N(3, 2) = 25.
+description: |
+  What Lean cannot compute: facts about Graphix's output, stated as the axioms of MBQC.Assumptions.HamSim.Trotter2OptN (lean/MBQC/Assumptions/HamSimOpt.lean). The scaling check counts the real patterns on the whole grid, held-out points included. A reviewer should judge whether (i) and (ii) are plausible for the Graphix-optimized (Pauli-removed) pattern beyond the grid.
+lean_decl: [MBQC.Assumptions.HamSim.Trotter2OptN]
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps, compiler: graphix_opt}
+depends_on:
+- {node: def.resource_counts, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: trotter2
+    optimize: true
+    quantity: N
+    coef: [3, -1, 3, 0]
+tags: [hamsim, trotter2, resources, Graphix-optimized]

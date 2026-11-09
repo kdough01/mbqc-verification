@@ -7,7 +7,7 @@ description: |
   What Lean cannot compute: facts about Graphix's output, stated as the axioms in lean/MBQC/Assumptions/HamSim.lean. (i) holds because the per-degree blocks of the circuit are concatenated copies; (ii) and (iii) are supported by exact counts on the grid. A reviewer should judge whether (i) and (ii) are plausible for the Graphix-optimized (Pauli-removed) pattern.
 lean_decl: [MBQC.Assumptions.HamSim.QsvtOptN]
 code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
-conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: qsvt_calls_per_sequence}
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: qsvt_calls_per_sequence, compiler: graphix_opt}
 depends_on:
 - {node: def.resource_counts, kind: uses}
 checks:

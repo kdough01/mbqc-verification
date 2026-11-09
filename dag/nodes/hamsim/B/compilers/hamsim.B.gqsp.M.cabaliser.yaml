@@ -1,0 +1,25 @@
+id: hamsim.B.gqsp.M.cabaliser
+kind: theorem
+layer: B
+title: GQSP M formula (Cabaliser)
+statement: |
+  Compiling the GQSP circuit for n ≥ 2 data qubits with Cabaliser, with d ≥ 1, gives a graph state with M = (80n − 40)d + 4n + 3 measured vertices.
+statement_tex: M = (80n - 40)d + 4n + 3
+description: |
+  The same circuit as the Graphix nodes (Qiskit transpile, level 1, here to Clifford + Rz with Rz by multiples of π/2 passed as Cliffords), compiled by Cabaliser in one widget with its inputs teleported in. Graphix-optimized gives (80n − 40)d + 4n + 2 (hamsim.B.gqsp.M.opt); Cabaliser has exactly one more measured vertex at every grid point: the same per-degree cost, a different setup term. Counts are recorded by experiments/compilers/run.py in the pinned RRE environment (Cabaliser 10f5c4e).
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/analysis.py, src/mbqc_verify/compile/compilers.py, src/mbqc_verify/compile/cabaliser_adapter.py,
+  experiments/compilers/results/cabaliser.json]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: gqsp_laurent_degree, compiler: cabaliser}
+depends_on:
+- {node: hamsim.B.gqsp.M.opt, kind: variant_of}
+- {node: hamsim.B.cabaliser_graphs_match, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: gqsp
+    compiler: cabaliser
+    quantity: M
+    coef: [80, -40, 4, 3]
+- kind: mutation
+  params: {target: scaling}
+tags: [hamsim, gqsp, resources, cabaliser, compiler-variant]

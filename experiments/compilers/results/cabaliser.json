@@ -1,0 +1,553 @@
+{
+ "compiler": "cabaliser",
+ "label": "Cabaliser",
+ "description": "Cabaliser (Rigetti RRE's graph-state compiler, pinned in experiments/rre/environment.sh): the circuit, transpiled by Qiskit (level 1) to Clifford + Rz, is compiled to a graph state in one widget. Each non-Clifford Rz becomes a measured vertex; Clifford gates are absorbed into the graph and a local-Clifford frame.",
+ "versions": {
+  "qiskit": "2.5.0",
+  "python": "3.13.18",
+  "rre_commit": "9383b4da859d73e17d49a82fd18eff005ae6ecf1",
+  "cabaliser_commit": "10f5c4e700fba59adadf4197fa6fbf1aea1f8175"
+ },
+ "grids": {
+  "trotter2": [
+   [
+    2,
+    1
+   ],
+   [
+    2,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    2,
+    4
+   ],
+   [
+    3,
+    1
+   ],
+   [
+    3,
+    2
+   ],
+   [
+    3,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    1
+   ],
+   [
+    4,
+    2
+   ],
+   [
+    4,
+    3
+   ],
+   [
+    4,
+    4
+   ],
+   [
+    5,
+    1
+   ],
+   [
+    5,
+    2
+   ],
+   [
+    5,
+    3
+   ],
+   [
+    5,
+    4
+   ],
+   [
+    7,
+    6
+   ],
+   [
+    9,
+    3
+   ]
+  ],
+  "qsvt": [
+   [
+    2,
+    3
+   ],
+   [
+    2,
+    5
+   ],
+   [
+    2,
+    7
+   ],
+   [
+    3,
+    3
+   ],
+   [
+    3,
+    5
+   ],
+   [
+    3,
+    7
+   ],
+   [
+    4,
+    3
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    4,
+    7
+   ],
+   [
+    5,
+    9
+   ]
+  ],
+  "gqsp": [
+   [
+    2,
+    1
+   ],
+   [
+    2,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    1
+   ],
+   [
+    3,
+    2
+   ],
+   [
+    3,
+    3
+   ],
+   [
+    4,
+    1
+   ],
+   [
+    4,
+    2
+   ],
+   [
+    4,
+    3
+   ],
+   [
+    5,
+    4
+   ]
+  ]
+ },
+ "counts": {
+  "trotter2": {
+   "2,1": {
+    "N": 11,
+    "E": 10,
+    "M": 9,
+    "space": 6,
+    "time": 6,
+    "rotations": 7,
+    "inputs": 2
+   },
+   "2,2": {
+    "N": 16,
+    "E": 16,
+    "M": 14,
+    "space": 6,
+    "time": 9,
+    "rotations": 12,
+    "inputs": 2
+   },
+   "2,3": {
+    "N": 21,
+    "E": 22,
+    "M": 19,
+    "space": 6,
+    "time": 12,
+    "rotations": 17,
+    "inputs": 2
+   },
+   "2,4": {
+    "N": 26,
+    "E": 28,
+    "M": 24,
+    "space": 6,
+    "time": 15,
+    "rotations": 22,
+    "inputs": 2
+   },
+   "3,1": {
+    "N": 17,
+    "E": 16,
+    "M": 14,
+    "space": 9,
+    "time": 6,
+    "rotations": 11,
+    "inputs": 3
+   },
+   "3,2": {
+    "N": 25,
+    "E": 26,
+    "M": 22,
+    "space": 9,
+    "time": 9,
+    "rotations": 19,
+    "inputs": 3
+   },
+   "3,3": {
+    "N": 33,
+    "E": 36,
+    "M": 30,
+    "space": 9,
+    "time": 12,
+    "rotations": 27,
+    "inputs": 3
+   },
+   "3,4": {
+    "N": 41,
+    "E": 46,
+    "M": 38,
+    "space": 9,
+    "time": 15,
+    "rotations": 35,
+    "inputs": 3
+   },
+   "4,1": {
+    "N": 23,
+    "E": 22,
+    "M": 19,
+    "space": 12,
+    "time": 6,
+    "rotations": 15,
+    "inputs": 4
+   },
+   "4,2": {
+    "N": 34,
+    "E": 36,
+    "M": 30,
+    "space": 12,
+    "time": 9,
+    "rotations": 26,
+    "inputs": 4
+   },
+   "4,3": {
+    "N": 45,
+    "E": 50,
+    "M": 41,
+    "space": 12,
+    "time": 12,
+    "rotations": 37,
+    "inputs": 4
+   },
+   "4,4": {
+    "N": 56,
+    "E": 64,
+    "M": 52,
+    "space": 12,
+    "time": 15,
+    "rotations": 48,
+    "inputs": 4
+   },
+   "5,1": {
+    "N": 29,
+    "E": 28,
+    "M": 24,
+    "space": 15,
+    "time": 6,
+    "rotations": 19,
+    "inputs": 5
+   },
+   "5,2": {
+    "N": 43,
+    "E": 46,
+    "M": 38,
+    "space": 15,
+    "time": 9,
+    "rotations": 33,
+    "inputs": 5
+   },
+   "5,3": {
+    "N": 57,
+    "E": 64,
+    "M": 52,
+    "space": 15,
+    "time": 12,
+    "rotations": 47,
+    "inputs": 5
+   },
+   "5,4": {
+    "N": 71,
+    "E": 82,
+    "M": 66,
+    "space": 15,
+    "time": 15,
+    "rotations": 61,
+    "inputs": 5
+   },
+   "7,6": {
+    "N": 141,
+    "E": 170,
+    "M": 134,
+    "space": 21,
+    "time": 21,
+    "rotations": 127,
+    "inputs": 7
+   },
+   "9,3": {
+    "N": 105,
+    "E": 120,
+    "M": 96,
+    "space": 26,
+    "time": 12,
+    "rotations": 87,
+    "inputs": 9
+   }
+  },
+  "qsvt": {
+   "2,3": {
+    "N": 326,
+    "E": 2408,
+    "M": 317,
+    "space": 80,
+    "time": 173,
+    "rotations": 308,
+    "inputs": 9
+   },
+   "2,5": {
+    "N": 434,
+    "E": 4848,
+    "M": 425,
+    "space": 89,
+    "time": 259,
+    "rotations": 416,
+    "inputs": 9
+   },
+   "2,7": {
+    "N": 542,
+    "E": 8272,
+    "M": 533,
+    "space": 96,
+    "time": 345,
+    "rotations": 524,
+    "inputs": 9
+   },
+   "3,3": {
+    "N": 526,
+    "E": 8472,
+    "M": 513,
+    "space": 104,
+    "time": 256,
+    "rotations": 500,
+    "inputs": 13
+   },
+   "3,5": {
+    "N": 706,
+    "E": 19494,
+    "M": 693,
+    "space": 134,
+    "time": 396,
+    "rotations": 680,
+    "inputs": 13
+   },
+   "3,7": {
+    "N": 886,
+    "E": 36372,
+    "M": 873,
+    "space": 147,
+    "time": 536,
+    "rotations": 860,
+    "inputs": 13
+   },
+   "4,3": {
+    "N": 726,
+    "E": 15070,
+    "M": 709,
+    "space": 124,
+    "time": 333,
+    "rotations": 692,
+    "inputs": 17
+   },
+   "4,5": {
+    "N": 978,
+    "E": 35232,
+    "M": 961,
+    "space": 163,
+    "time": 527,
+    "rotations": 944,
+    "inputs": 17
+   },
+   "4,7": {
+    "N": 1230,
+    "E": 65850,
+    "M": 1213,
+    "space": 194,
+    "time": 721,
+    "rotations": 1196,
+    "inputs": 17
+   },
+   "5,9": {
+    "N": 1898,
+    "E": 155117,
+    "M": 1877,
+    "space": 261,
+    "time": 1156,
+    "rotations": 1856,
+    "inputs": 21
+   }
+  },
+  "gqsp": {
+   "2,1": {
+    "N": 139,
+    "E": 611,
+    "M": 131,
+    "space": 55,
+    "time": 50,
+    "rotations": 123,
+    "inputs": 8
+   },
+   "2,2": {
+    "N": 259,
+    "E": 1223,
+    "M": 251,
+    "space": 66,
+    "time": 98,
+    "rotations": 243,
+    "inputs": 8
+   },
+   "2,3": {
+    "N": 379,
+    "E": 1821,
+    "M": 371,
+    "space": 75,
+    "time": 146,
+    "rotations": 363,
+    "inputs": 8
+   },
+   "3,1": {
+    "N": 227,
+    "E": 1308,
+    "M": 215,
+    "space": 65,
+    "time": 72,
+    "rotations": 203,
+    "inputs": 12
+   },
+   "3,2": {
+    "N": 427,
+    "E": 2564,
+    "M": 415,
+    "space": 84,
+    "time": 142,
+    "rotations": 403,
+    "inputs": 12
+   },
+   "3,3": {
+    "N": 627,
+    "E": 3782,
+    "M": 615,
+    "space": 102,
+    "time": 212,
+    "rotations": 603,
+    "inputs": 12
+   },
+   "4,1": {
+    "N": 315,
+    "E": 2162,
+    "M": 299,
+    "space": 83,
+    "time": 86,
+    "rotations": 283,
+    "inputs": 16
+   },
+   "4,2": {
+    "N": 595,
+    "E": 4280,
+    "M": 579,
+    "space": 100,
+    "time": 170,
+    "rotations": 563,
+    "inputs": 16
+   },
+   "4,3": {
+    "N": 875,
+    "E": 6300,
+    "M": 859,
+    "space": 115,
+    "time": 254,
+    "rotations": 843,
+    "inputs": 16
+   },
+   "5,4": {
+    "N": 1483,
+    "E": 12481,
+    "M": 1463,
+    "space": 165,
+    "time": 402,
+    "rotations": 1443,
+    "inputs": 20
+   }
+  }
+ },
+ "translation": [
+  {
+   "method": "trotter2",
+   "n": 2,
+   "r": 1,
+   "t": 1.0,
+   "seed": 2,
+   "vertices": 11,
+   "inputs": 8,
+   "worst_fidelity": 0.9999999999999998
+  },
+  {
+   "method": "trotter2",
+   "n": 2,
+   "r": 2,
+   "t": 1.0,
+   "seed": 2,
+   "vertices": 16,
+   "inputs": 8,
+   "worst_fidelity": 0.9999999999999998
+  },
+  {
+   "method": "trotter2",
+   "n": 3,
+   "r": 1,
+   "t": 1.0,
+   "seed": 3,
+   "vertices": 17,
+   "inputs": 12,
+   "worst_fidelity": 0.9999999999999998
+  }
+ ]
+}

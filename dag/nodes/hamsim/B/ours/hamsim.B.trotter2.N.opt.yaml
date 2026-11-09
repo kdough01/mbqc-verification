@@ -5,13 +5,15 @@ title: second-order Trotter N formula (Graphix-optimized)
 statement: |
   Compiling the second-order Trotter circuit for n ≥ 2 data qubits after standardizing and removing Pauli measurements (Graphix-optimized), with r ≥ 1, gives a pattern with N = (3n − 1)r + 3n vertices.
 statement_tex: N = (3n - 1)r + 3n
+lean_decl: MBQC.Results.HamSim.trotter2_vertices_opt
 description: |
   Optimization trades vertices for memory: peak live qubits rise from about 10–22 to 55–991 on the grid.
 code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
-conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps}
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps, compiler: graphix_opt}
 depends_on:
 - {node: transfer.gate_to_mbqc, kind: instantiates}
-- {node: def.resource_counts, kind: uses}
+- {node: lemma.bilinear_interpolation, kind: uses}
+- {node: assume.hamsim.trotter2_opt_N, kind: assumes}
 checks:
 - kind: scaling
   params:
@@ -21,4 +23,8 @@ checks:
     coef: [3, -1, 3, 0]
 - kind: mutation
   params: {target: scaling}
+- {kind: lean}
+- {kind: vocabulary}
+- kind: nonvacuity
+  params: {witness: MBQC.Results.HamSim.trotter2_vertices_opt_nonvacuous}
 tags: [hamsim, trotter2, resources, Graphix-optimized]

@@ -1,0 +1,20 @@
+id: assume.hamsim.qsvt_opt_M
+kind: assumption
+title: 'Graphix-optimized QSVT measurement counts: structure and corners'
+statement: |
+  Let M(n, D) be the measurement count of the Graphix-optimized QSVT pattern (n ≥ 2, odd D ≥ 3). (i) M(n, D + 2) − M(n, D) does not depend on D; (ii) M(n + 1, D) − M(n, D) does not depend on n; (iii) M(2, 3) = 317, M(2, 5) = 425, M(3, 3) = 513, M(3, 5) = 693.
+description: |
+  What Lean cannot compute: facts about Graphix's output, stated as the axioms of MBQC.Assumptions.HamSim.QsvtOptM (lean/MBQC/Assumptions/HamSimOpt.lean). The scaling check counts the real patterns on the whole grid, held-out points included. A reviewer should judge whether (i) and (ii) are plausible for the Graphix-optimized (Pauli-removed) pattern beyond the grid.
+lean_decl: [MBQC.Assumptions.HamSim.QsvtOptM]
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: qsvt_calls_per_sequence, compiler: graphix_opt}
+depends_on:
+- {node: def.resource_counts, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: qsvt
+    optimize: true
+    quantity: M
+    coef: [36, -18, 88, -21]
+tags: [hamsim, qsvt, resources, Graphix-optimized]

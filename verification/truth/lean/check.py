@@ -8,6 +8,11 @@ Builds the Lean project, then reads `#print axioms` for the node's `lean_decl`.
     sorryAx or any other axiom                            -> fail
 The evidence also records which other nodes' declarations the proof reaches
 (graph/edges uses this instead of the declared edges once a proof exists).
+
+Node params:
+    refutes: true   the declaration proves the node's claim false (its statement is
+                    `¬ claim`): a successful proof refutes the node instead of proving it,
+                    modulo the same assumption axioms.
 """
 
 from __future__ import annotations
@@ -45,6 +50,10 @@ class LeanCheck(Check):
             return CheckResult("fail", summary="the proof uses sorry", evidence=ev)
         if bad:
             return CheckResult("fail", summary=f"undeclared axioms: {', '.join(bad)}", evidence=ev)
+        if params.get("refutes"):
+            modulo = f" modulo {len(extra)} assumption axiom(s) of {', '.join(assumption_nodes)}" if extra else ""
+            return CheckResult("fail", "refuted", "the claim as stated",
+                               summary=f"Lean proves the claim false{modulo} ({node.lean_decl})", evidence=ev)
         if extra:
             return CheckResult("pass", "proved_modulo", "all values in the statement",
                                frontier=assumption_nodes,

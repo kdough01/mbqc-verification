@@ -133,7 +133,8 @@ def test_rejection_labels_name_the_check_kind():
     label, why = rejection(["scaling", "refuter"])                      # the most decisive kind names it
     assert label == "Counterexample found" and "does not pass scaling tests" in why
     from verification.kinds import CHECK_KINDS
-    refuting = {"refuter", "finite", "symbolic", "numerical", "translation", "tool", "reproduction", "scaling"}
+    refuting = {"lean", "refuter", "finite", "symbolic", "numerical", "translation", "tool", "reproduction", "scaling"}
+    assert rejection(["lean", "refuter"])[0] == "Disproved in Lean"
     assert refuting <= {k for k, _, _ in REJECTION} and {k for k, _, _ in REJECTION} <= set(CHECK_KINDS)
 
 

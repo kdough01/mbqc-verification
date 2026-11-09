@@ -34,6 +34,8 @@ OPEN_REASONS = {
 # How a claim fails, by the kind of check that refuted it, most decisive first. A scaling or reproduction failure is
 # not a proof that the claim is false: the label and explanation say what was actually observed.
 REJECTION = [
+    ("lean", "Disproved in Lean",
+     "Lean proves the negation of the claim, from the formulas and assumptions it names"),
     ("refuter", "Counterexample found",
      "a counterexample search found an instance where the claim fails"),
     ("finite", "Fails on a checked case",

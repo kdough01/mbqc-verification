@@ -7,3 +7,10 @@ import MBQC.Math.Interpolation
 import MBQC.Assumptions.HamSim
 import MBQC.Results.HamSim.Slide
 import MBQC.Results.HamSim.QSVT
+import MBQC.Defs.GraphixGates
+import MBQC.Transfer.Gates
+import MBQC.Assumptions.HamSimGates
+import MBQC.Results.HamSim.Unopt
+import MBQC.Assumptions.HamSimOpt
+import MBQC.Results.HamSim.Opt
+import MBQC.Results.HamSim.Compare

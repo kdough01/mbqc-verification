@@ -1,0 +1,83 @@
+id: assume.hamsim.gqsp_unopt_gates
+kind: assumption
+title: 'Transpiled GQSP circuit: gate counts'
+statement: |
+  For n ≥ 2 data qubits and d ≥ 1, the GQSP circuit after Qiskit's transpiler (level 1, Graphix's gate set) acts on 4n qubits and has CNOT = (48n − 34)d + 2; CZ = 2d; CCX = (8n − 4)d; H = 4nd; X = 1; RY = (24n − 16)d; U = 2d + 1 gates (every other kind: none), and no CZ of its J/CZ stream cancels an edge.
+description: |
+  What Lean cannot compute: what Qiskit's transpiler outputs. Stated as the axioms of MBQC.Assumptions.HamSim.GqspUnoptGates (lean/MBQC/Assumptions/HamSimGates.lean). The scaling checks count every gate kind of the real transpiled circuits on the whole grid, held-out points included, and check the qubit count and that no CZ cancels. A reviewer should judge whether exact bilinear gate counts are plausible beyond the grid: the circuit repeats one block per d, and each block grows linearly in n.
+lean_decl: [MBQC.Assumptions.HamSim.GqspUnoptGates]
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: gqsp_laurent_degree, compiler: graphix}
+depends_on:
+- {node: def.graphix_gates, kind: uses}
+checks:
+- kind: scaling
+  name: gates-cnot
+  params:
+    method: gqsp
+    quantity: gate:cnot
+    coef: [48, -34, 0, 2]
+- kind: scaling
+  name: gates-cz
+  params:
+    method: gqsp
+    quantity: gate:cz
+    coef: [0, 2, 0, 0]
+- kind: scaling
+  name: gates-rzz
+  params:
+    method: gqsp
+    quantity: gate:rzz
+    coef: [0, 0, 0, 0]
+- kind: scaling
+  name: gates-ccx
+  params:
+    method: gqsp
+    quantity: gate:ccx
+    coef: [8, -4, 0, 0]
+- kind: scaling
+  name: gates-h
+  params:
+    method: gqsp
+    quantity: gate:h
+    coef: [4, 0, 0, 0]
+- kind: scaling
+  name: gates-x
+  params:
+    method: gqsp
+    quantity: gate:x
+    coef: [0, 0, 0, 1]
+- kind: scaling
+  name: gates-rx
+  params:
+    method: gqsp
+    quantity: gate:rx
+    coef: [0, 0, 0, 0]
+- kind: scaling
+  name: gates-ry
+  params:
+    method: gqsp
+    quantity: gate:ry
+    coef: [24, -16, 0, 0]
+- kind: scaling
+  name: gates-rz
+  params:
+    method: gqsp
+    quantity: gate:rz
+    coef: [0, 0, 0, 0]
+- kind: scaling
+  name: gates-u
+  params:
+    method: gqsp
+    quantity: gate:u
+    coef: [0, 2, 0, 1]
+- kind: scaling
+  name: width
+  params:
+    method: gqsp
+    quantity: width
+    coef: [0, 0, 4, 0]
+- kind: scaling
+  name: no-cancel
+  params: {method: gqsp, claim: no_cancel}
+tags: [hamsim, gqsp, resources, unoptimized, gate-counts]
