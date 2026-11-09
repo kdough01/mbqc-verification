@@ -17,7 +17,7 @@ description: 'From "Superconducting qubits in the millions: the potential and li
   pages 15, 16, 29, 31 on the review site. Added by `dagtool pull-papers`; it stays open until depends_on
   edges and checks are added.'
 paper:
-  server: https://genesis-thrust2-review.fly.dev
+  server: https://genesis-thrust2-review.northcentralus.cloudapp.azure.com
   theorem_id: paper.p_95c1e708730c.runtime_model_tocks_delays_and_handover
   paper_id: p_95c1e708730c
   module_id: m_5887109d419e
