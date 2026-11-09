@@ -171,6 +171,19 @@
           },
           "params": {
             "type": "object"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "verifier",
+              "proposal",
+              "author"
+            ],
+            "description": "who asked for the check: the verifier's fixed checks, a proposal's suite, or the node's author"
+          },
+          "rationale": {
+            "type": "string",
+            "description": "what in the claim this check tests (required for proposed checks)"
           }
         }
       }

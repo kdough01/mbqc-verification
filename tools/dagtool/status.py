@@ -25,7 +25,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from verification.kinds import (CHECK_KINDS, EXTRA_FOLDERS, FAITH_ORDER, FAITH_RANK, LEAN_KINDS, LEAN_ONLY,
+from verification.kinds import (CHECK_KINDS, EXTRA_FOLDERS, FAITH_ORDER, FAITH_RANK, LEAN_KINDS, LEAN_ONLY, TOOL_KINDS,
                                 REQUIRED_FAITH,
                                 TRUTH_ORDER, TRUTH_RANK, clamp_truth)
 
@@ -40,6 +40,8 @@ def check_files(root: Path, kind: str) -> list[Path]:
     for rel in [CHECK_KINDS[kind].folder, *EXTRA_FOLDERS.get(kind, [])]:
         folder = root / "verification" / rel
         files += sorted(p for p in folder.glob("*.py") if p.name != "__init__.py")
+    if kind in TOOL_KINDS and (root / "requirements-tools.txt").exists():
+        files.append(root / "requirements-tools.txt")      # the pinned external tools these kinds call
     return files
 
 

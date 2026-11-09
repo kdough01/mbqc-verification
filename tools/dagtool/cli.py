@@ -22,6 +22,10 @@ dagtool — validate, run and inspect the theorem DAG.
     dagtool apply-proposals DIR          apply proposals that pass (the proposals gate runs this)
     dagtool proposal-paths < FILES       fail if a changed path is not proposals/<node>/<allowed file>
     dagtool lean-check FILE              scan and compile one Lean file under lean/MBQC/Papers/
+    dagtool heldout keygen | seal ID VALUE [--note T] | list   sealed expected values (HELDOUT_KEY)
+    dagtool tool NAME --args JSON        run one pinned tool (Stim, gridsynth, Qualtran, Azure RE...) and print it
+    dagtool suite-policy [--json]        what a proposal's test suite must and may contain (dag/suites/policy.yaml)
+    dagtool suite-diff OLD NEW           added / removed / tightened / loosened / modified checks between two suites
 
 Run from the repository root (or pass --root).
 """
@@ -263,6 +267,60 @@ def cmd_open_theorems(dag, args):
     return 0
 
 
+def cmd_heldout(dag, args):
+    from verification.truth.heldout import heldout as ho
+    if args.action == "keygen":
+        print(ho.keygen())
+        print("Store it as the repository secret HELDOUT_KEY (Settings → Secrets and variables → Actions); "
+              "keep a copy offline. It is not written anywhere.", file=sys.stderr)
+        return 0
+    if args.action == "list":
+        print("\n".join(ho.ids(dag.root)) or "no held-out values")
+        return 0
+    if len(args.rest) != 2:
+        print("usage: dagtool heldout seal ID VALUE [--note TEXT]", file=sys.stderr)
+        return 2
+    try:
+        path = ho.seal(dag.root, args.rest[0], float(args.rest[1]), note=args.note or "")
+    except (ho.HeldOutUnavailable, ValueError) as e:
+        print(e, file=sys.stderr)
+        return 1
+    print(f"sealed {args.rest[0]} -> {path.relative_to(dag.root).as_posix()}; reference it as "
+          f"expect: {{heldout: {args.rest[0]}}}")
+    return 0
+
+
+def cmd_tool(dag, args):
+    from types import SimpleNamespace
+
+    from verification.truth.tool.check import run_tool
+    out = run_tool(args.name, json.loads(args.args), SimpleNamespace(cache={}, root=dag.root))
+    print(json.dumps(out, indent=1, default=str))
+    return 0
+
+
+def cmd_suite_policy(dag, args):
+    from .proposals import _suite_brief
+    data = _suite_brief(dag.root)
+    if args.json:
+        print(json.dumps(data, indent=1, ensure_ascii=False))
+    else:
+        print(f"always added: {', '.join(data['required'])}")
+        for name, spec in data["claim_types"].items():
+            need = "; ".join(" or ".join(g) for g in spec.get("require_one_of", []))
+            print(f"{name}: needs {need}; may use {', '.join(spec['allowed'])} — {spec['describe']}")
+    return 0
+
+
+def cmd_suite_diff(dag, args):
+    from .suites import suite_diff
+
+    def load(p):
+        return json.loads(Path(p).read_text(encoding="utf-8")) if p != "-" else None
+    print(json.dumps(suite_diff(load(args.old), load(args.new)), indent=1))
+    return 0
+
+
 def cmd_proof_targets(dag, args):
     from . import proposals as pr
     todo = pr.proof_targets(dag, only=set(args.node or []) or None)
@@ -379,6 +437,18 @@ def main(argv=None) -> int:
     sub.add_parser("proposal-paths", help="check changed paths (stdin) against the proposal allow-list")
     p = sub.add_parser("lean-check", help="scan and compile one Lean file under lean/MBQC/Papers/")
     p.add_argument("file")
+    p = sub.add_parser("heldout", help="sealed expected values a proposer cannot read")
+    p.add_argument("action", choices=["keygen", "seal", "list"])
+    p.add_argument("rest", nargs="*")
+    p.add_argument("--note")
+    p = sub.add_parser("suite-policy", help="what a proposal's test suite must and may contain")
+    p.add_argument("--json", action="store_true")
+    p = sub.add_parser("suite-diff", help="compare two suite.json files (OLD may be '-' for none)")
+    p.add_argument("old")
+    p.add_argument("new")
+    p = sub.add_parser("tool", help="run one pinned tool and print its output")
+    p.add_argument("name")
+    p.add_argument("--args", default="{}")
     args = ap.parse_args(argv)
 
     root = Path(args.root).resolve()

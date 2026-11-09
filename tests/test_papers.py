@@ -118,6 +118,23 @@ def test_verdicts(repo):
     assert v["t.broken"]["state"] == "rejected" and "t.refuted" in v["t.broken"]["reason"]
     assert v["t.waiting"]["state"] == "open" and v["t.waiting"]["methods"] == ["numerical"]
     assert v["t.open_parent"]["state"] == "open" and v["t.open_parent"]["reason"] == "no passing check yet"
+    # a rejection says how it failed, not only that it did
+    assert v["t.refuted"]["label"] == "Counterexample found"
+    assert v["t.broken"]["label"] == "Relies on a claim that does not pass"
+    assert "counterexample found" in v["t.broken"]["explain"]
+    assert v["t.proved"]["label"] == "Verified" and v["t.waiting"]["label"] == "Open"
+
+
+def test_rejection_labels_name_the_check_kind():
+    from dagtool.verdict import REJECTION, rejection
+    label, why = rejection(["scaling"])
+    assert label == "Does not pass scaling tests" and "large constant" in why
+    assert rejection(["reproduction"])[0] == "Does not reproduce" and "unstated settings" in rejection(["reproduction"])[1]
+    label, why = rejection(["scaling", "refuter"])                      # the most decisive kind names it
+    assert label == "Counterexample found" and "does not pass scaling tests" in why
+    from verification.kinds import CHECK_KINDS
+    refuting = {"refuter", "finite", "symbolic", "numerical", "translation", "tool", "reproduction", "scaling"}
+    assert refuting <= {k for k, _, _ in REJECTION} and {k for k, _, _ in REJECTION} <= set(CHECK_KINDS)
 
 
 def test_export_carries_verdict_paper_and_checks(repo):

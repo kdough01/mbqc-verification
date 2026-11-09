@@ -13,6 +13,15 @@ Node params:
                (for quantities with no closed form)
     n_max, k_max: search bounds (default 50, 41)
 
+Generic search with Hypothesis (any claim, not only the one above):
+    source:       hypothesis
+    predicate:    FILE.py:FUNCTION (listed under the node's code:), called with one keyword per variable,
+                  returning a bool or (bool, detail); the claim is that it always holds
+    strategy:     {VAR: {integers: [LOW, HIGH]} | {floats: [LOW, HIGH]} | {values: [...]} | {booleans: true}}
+    max_examples: default 500
+Hypothesis generates instances (including boundary values), and shrinks a failure to a minimal one. It runs
+derandomized (database off), so the same inputs give the same evidence.
+
 A counterexample refutes the claim. Finding none records what was searched,
 as `empirical` evidence on that domain.
 """
@@ -23,6 +32,7 @@ from fractions import Fraction
 
 from mbqc_verify.hamsim.analysis import evaluate
 from verification.base import Check, CheckResult, register
+from verification.truth.finite.check import call, load_predicate
 from verification.truth.scaling.grids import counts
 
 
@@ -36,6 +46,8 @@ class RefuterCheck(Check):
     kind = "refuter"
 
     def run(self, node, params, ctx):
+        if params.get("source") == "hypothesis":
+            return self._hypothesis(node, params, ctx)
         q = params["quantity"]
         if params.get("source", "formula") == "formula":
             fq, fg = _coef(ctx.dag, params["qsvt"]), _coef(ctx.dag, params["gqsp"])
@@ -70,3 +82,44 @@ class RefuterCheck(Check):
                                        evidence={"counterexample": ce, "searched": searched})
         return CheckResult("pass", "empirical", "compiled counts on the Layer B grids",
                            summary=f"no counterexample in {searched} grid pairs", evidence={"searched": searched})
+
+    def _hypothesis(self, node, params, ctx):
+        from hypothesis import HealthCheck, Phase, find, settings
+        from hypothesis import strategies as st
+        from hypothesis.errors import NoSuchExample
+        try:
+            pred = load_predicate(node, params.get("predicate", ""), ctx.root)
+            strat = {}
+            for k, v in (params.get("strategy") or {}).items():
+                if "integers" in v:
+                    strat[k] = st.integers(*[int(x) for x in v["integers"]])
+                elif "floats" in v:
+                    strat[k] = st.floats(*[float(x) for x in v["floats"]], allow_nan=False, allow_infinity=False)
+                elif "values" in v:
+                    strat[k] = st.sampled_from(list(v["values"]))
+                elif "booleans" in v:
+                    strat[k] = st.booleans()
+                else:
+                    raise ValueError(f"strategy.{k}: integers | floats | values | booleans")
+        except (ValueError, AttributeError, OSError) as e:
+            return CheckResult("error", summary=f"refuter (hypothesis): {e}")
+        if not strat:
+            return CheckResult("error", summary="refuter (hypothesis) needs a strategy")
+        n = int(params.get("max_examples", 500))
+        tried = {"n": 0}
+
+        def fails(point):
+            tried["n"] += 1
+            return not call(pred, point)[0]
+        cfg = settings(max_examples=n, derandomize=True, database=None, deadline=None,
+                       phases=[Phase.generate, Phase.shrink], suppress_health_check=list(HealthCheck))
+        domain = ", ".join(f"{k} ~ {v}" for k, v in (params.get("strategy") or {}).items())
+        try:
+            ce = find(st.fixed_dictionaries(strat), fails, settings=cfg)
+        except NoSuchExample:
+            return CheckResult("pass", "empirical", f"Hypothesis, {n} examples: {domain}",
+                               summary=f"no counterexample in {tried['n']} generated instances (Hypothesis)",
+                               evidence={"tried": tried["n"], "max_examples": n, "strategy": params.get("strategy")})
+        ok, detail = call(pred, ce)
+        return CheckResult("fail", "refuted", f"counterexample {ce}", summary=f"fails at {ce} (shrunk by Hypothesis)",
+                           evidence={"counterexample": ce, "detail": detail, "tried": tried["n"]})

@@ -1,9 +1,9 @@
 id: hamsim.B.trotter2.M.opt
 kind: theorem
 layer: B
-title: second-order Trotter M formula (optimized)
+title: second-order Trotter M formula (Graphix-optimized)
 statement: |
-  Compiling the second-order Trotter circuit for n ≥ 2 data qubits after standardizing and removing Pauli measurements (optimized), with r ≥ 1, gives a pattern with M = (3n − 1)r + 2n measurements.
+  Compiling the second-order Trotter circuit for n ≥ 2 data qubits after standardizing and removing Pauli measurements (Graphix-optimized), with r ≥ 1, gives a pattern with M = (3n − 1)r + 2n measurements.
 statement_tex: M = (3n - 1)r + 2n
 description: |
   Optimization trades vertices for memory: peak live qubits rise from about 10–22 to 55–991 on the grid.
@@ -21,4 +21,4 @@ checks:
     coef: [3, -1, 2, 0]
 - kind: mutation
   params: {target: scaling}
-tags: [hamsim, trotter2, resources, optimized]
+tags: [hamsim, trotter2, resources, Graphix-optimized]

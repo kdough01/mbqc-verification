@@ -7,7 +7,7 @@
 #
 # strategy group: independence = keeping the verifier separate from the proposer; numerical = checking numbers.
 # tool status: verifier = part of the verifier (an implemented check kind or gate); used = a pinned external tool
-# the verifier runs; candidate = fits a claim type we expect, not wired in yet.
+# the verifier runs; candidate = fits a claim type we expect, not wired in yet. `how` says how a check uses it.
 # Text fields accept `code`, **bold** and [links](url).
 principle: >-
   The verifier contains no model and calls none. It is a fixed set of deterministic checks, pinned tools and frozen
@@ -32,7 +32,7 @@ strategies:
     what: A proposal may add or change files in a few places (its Lean file, its node's statement draft, its results); a change anywhere else — check code, kinds, schema, transcribed claims, tolerances, acknowledgements, evidence — rejects the whole proposal.
     why: The boundary has to be mechanical; reviewing every diff for sneaky edits does not scale.
     example: "The `proposals` gate refuses a pull request that touches anything outside `proposals/<node>/`; `dagtool apply-proposals` rejects axioms, `sorry`, `native_decide`, IO, metaprogramming and proposer-chosen checks."
-    how: "Path allow-list enforced by the apply step; CODEOWNERS and branch protection on `verification/`, `tools/dagtool/`, `dag/schema/`, `experiments/*/paper_*.yaml` so those change only with a human review."
+    how: "Path allow-list enforced by the apply step; `.github/CODEOWNERS` on `verification/`, `tools/dagtool/`, `dag/schema/`, `dag/heldout/`, `experiments/*/paper_*.yaml`, the requirements and the workflows, enforced by the `main` ruleset (`.github/rulesets/main.json`, `scripts/protect-main.sh`), so those change only with the owner's review."
   - group: independence
     title: Freeze the claim before anyone tries to meet it
     what: Transcribe the paper's values once, with the printed text, and treat them as read-only. Checks compare against that file, never against a number the proposer supplies.
@@ -58,11 +58,17 @@ strategies:
     example: "`experiments/rre/settings_space.yaml` lists the failure budget, factory table, gate time, widget levels and ancilla allocation; `run_candidate.py` validates a candidate against it."
     how: "`experiments/rre/candidates.py validate` before any run; every attempt and its rationale is kept with the proposal."
   - group: independence
+    title: Proposers suggest tests; the verifier sets the floor
+    what: A formalization comes with a test suite (`suite.json`) chosen for its claim type. The verifier adds its own Lean checks, requires each claim type's minimum, allows only listed kinds and parameter ranges, and takes expected values only from frozen files or held-out values. A revision must say what went wrong (proof, claim wrong, test misspecified, coverage thin); adding or tightening tests is free, removing, loosening or modifying one needs a person's sign-off.
+    why: An agent that knows the claim can write tests the verifier would not think of, but one that may write its own tests freely can write easy ones, and one that may change them after failing can edit tests until they pass.
+    example: "End to end, a predicate that dropped `a ≤ b` failed at (a, b) = (1, 0) while the Lean checks passed; fixing it counted as `modified` (sign-off), adding a Hypothesis search counted as `added` (free)."
+    how: "`dag/suites/policy.yaml`, `dagtool suite-policy`, `dagtool suite-diff`; `checks.py` passes an allow-list scan before it runs; every theorem's sheet lists each test, who asked for it, and whether it passed, failed or was skipped."
+  - group: independence
     title: Feedback without the answer key
     what: Return enough to act on — which check failed, the measured value against the claim, the ratio — but keep some checks hidden from the proposer, chosen before any attempt.
     why: A proposer that sees every test can fit to them. Held-out checks measure whether it generalized.
     example: "The calibration used QFT N-4, N-10 and N-25; N-100 (four modules) was held out and reproduced all nine numbers."
-    how: "Held-out instances and their expected values kept outside what the proposer can read (a separate protected file or repository), evaluated only by CI."
+    how: "`dagtool heldout seal ID VALUE` writes the value sealed (Fernet) under `dag/heldout/`; a check names it as `expect: {heldout: ID}`. The key is the `HELDOUT_KEY` secret of the `heldout` environment, which only `main` can use, so feedback, the proposals gate and branches skip the check; evidence records only whether it matched."
   - group: independence
     title: Every check must be able to fail
     what: Before trusting a check, show it rejects a wrong answer — a perturbed statement, a wrong reference, a mutated value — and record that it did.
@@ -98,7 +104,7 @@ strategies:
     what: A formalized theorem can take further Lean proofs, each in its own file and namespace, each a separate `lean_proof` check. The site shows how many proofs a theorem has and how many pass.
     why: One proof can lean on a lucky tactic or a definition that happens to unfold conveniently; a second proof that reaches the same exact statement another way makes a mistaken formalization less likely to go unnoticed, and keeps the theorem proved if one proof breaks.
     example: "The tests prove `a + (b - a) = b` by `omega` and again by `Nat.add_sub_of_le`; restating it as `b = a + (b - a)`, or as the definitionally equal `a + (b - a) + 0 = b`, is refused, and so is the same proof term in brackets."
-    how: "`dagtool proof-targets`, a proposal with `outcome: proof` and an `approach` line; the check compares the statements syntactically and the proof terms in Lean (`same` requests in `lean/scripts/Inspect.lean`). Independent statements of the same claim (the `equivalence` kind) are a separate, not yet implemented check."
+    how: "`dagtool proof-targets`, a proposal with `outcome: proof` and an `approach` line; the check compares the statements syntactically and the proof terms in Lean (`same` requests in `lean/scripts/Inspect.lean`). Independent statements of the same claim are the `equivalence` check: a Lean proof of `stmt(main) ↔ stmt(other)` that does not use either proof."
   - group: numerical
     title: Run the authors' own pipeline, pinned
     what: Before judging a number, rebuild exactly what produced it — the code at the commit the paper cites, its dependencies, the inputs.
@@ -183,7 +189,7 @@ tools:
     status: verifier
     checks: A proposal touches only the files it may write; its Lean contains no axiom, sorry, admit, native_decide, IO, metaprogramming or foreign imports; anything else is restored or rejected.
     applies: Every pull request carrying proposals, and every `dagtool feedback` run.
-    limits: Covers proposals under `proposals/`; CODEOWNERS and branch protection on the verifier's own paths are still to be set up.
+    limits: Covers proposals under `proposals/`; the verifier's own paths are guarded by CODEOWNERS once the `main` ruleset is enabled.
     check_kinds: [lean]
   - id: evidence-hashing
     name: Input hashing, staleness and the CI gate
@@ -276,74 +282,88 @@ tools:
     applies: Circuits a paper builds with Cirq.
     check_kinds: [reproduction, numerical]
   - id: held-out
-    name: Held-out instances
+    name: Held-out values
     category: Verifier practice
-    status: candidate
-    checks: Instances and expected values the proposer never sees, evaluated only in CI after a proposal is frozen.
+    status: verifier
+    checks: Expected values the proposer never sees, sealed in the repository and opened only by the `verify` workflow on main; a `reproduction` or `tool` check compares against them and records only whether the result matched.
     applies: Any claim a proposer could fit to — calibrations, formula fits, numerical reproductions.
-    limits: Done by hand once here (QFT N-100); keeping held-out values unreadable by proposers needs a protected file or repository.
-    check_kinds: [reproduction, scaling]
+    limits: "The key's holder can read the values. After setting the key, run verify with `rerun: all` so checks that skipped re-run."
+    how: "`dagtool heldout keygen` (once; store it as `HELDOUT_KEY` in the `heldout` environment, branch rule main), `HELDOUT_KEY=… dagtool heldout seal ID VALUE`, then `expect: {heldout: ID}` in the check."
+    check_kinds: [reproduction, tool]
   - id: codeowners
-    name: CODEOWNERS and branch protection
+    name: CODEOWNERS and the main ruleset
     url: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
     category: Repository controls
-    status: candidate
-    checks: Changes to check code, schema, transcribed claims, tolerances and acknowledgements need a named human reviewer before merge.
-    applies: The verifier repository itself, against any proposer with push access.
+    status: verifier
+    checks: Changes to check code, schema, transcribed claims, settings spaces, held-out values, requirements, the Lean inspection script and the workflows need the code owner's review before merge.
+    applies: The verifier repository itself, against any proposer or collaborator with push access.
+    limits: Enforced only once the ruleset is enabled (admin step). GitHub Actions may still push to main (evidence, applied proposals); admins bypass only through a pull request.
+    how: "`.github/CODEOWNERS`; `.github/rulesets/main.json` applied with `scripts/protect-main.sh` or Settings → Rules → Rulesets → Import; `tests/test_codeowners.py` keeps the protected paths covered."
   - id: hypothesis
     name: Hypothesis
     url: https://hypothesis.readthedocs.io
     category: Property-based testing
-    status: candidate
-    checks: Generates many random instances (and shrinks failures) for differential and translation checks, instead of a fixed list a proposer can learn.
-    applies: Any check over a family of instances.
-    check_kinds: [numerical, translation, refuter]
+    status: verifier
+    checks: Generates many instances, including boundary values, for a claim stated as a predicate, and shrinks a counterexample to a minimal one; runs derandomized so evidence is reproducible.
+    applies: Any claim over a family of instances that is too large to enumerate (for a small domain, `finite` enumerates it).
+    limits: A search, not a proof (grants at most `empirical`); derandomized, so a proposer can run the same search.
+    how: "`kind: refuter` with `source: hypothesis`, `predicate: FILE.py:FUNCTION` (listed under the node's `code:`), `strategy: {n: {integers: [2, 500]}}`, `max_examples`. Exhaustive version: `kind: finite` with `domain: {n: {range: [2, 50]}}` (grants `bounded`)."
+    check_kinds: [refuter, finite]
   - id: qualtran
     name: Qualtran
     url: https://github.com/quantumlib/Qualtran
     category: Fault-tolerant algorithms and cost models
-    status: candidate
-    checks: Independent T-, Toffoli-, rotation- and qubit-counts for the same algorithm.
+    status: verifier
+    checks: Independent T-, Toffoli-, rotation-, Clifford- and qubit-counts for an algorithm built from Qualtran bloqs.
     applies: T-count and register claims; a second count before trusting one tool's.
-    check_kinds: [reproduction, symbolic]
+    limits: Counts Qualtran's own construction of the algorithm, which may differ from the paper's; installed without its notebook and PennyLane extras (resource counting does not need them).
+    how: "`kind: tool`, `tool: qualtran.cost`, `args: {bloq: qualtran.bloqs.qft.QFTTextBook, kwargs: {bitsize: 8}}`, `path: total_t_count` (or `toffoli`, `rotation`, `qubits`)."
+    check_kinds: [tool]
   - id: gridsynth
     name: gridsynth (Ross–Selinger) synthesis
-    url: https://www.mathstat.dal.ca/~selinger/newsynth/
+    url: https://github.com/quantum-programming/pygridsynth
     category: Rotation synthesis
-    status: candidate
-    checks: Actual Clifford+T lengths for single-qubit rotations at a precision ε, against a stated L_ε formula.
-    applies: Claims that depend on synthesis constants.
-    check_kinds: [reproduction, scaling]
+    status: verifier
+    checks: Actual Clifford+T circuits for Rz(θ) at precision ε, with each circuit's error recomputed, so T counts are certified; compares with 3 log2(1/ε).
+    applies: Claims that depend on synthesis constants (e.g. an L_ε formula such as Saadatmand et al. Parameter 16).
+    limits: Plain Ross–Selinger; mixed or fallback synthesis (as in the paper's L_ε) is cheaper on average, so gridsynth gives an upper reference, not that formula.
+    how: "`kind: tool`, `tool: gridsynth.rz`, `args: {angles: [0.3, 1.1], epsilon: \"1e-6\"}`, `path: mean_t_count` (or `max_t_count`, `max_error`)."
+    check_kinds: [tool]
   - id: stim
     name: Stim
     url: https://github.com/quantumlib/Stim
     category: Stabilizer simulation
-    status: candidate
-    checks: Generates and samples surface-code circuits under circuit-level noise.
+    status: verifier
+    checks: Generates rotated surface-code memory circuits under circuit-level depolarizing noise and samples their detectors (seeded).
     applies: Logical-error models, thresholds and code-distance choices.
-    check_kinds: [numerical, reproduction]
+    limits: Stim's generated noise model (every parameter = p); a paper's own noise model may differ, so compare like with like.
+    how: "`kind: tool`, `tool: surface_code.memory`, `args: {distance: 5, p: 0.003, shots: 100000, seed: 1}`, `path: per_round`; or `surface_code.fit` for κ and p_th."
+    check_kinds: [tool]
   - id: pymatching
     name: PyMatching
     url: https://github.com/oscarhiggott/PyMatching
     category: Decoder (MWPM)
-    status: candidate
-    checks: Minimum-weight perfect-matching decoding of sampled syndromes.
-    applies: With Stim, re-deriving a logical-error fit.
-    check_kinds: [numerical]
+    status: verifier
+    checks: Minimum-weight perfect-matching decoding of Stim's sampled syndromes, from the circuit's detector error model.
+    applies: With Stim, re-deriving a logical-error fit (the MWPM fit behind κ and p_th).
+    check_kinds: [tool]
   - id: sinter
     name: sinter
     url: https://github.com/quantumlib/Stim/tree/main/glue/sample
-    category: Monte Carlo sampling
-    status: candidate
-    checks: Stim + decoder sampling at scale, logical error rates with confidence intervals.
-    applies: Refitting κ and p_th within uncertainty.
-    check_kinds: [numerical]
+    category: Monte Carlo statistics
+    status: verifier
+    checks: Likelihood intervals for logical error rates (fit_binomial) and conversion of a shot error rate to a per-round rate.
+    applies: Comparing a refitted κ and p_th, or one rate, within uncertainty.
+    limits: Used for its statistics; sampling runs in-process and seeded (not sinter's parallel collector) so evidence is reproducible.
+    how: "`surface_code.memory` returns `interval` and `per_round_interval`; a check can test `op: within`."
+    check_kinds: [tool]
   - id: azure-re
     name: Azure Quantum Resource Estimator
     url: https://learn.microsoft.com/en-us/azure/quantum/intro-to-resource-estimation
     category: Fault-tolerant resource estimator
-    status: candidate
-    checks: A second, independently built estimate of qubits and runtime under its own architecture assumptions.
+    status: verifier
+    checks: A second, independently built estimate of physical qubits, runtime, code distance and T factories, from logical counts or a Q# program; runs locally through the `qdk` package (no Azure account).
     applies: Order-of-magnitude cross-checks of resource tables.
     limits: Different architecture model; agreement is approximate by construction.
-    check_kinds: [reproduction]
+    how: "`kind: tool`, `tool: azure_re.logical_counts`, `args: {counts: {numQubits: 100, tCount: 1000000}, params: {errorBudget: 0.05}}`, `path: physical_qubits`; or `azure_re.qsharp` with a `.qs` file."
+    check_kinds: [tool]

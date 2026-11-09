@@ -1,10 +1,13 @@
 # Proposals for open paper theorems arrive as pull requests that add files under proposals/<node id>/
-# (proposal.json, theorem.lean, attempts.json). This gate decides, with the verifier's own code only:
+# (proposal.json, theorem.lean, suite.json, checks.py, attempts.json). This gate decides, with the verifier's own
+# code only:
 #
 #   check   runs from the base branch's copy of this workflow and tools (pull_request_target), with read-only
 #           permissions and no credentials on disk. It refuses the pull request if it touches anything outside
 #           proposals/, copies the proposal files out as data, and runs `dagtool apply-proposals`, which scans
-#           and compiles the Lean, runs the node's fixed checks, and keeps only what passes. A proposal with
+#           and compiles the Lean, validates the proposed test suite against dag/suites/policy.yaml (checks.py
+#           passes an allow-list scan before it runs), runs the fixed checks and the suite, and keeps only what
+#           passes. A proposal with
 #           outcome `proof` adds another Lean proof to a formalized theorem (the lean_proof check).
 #   apply   commits what passed to the base branch and comments the verdict on the pull request. Accepted
 #           proposals close the pull request; if nothing passed, it stays open for a revised proposal.
@@ -61,7 +64,7 @@ jobs:
         id: apply
         run: |
           dagtool apply-proposals "$RUNNER_TEMP/in/proposals" --report "$RUNNER_TEMP/applied.json"
-          git add -A dag lean
+          git add -A dag lean checks
           git diff --cached --binary > "$RUNNER_TEMP/applied.patch"
           python -c "import json,sys; print('accepted=' + str(sum(bool(r.get('accepted')) for r in json.load(open(sys.argv[1])))))" "$RUNNER_TEMP/applied.json" >> "$GITHUB_OUTPUT"
 

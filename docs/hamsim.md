@@ -45,7 +45,7 @@ It rebuilds everything the slide talks about, runs it, and tests each claim. Eve
 **Layer B: the cost formulas are exact, and one is now proved modulo named assumptions.**
 - Unoptimized patterns give exact bilinear formulas for N, E and M for all three methods, on held-out points too. Lean's
   independent model of Graphix's J-∧z construction reproduces every one of those counts (differential check).
-- Optimized patterns give exact formulas for N and M but **not for E**. Removing Pauli measurements rewires edges
+- Graphix-optimized patterns give exact formulas for N and M but **not for E**. Removing Pauli measurements rewires edges
   depending on the graph's details. The scaling check now proves this on the grid: the unique bilinear formula through
   the four corner points misses other points.
 - **Our optimized QSVT costs exactly 36n − 18 vertices per degree, the slide's coefficient**, from an independent

@@ -1,9 +1,9 @@
 id: hamsim.B.qsvt.N.opt
 kind: theorem
 layer: B
-title: QSVT N formula (optimized)
+title: QSVT N formula (Graphix-optimized)
 statement: |
-  Compiling the QSVT circuit for n ≥ 2 data qubits after standardizing and removing Pauli measurements (optimized), with odd D ≥ 3, gives a pattern with N = (36n − 18)D + 92n − 20 vertices.
+  Compiling the QSVT circuit for n ≥ 2 data qubits after standardizing and removing Pauli measurements (Graphix-optimized), with odd D ≥ 3, gives a pattern with N = (36n − 18)D + 92n − 20 vertices.
 statement_tex: N = (36n - 18)D + 92n - 20
 description: |
   Optimization trades vertices for memory: peak live qubits rise from about 10–22 to 55–991 on the grid.
@@ -27,4 +27,4 @@ checks:
 - {kind: vocabulary}
 - kind: nonvacuity
   params: {witness: MBQC.Results.HamSim.qsvt_vertices_opt_nonvacuous}
-tags: [hamsim, qsvt, resources, optimized]
+tags: [hamsim, qsvt, resources, Graphix-optimized]

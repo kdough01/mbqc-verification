@@ -8,6 +8,9 @@ inputs:
   lean:
     description: Install Lean and build lean/
     default: "true"
+  tools:
+    description: Install the pinned external tools of requirements-tools.txt (Stim, PyMatching, sinter, Hypothesis, Qualtran, gridsynth, the Azure Resource Estimator)
+    default: "true"
 
 runs:
   using: composite
@@ -16,17 +19,24 @@ runs:
       with:
         python-version: "3.13"
         cache: pip
-        cache-dependency-path: requirements.txt
+        cache-dependency-path: |
+          requirements.txt
+          requirements-tools.txt
 
     - name: Install Python packages
       shell: bash
       env:
         PACKAGES: ${{ inputs.packages }}
+        TOOLS: ${{ inputs.tools }}
       run: |
         if [ "$PACKAGES" = light ]; then
           python -m pip install pyyaml jsonschema
         else
           python -m pip install -r requirements.txt
+          if [ "$TOOLS" = true ]; then
+            # every dependency is pinned in the file, so nothing in requirements.txt moves
+            python -m pip install --no-deps -r requirements-tools.txt
+          fi
         fi
         python -m pip install --no-deps -e .
 
