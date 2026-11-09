@@ -1,0 +1,20 @@
+id: assume.hamsim.trotter2_opt_M
+kind: assumption
+title: 'Graphix-optimized second-order Trotter measurement counts: structure and corners'
+statement: |
+  Let M(n, r) be the measurement count of the Graphix-optimized second-order Trotter pattern (n ≥ 2, r ≥ 1). (i) M(n, r + 1) − M(n, r) does not depend on r; (ii) M(n + 1, r) − M(n, r) does not depend on n; (iii) M(2, 1) = 9, M(2, 2) = 14, M(3, 1) = 14, M(3, 2) = 22.
+description: |
+  What Lean cannot compute: facts about Graphix's output, stated as the axioms of MBQC.Assumptions.HamSim.Trotter2OptM (lean/MBQC/Assumptions/HamSimOpt.lean). The scaling check counts the real patterns on the whole grid, held-out points included. A reviewer should judge whether (i) and (ii) are plausible for the Graphix-optimized (Pauli-removed) pattern beyond the grid.
+lean_decl: [MBQC.Assumptions.HamSim.Trotter2OptM]
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps, compiler: graphix_opt}
+depends_on:
+- {node: def.resource_counts, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: trotter2
+    optimize: true
+    quantity: M
+    coef: [3, -1, 2, 0]
+tags: [hamsim, trotter2, resources, Graphix-optimized]

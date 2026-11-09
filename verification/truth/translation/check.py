@@ -11,6 +11,10 @@ Node params:
     instances: list of {method: trotter2 | qsvt | gqsp, optimize: bool,
                          n: int, seed: int, t: float, r: int (trotter2) | eps: float (qsvt, gqsp)}
     atol: float (default 1e-8)
+  or
+    compiler: cabaliser | ...   a compiler outside the main environment: read the fidelities that
+                                experiments/compilers/run.py recorded (every basis input and random
+                                inputs, post-selected branch); each must be within atol of 1
 
 The optimized QSVT/GQSP patterns keep ~100 qubits alive at once and can't be
 simulated, so only unoptimized ones are listed for those methods.
@@ -38,12 +42,37 @@ def _label(inst: dict, calls: int) -> str:
     return f"{inst['method']} n={inst['n']} {rep} ({'optimized' if inst['optimize'] else 'unoptimized'})"
 
 
+def _recorded(compiler: str, atol: float) -> CheckResult:
+    import json
+
+    from verification.truth.scaling.grids import record_path
+    path = record_path(compiler)
+    if not path.exists():
+        return CheckResult("error", summary=f"no record for {compiler}: run experiments/compilers/run.py --compiler {compiler}")
+    rec = json.loads(path.read_text(encoding="utf-8"))
+    rows = rec.get("translation", [])
+    if not rows:
+        return CheckResult("error", summary=f"{path.name} records no translation runs")
+    label = lambda r: f"{r['method']} n={r['n']} r={r['r']} ({r['vertices']} vertices, {r['inputs']} inputs)"
+    bad = [r for r in rows if r["worst_fidelity"] < 1 - atol]
+    domain = f"{rec['label']}, instances: " + "; ".join(label(r) for r in rows)
+    ev = {"record": path.name, "versions": rec.get("versions"), "rows": rows, "atol": atol}
+    if bad:
+        return CheckResult("fail", "refuted", domain, summary=f"graph state != circuit for {label(bad[0])} "
+                                                              f"(fidelity {bad[0]['worst_fidelity']:.6f})", evidence=ev)
+    worst = min(r["worst_fidelity"] for r in rows)
+    return CheckResult("pass", "bounded", domain, summary=f"{len(rows)} instances match on every input; worst "
+                                                          f"fidelity {worst:.12f} (post-selected branch)", evidence=ev)
+
+
 @register
 class TranslationCheck(Check):
     kind = "translation"
 
     def run(self, node, params, ctx):
         atol = float(params.get("atol", 1e-8))
+        if params.get("compiler") not in (None, "graphix", "graphix_opt"):
+            return _recorded(params["compiler"], atol)
         rows, failures = [], []
         for inst in params["instances"]:
             hc = _circuit(inst)

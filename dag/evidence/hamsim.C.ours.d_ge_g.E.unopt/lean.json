@@ -1,0 +1,127 @@
+{
+ "input_hash": "5df97f1e5795325d",
+ "inputs": {
+  "check_code": {
+   "verification/truth/lean/check.py": "029219c782e5286887cdcfb44b0b501ccf6fbfc576d524fddc51a7afb4b31807",
+   "verification/truth/lean/leanrun.py": "6cea0e6e8353cc39b75cc5e8e95ada1dba194a8cdf6dc71a55324b54fc69fb96",
+   "verification/truth/lean/proof.py": "6525c42aa321ab57f1107009507be1bb1cd81ebd4f58d40fa8f73866e082e7c5"
+  },
+  "check_params": "f9d7d6c538f1b37a",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.graphix_gates": "17ace17c95ba5577",
+   "def.jcz_construction": "392cb6fd4770bc56",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
+  "parents": {
+   "hamsim.B.gqsp.E.unopt": "ed2e1bad65aa8a37:6373b3d2",
+   "hamsim.B.qsvt.E.unopt": "a176154626105d50:16c40864"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "0f506726e0fad46c"
+ },
+ "kind": "lean",
+ "name": "lean",
+ "node": "hamsim.C.ours.d_ge_g.E.unopt",
+ "params": {
+  "refutes": true
+ },
+ "provenance": {
+  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "dirty": true,
+  "finished": "2026-11-09T16:40:37+00:00",
+  "quick": false,
+  "seconds": 0.01,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "the claim as stated",
+  "evidence": {
+   "assumption_axioms": [
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_ccx",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_cnot",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_cz",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_h",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_rx",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_ry",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_rz",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_rzz",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_u",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_x",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.no_cancel",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_ccx",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_cnot",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_cz",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_h",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_rx",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_ry",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_rz",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_rzz",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_u",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_x",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.no_cancel"
+   ],
+   "assumption_nodes": [
+    "assume.hamsim.gqsp_unopt_gates",
+    "assume.hamsim.qsvt_unopt_gates"
+   ],
+   "axioms": [
+    "Classical.choice",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_ccx",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_cnot",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_cz",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_h",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_rx",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_ry",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_rz",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_rzz",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_u",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.count_x",
+    "MBQC.Assumptions.HamSim.GqspUnoptGates.no_cancel",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_ccx",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_cnot",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_cz",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_h",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_rx",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_ry",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_rz",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_rzz",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_u",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.count_x",
+    "MBQC.Assumptions.HamSim.QsvtUnoptGates.no_cancel",
+    "Quot.sound",
+    "propext"
+   ],
+   "decl": "MBQC.Results.HamSim.qsvt_gqsp_edges_unopt_disproof",
+   "module": "MBQC.Results.HamSim.Compare",
+   "node_deps": [
+    "assume.hamsim.gqsp_unopt_gates",
+    "assume.hamsim.qsvt_unopt_gates",
+    "def.graphix_gates",
+    "def.jcz_construction",
+    "hamsim.B.gqsp.E.unopt",
+    "hamsim.B.qsvt.E.unopt"
+   ]
+  },
+  "frontier": [],
+  "grants": "refuted",
+  "outcome": "fail",
+  "seed": null,
+  "summary": "Lean proves the claim false modulo 22 assumption axiom(s) of assume.hamsim.gqsp_unopt_gates, assume.hamsim.qsvt_unopt_gates (MBQC.Results.HamSim.qsvt_gqsp_edges_unopt_disproof)"
+ }
+}

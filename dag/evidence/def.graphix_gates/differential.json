@@ -1,0 +1,299 @@
+{
+ "input_hash": "dfe3857109941827",
+ "inputs": {
+  "check_code": {
+   "verification/faithfulness/differential/check.py": "c3bd14a9b21d289d8d112a3a573597245e33f1acaa3b60092ec374a81c90081e",
+   "verification/truth/lean/check.py": "029219c782e5286887cdcfb44b0b501ccf6fbfc576d524fddc51a7afb4b31807",
+   "verification/truth/lean/leanrun.py": "6cea0e6e8353cc39b75cc5e8e95ada1dba194a8cdf6dc71a55324b54fc69fb96",
+   "verification/truth/lean/proof.py": "6525c42aa321ab57f1107009507be1bb1cd81ebd4f58d40fa8f73866e082e7c5",
+   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
+   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
+  },
+  "check_params": "efca6daef982e249",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.jcz_construction": "392cb6fd4770bc56",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
+  "parents": {
+   "def.jcz_construction": "392cb6fd4770bc56:b8ffd8b5"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "17ace17c95ba5577"
+ },
+ "kind": "differential",
+ "name": "differential",
+ "node": "def.graphix_gates",
+ "params": {
+  "gates": true,
+  "instances": [
+   {
+    "k": 1,
+    "method": "trotter2",
+    "n": 2
+   },
+   {
+    "k": 4,
+    "method": "trotter2",
+    "n": 5
+   },
+   {
+    "k": 3,
+    "method": "qsvt",
+    "n": 2
+   },
+   {
+    "k": 5,
+    "method": "qsvt",
+    "n": 3
+   },
+   {
+    "k": 1,
+    "method": "gqsp",
+    "n": 2
+   },
+   {
+    "k": 3,
+    "method": "gqsp",
+    "n": 4
+   }
+  ]
+ },
+ "provenance": {
+  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "dirty": true,
+  "finished": "2026-11-09T16:40:25+00:00",
+  "quick": false,
+  "seconds": 0.08,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": null,
+  "evidence": {
+   "rows": [
+    {
+     "agree": true,
+     "case": "cnot 0,1",
+     "gates": 1,
+     "tokens": 3
+    },
+    {
+     "agree": true,
+     "case": "cz 0,1",
+     "gates": 1,
+     "tokens": 1
+    },
+    {
+     "agree": true,
+     "case": "rzz 0,1",
+     "gates": 1,
+     "tokens": 8
+    },
+    {
+     "agree": true,
+     "case": "cnot 1,0",
+     "gates": 1,
+     "tokens": 3
+    },
+    {
+     "agree": true,
+     "case": "cz 1,0",
+     "gates": 1,
+     "tokens": 1
+    },
+    {
+     "agree": true,
+     "case": "rzz 1,0",
+     "gates": 1,
+     "tokens": 8
+    },
+    {
+     "agree": true,
+     "case": "cnot 2,0",
+     "gates": 1,
+     "tokens": 3
+    },
+    {
+     "agree": true,
+     "case": "cz 2,0",
+     "gates": 1,
+     "tokens": 1
+    },
+    {
+     "agree": true,
+     "case": "rzz 2,0",
+     "gates": 1,
+     "tokens": 8
+    },
+    {
+     "agree": true,
+     "case": "cnot 1,3",
+     "gates": 1,
+     "tokens": 3
+    },
+    {
+     "agree": true,
+     "case": "cz 1,3",
+     "gates": 1,
+     "tokens": 1
+    },
+    {
+     "agree": true,
+     "case": "rzz 1,3",
+     "gates": 1,
+     "tokens": 8
+    },
+    {
+     "agree": true,
+     "case": "ccx 0,1,2",
+     "gates": 1,
+     "tokens": 36
+    },
+    {
+     "agree": true,
+     "case": "ccx 2,0,1",
+     "gates": 1,
+     "tokens": 36
+    },
+    {
+     "agree": true,
+     "case": "ccx 1,2,0",
+     "gates": 1,
+     "tokens": 36
+    },
+    {
+     "agree": true,
+     "case": "ccx 3,0,2",
+     "gates": 1,
+     "tokens": 36
+    },
+    {
+     "agree": true,
+     "case": "h 0",
+     "gates": 1,
+     "tokens": 1
+    },
+    {
+     "agree": true,
+     "case": "x 0",
+     "gates": 1,
+     "tokens": 2
+    },
+    {
+     "agree": true,
+     "case": "rx 0",
+     "gates": 1,
+     "tokens": 2
+    },
+    {
+     "agree": true,
+     "case": "ry 0",
+     "gates": 1,
+     "tokens": 4
+    },
+    {
+     "agree": true,
+     "case": "rz 0",
+     "gates": 1,
+     "tokens": 2
+    },
+    {
+     "agree": true,
+     "case": "u 0",
+     "gates": 1,
+     "tokens": 4
+    },
+    {
+     "agree": true,
+     "case": "h 2",
+     "gates": 1,
+     "tokens": 1
+    },
+    {
+     "agree": true,
+     "case": "x 2",
+     "gates": 1,
+     "tokens": 2
+    },
+    {
+     "agree": true,
+     "case": "rx 2",
+     "gates": 1,
+     "tokens": 2
+    },
+    {
+     "agree": true,
+     "case": "ry 2",
+     "gates": 1,
+     "tokens": 4
+    },
+    {
+     "agree": true,
+     "case": "rz 2",
+     "gates": 1,
+     "tokens": 2
+    },
+    {
+     "agree": true,
+     "case": "u 2",
+     "gates": 1,
+     "tokens": 4
+    },
+    {
+     "agree": true,
+     "case": "trotter2 n=2 k=1",
+     "gates": 5,
+     "tokens": 20
+    },
+    {
+     "agree": true,
+     "case": "trotter2 n=5 k=4",
+     "gates": 41,
+     "tokens": 218
+    },
+    {
+     "agree": true,
+     "case": "qsvt n=2 k=3",
+     "gates": 581,
+     "tokens": 2533
+    },
+    {
+     "agree": true,
+     "case": "qsvt n=3 k=5",
+     "gates": 1545,
+     "tokens": 5993
+    },
+    {
+     "agree": true,
+     "case": "gqsp n=2 k=1",
+     "gates": 122,
+     "tokens": 776
+    },
+    {
+     "agree": true,
+     "case": "gqsp n=4 k=3",
+     "gates": 862,
+     "tokens": 5496
+    }
+   ]
+  },
+  "frontier": [],
+  "grants": null,
+  "outcome": "pass",
+  "seed": null,
+  "summary": "Lean's gate decompositions reproduce Graphix's J/CZ stream token for token on 28 single gates and 6 whole circuits"
+ }
+}

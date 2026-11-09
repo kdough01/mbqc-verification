@@ -27,6 +27,7 @@ dag/
 tools/dagtool/            CLI: validate, run, status, show, queue, review, repro, render, report, check
 experiments/hamsim/       the full report (run_all.py), plots, results/hamsim_results.json, figures/
 experiments/rre/          reproduction of Saadatmand et al. (arXiv:2406.06015) with their pinned pipeline
+experiments/compilers/    counts and translation runs of compilers that need their own environment (Cabaliser)
 docs/                     write-ups and images
 .github/                  CI: verify (every push), papers (pull site theorems), proposals (gate for submitted proofs), reproduce (manual), review, repro (weekly), setup
 tests/                    unit tests for the status rules and check logic

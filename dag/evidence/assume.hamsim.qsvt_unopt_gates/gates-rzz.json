@@ -1,0 +1,184 @@
+{
+ "input_hash": "fa062dc4e7435c1e",
+ "inputs": {
+  "check_code": {
+   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
+   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
+  },
+  "check_params": "f20834d44105e2d2",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.graphix_gates": "17ace17c95ba5577",
+   "def.jcz_construction": "392cb6fd4770bc56",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
+  "parents": {
+   "def.graphix_gates": "17ace17c95ba5577:6029ded9"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "2ef8d14e50a46ab9"
+ },
+ "kind": "scaling",
+ "name": "gates-rzz",
+ "node": "assume.hamsim.qsvt_unopt_gates",
+ "params": {
+  "coef": [
+   0,
+   3,
+   0,
+   3
+  ],
+  "method": "qsvt",
+  "quantity": "gate:rzz"
+ },
+ "provenance": {
+  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "dirty": true,
+  "finished": "2026-11-09T16:40:26+00:00",
+  "quick": false,
+  "seconds": 0.01,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "n in [2, 3, 4], k in [3, 5, 7] (training) + held-out [(5, 9)]",
+  "evidence": {
+   "compiler": "graphix",
+   "counts": [
+    {
+     "gate:rzz": 12,
+     "k": 3,
+     "n": 2,
+     "space": null
+    },
+    {
+     "gate:rzz": 18,
+     "k": 5,
+     "n": 2,
+     "space": null
+    },
+    {
+     "gate:rzz": 24,
+     "k": 7,
+     "n": 2,
+     "space": null
+    },
+    {
+     "gate:rzz": 12,
+     "k": 3,
+     "n": 3,
+     "space": null
+    },
+    {
+     "gate:rzz": 18,
+     "k": 5,
+     "n": 3,
+     "space": null
+    },
+    {
+     "gate:rzz": 24,
+     "k": 7,
+     "n": 3,
+     "space": null
+    },
+    {
+     "gate:rzz": 12,
+     "k": 3,
+     "n": 4,
+     "space": null
+    },
+    {
+     "gate:rzz": 18,
+     "k": 5,
+     "n": 4,
+     "space": null
+    },
+    {
+     "gate:rzz": 24,
+     "k": 7,
+     "n": 4,
+     "space": null
+    },
+    {
+     "gate:rzz": 30,
+     "k": 9,
+     "n": 5,
+     "space": null
+    }
+   ],
+   "holdout": [
+    [
+     5,
+     9
+    ]
+   ],
+   "least_squares_fit": [
+    "0",
+    "3",
+    "0",
+    "3"
+   ],
+   "method": "qsvt",
+   "mismatches": [],
+   "optimize": false,
+   "quantity": "gate:rzz",
+   "training": [
+    [
+     2,
+     3
+    ],
+    [
+     2,
+     5
+    ],
+    [
+     2,
+     7
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     3,
+     5
+    ],
+    [
+     3,
+     7
+    ],
+    [
+     4,
+     3
+    ],
+    [
+     4,
+     5
+    ],
+    [
+     4,
+     7
+    ]
+   ]
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "exact on all 9 training and 1 held-out points"
+ }
+}

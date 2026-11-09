@@ -1,0 +1,179 @@
+{
+ "input_hash": "48353ddb67646855",
+ "inputs": {
+  "check_code": {
+   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
+   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
+  },
+  "check_params": "a84873b68a067763",
+  "code": {
+   "experiments/compilers/results/cabaliser.json": "01bfb8d4905529f00f119ed447666921367fc452971240caf4472355c06a5cfe",
+   "src/mbqc_verify/compile/cabaliser_adapter.py": "846bf23cd045ac76af20fab9e20635311335aaf605b68e1931339b7d837640b9",
+   "src/mbqc_verify/compile/compilers.py": "6d307781077f0a192b28b84e79c1d4be6bea75b66ccb6caeafd5e2b5bea270b8",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {},
+  "parents": {
+   "hamsim.B.cabaliser_graphs_match": "6402d2bf0dbec8b9:62320ff7"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "2c6862339e2911bb"
+ },
+ "kind": "scaling",
+ "name": "scaling",
+ "node": "hamsim.B.gqsp.M.cabaliser",
+ "params": {
+  "coef": [
+   80,
+   -40,
+   4,
+   3
+  ],
+  "compiler": "cabaliser",
+  "method": "gqsp",
+  "quantity": "M"
+ },
+ "provenance": {
+  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "dirty": true,
+  "finished": "2026-11-09T16:40:26+00:00",
+  "quick": false,
+  "seconds": 0.01,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "n in [2, 3, 4], k in [1, 2, 3] (training) + held-out [(5, 4)]",
+  "evidence": {
+   "compiler": "cabaliser",
+   "counts": [
+    {
+     "M": 131,
+     "k": 1,
+     "n": 2,
+     "space": 55
+    },
+    {
+     "M": 251,
+     "k": 2,
+     "n": 2,
+     "space": 66
+    },
+    {
+     "M": 371,
+     "k": 3,
+     "n": 2,
+     "space": 75
+    },
+    {
+     "M": 215,
+     "k": 1,
+     "n": 3,
+     "space": 65
+    },
+    {
+     "M": 415,
+     "k": 2,
+     "n": 3,
+     "space": 84
+    },
+    {
+     "M": 615,
+     "k": 3,
+     "n": 3,
+     "space": 102
+    },
+    {
+     "M": 299,
+     "k": 1,
+     "n": 4,
+     "space": 83
+    },
+    {
+     "M": 579,
+     "k": 2,
+     "n": 4,
+     "space": 100
+    },
+    {
+     "M": 859,
+     "k": 3,
+     "n": 4,
+     "space": 115
+    },
+    {
+     "M": 1463,
+     "k": 4,
+     "n": 5,
+     "space": 165
+    }
+   ],
+   "holdout": [
+    [
+     5,
+     4
+    ]
+   ],
+   "least_squares_fit": [
+    "80",
+    "-40",
+    "4",
+    "3"
+   ],
+   "method": "gqsp",
+   "mismatches": [],
+   "optimize": false,
+   "quantity": "M",
+   "training": [
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     2
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     3,
+     1
+    ],
+    [
+     3,
+     2
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     4,
+     1
+    ],
+    [
+     4,
+     2
+    ],
+    [
+     4,
+     3
+    ]
+   ]
+  },
+  "frontier": [],
+  "grants": "empirical",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "exact on all 9 training and 1 held-out points"
+ }
+}

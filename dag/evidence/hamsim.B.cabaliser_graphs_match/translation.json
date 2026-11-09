@@ -1,0 +1,92 @@
+{
+ "input_hash": "00d6a5facde13811",
+ "inputs": {
+  "check_code": {
+   "verification/truth/translation/check.py": "ce2bda666b3d6b10cab6979984b22304f82d74127d5e059dfd7f9d68fb83baf4"
+  },
+  "check_params": "6cd54d4146ee6de2",
+  "code": {
+   "experiments/compilers/results/cabaliser.json": "01bfb8d4905529f00f119ed447666921367fc452971240caf4472355c06a5cfe",
+   "src/mbqc_verify/compile/cabaliser_adapter.py": "846bf23cd045ac76af20fab9e20635311335aaf605b68e1931339b7d837640b9",
+   "src/mbqc_verify/compile/compilers.py": "6d307781077f0a192b28b84e79c1d4be6bea75b66ccb6caeafd5e2b5bea270b8",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {},
+  "parents": {},
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "6402d2bf0dbec8b9"
+ },
+ "kind": "translation",
+ "name": "translation",
+ "node": "hamsim.B.cabaliser_graphs_match",
+ "params": {
+  "atol": 1e-09,
+  "compiler": "cabaliser"
+ },
+ "provenance": {
+  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "dirty": true,
+  "finished": "2026-11-09T16:40:26+00:00",
+  "quick": false,
+  "seconds": 0.01,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "Cabaliser, instances: trotter2 n=2 r=1 (11 vertices, 8 inputs); trotter2 n=2 r=2 (16 vertices, 8 inputs); trotter2 n=3 r=1 (17 vertices, 12 inputs)",
+  "evidence": {
+   "atol": 1e-09,
+   "record": "cabaliser.json",
+   "rows": [
+    {
+     "inputs": 8,
+     "method": "trotter2",
+     "n": 2,
+     "r": 1,
+     "seed": 2,
+     "t": 1.0,
+     "vertices": 11,
+     "worst_fidelity": 0.9999999999999998
+    },
+    {
+     "inputs": 8,
+     "method": "trotter2",
+     "n": 2,
+     "r": 2,
+     "seed": 2,
+     "t": 1.0,
+     "vertices": 16,
+     "worst_fidelity": 0.9999999999999998
+    },
+    {
+     "inputs": 12,
+     "method": "trotter2",
+     "n": 3,
+     "r": 1,
+     "seed": 3,
+     "t": 1.0,
+     "vertices": 17,
+     "worst_fidelity": 0.9999999999999998
+    }
+   ],
+   "versions": {
+    "cabaliser_commit": "10f5c4e700fba59adadf4197fa6fbf1aea1f8175",
+    "python": "3.13.18",
+    "qiskit": "2.5.0",
+    "rre_commit": "9383b4da859d73e17d49a82fd18eff005ae6ecf1"
+   }
+  },
+  "frontier": [],
+  "grants": "bounded",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "3 instances match on every input; worst fidelity 1.000000000000 (post-selected branch)"
+ }
+}

@@ -116,6 +116,17 @@ def counts_exe(ctx) -> Path:
     return exe
 
 
+def run_lines(ctx, lines: list[str]) -> list[str]:
+    """The counts executable's raw output, one line per input line."""
+    p = _run([str(counts_exe(ctx))], ctx.root / "lean", stdin="\n".join(lines) + "\n", timeout=1800)
+    if p.returncode != 0:
+        raise RuntimeError(p.stderr[-2000:])
+    out = p.stdout.split("\n")[: len(lines)]
+    if any(r.strip() == "error" for r in out):
+        raise RuntimeError("mbqc_counts could not parse an input line")
+    return out
+
+
 def run_counts(ctx, lines: list[str]) -> list[tuple[int, int, int]]:
     """Lean's (N, E, M) for each J/CZ stream line."""
     p = _run([str(counts_exe(ctx))], ctx.root / "lean", stdin="\n".join(lines) + "\n", timeout=1800)

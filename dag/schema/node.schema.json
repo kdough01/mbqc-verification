@@ -110,6 +110,14 @@
             "trotter_steps",
             "slide_polynomial_degree"
           ]
+        },
+        "compiler": {
+          "description": "Which circuit-to-MBQC compiler a count is about (mbqc_verify.compile.compilers).",
+          "enum": [
+            "graphix",
+            "graphix_opt",
+            "cabaliser"
+          ]
         }
       }
     },

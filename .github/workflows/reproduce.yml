@@ -1,5 +1,6 @@
-# Re-runs the Saadatmand et al. reproduction (experiments/rre) with the paper's pinned pipeline, commits the
-# results, then runs the verifier so the `reproduction` checks re-evaluate. Manual only: the build takes a while
+# Re-runs the Saadatmand et al. reproduction (experiments/rre) with the paper's pinned pipeline and re-records
+# Cabaliser's Hamiltonian-simulation counts (experiments/compilers), commits the results, then runs the verifier
+# so the `reproduction` checks and the Cabaliser compiler variants re-evaluate. Manual only: the build takes a while
 # and the results change only when the pipeline or the configuration does.
 #
 # Small lattices run on GitHub's runners. For the larger ones, register the bigger machine as a self-hosted
@@ -64,12 +65,25 @@ jobs:
             done
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Verifier environment (for the compiler records)
+        if: inputs.only == ''
+        uses: ./.github/actions/setup
+        with:
+          lean: "false"
+          tools: "false"
+
+      - name: Record Cabaliser's counts and translation runs (experiments/compilers)
+        if: inputs.only == ''
+        env:
+          CABALISER_PYTHON: ${{ github.workspace }}/.rre/venv/bin/python
+        run: python experiments/compilers/run.py --compiler cabaliser
+
       - name: Commit the results
         id: commit
         env:
           TOKEN: ${{ github.token }}
         run: |
-          git add experiments/rre/results
+          git add experiments/rre/results experiments/compilers/results
           if git diff --cached --quiet; then echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0; fi
           echo "changed=true" >> "$GITHUB_OUTPUT"
           git config user.name "github-actions[bot]"

@@ -1,12 +1,12 @@
 {
- "input_hash": "86002ca454e416aa",
+ "input_hash": "9960dc8e0576045a",
  "inputs": {
   "check_code": {
    "requirements-tools.txt": "10d7364009957536e3eafb782d1920d29f038968b0e734b33737e6f82d92f630",
    "verification/truth/finite/check.py": "1863938a1758c22ee135df3f39480deaac2ec54a3bbb1eb3ee338afe4a3105e6",
    "verification/truth/refuter/check.py": "e8dcd3592d5cebd490e18b127c6919baefe2f05c629ca1e17d2eaeda7a409fd3",
-   "verification/truth/scaling/check.py": "ef885ffc8ea324e15bae0281a893be69bfe6a0979819878f65123841873c8455",
-   "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
+   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
+   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
   },
   "check_params": "c156ed6f864ce653",
   "code": {
@@ -19,12 +19,14 @@
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
+  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
-   "hamsim.B.gqsp.M.opt": "8e41f69111f46005:85508b3a",
-   "hamsim.B.qsvt.M.opt": "276f34e9b8776be0:d21ab166"
+   "hamsim.B.gqsp.M.opt": "a1efa994ceeb2e69:8551ff0f",
+   "hamsim.B.qsvt.M.opt": "83bd5912a86bbcfe:ded4bf40"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
-  "statement": "7dccbf5d4a6bd8fc"
+  "statement": "a65a1718b0261602"
  },
  "kind": "refuter",
  "name": "refuter",
@@ -38,11 +40,11 @@
   "source": "formula"
  },
  "provenance": {
-  "commit": "490da67a64b039b4ce5fa5640da725cfa33d2506",
+  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
   "dirty": true,
-  "finished": "2026-11-09T15:37:32+00:00",
+  "finished": "2026-11-09T16:40:37+00:00",
   "quick": false,
-  "seconds": 0.02,
+  "seconds": 0.01,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",

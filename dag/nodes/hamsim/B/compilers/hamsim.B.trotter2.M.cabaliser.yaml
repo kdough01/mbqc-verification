@@ -1,0 +1,25 @@
+id: hamsim.B.trotter2.M.cabaliser
+kind: theorem
+layer: B
+title: second-order Trotter M formula (Cabaliser)
+statement: |
+  Compiling the second-order Trotter circuit for n ≥ 2 data qubits with Cabaliser, with r ≥ 1, gives a graph state with M = (3n − 1)r + 2n measured vertices.
+statement_tex: M = (3n - 1)r + 2n
+description: |
+  The same circuit as the Graphix nodes (Qiskit transpile, level 1, here to Clifford + Rz with Rz by multiples of π/2 passed as Cliffords), compiled by Cabaliser in one widget with its inputs teleported in. The Graphix-optimized formula (hamsim.B.trotter2.M.opt) holds for Cabaliser too, exactly on the grid: both compilers end with one measured vertex per non-Clifford rotation, so they agree on M. Counts are recorded by experiments/compilers/run.py in the pinned RRE environment (Cabaliser 10f5c4e).
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/analysis.py, src/mbqc_verify/compile/compilers.py, src/mbqc_verify/compile/cabaliser_adapter.py,
+  experiments/compilers/results/cabaliser.json]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps, compiler: cabaliser}
+depends_on:
+- {node: hamsim.B.trotter2.M.opt, kind: variant_of}
+- {node: hamsim.B.cabaliser_graphs_match, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: trotter2
+    compiler: cabaliser
+    quantity: M
+    coef: [3, -1, 2, 0]
+- kind: mutation
+  params: {target: scaling}
+tags: [hamsim, trotter2, resources, cabaliser, compiler-variant]

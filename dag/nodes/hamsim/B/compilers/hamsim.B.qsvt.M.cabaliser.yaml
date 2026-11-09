@@ -1,0 +1,25 @@
+id: hamsim.B.qsvt.M.cabaliser
+kind: theorem
+layer: B
+title: QSVT M formula (Cabaliser)
+statement: |
+  Compiling the QSVT circuit for n ≥ 2 data qubits with Cabaliser, with odd D ≥ 3, gives a graph state with M = (36n − 18)D + 88n − 21 measured vertices.
+statement_tex: M = (36n - 18)D + 88n - 21
+description: |
+  The same circuit as the Graphix nodes (Qiskit transpile, level 1, here to Clifford + Rz with Rz by multiples of π/2 passed as Cliffords), compiled by Cabaliser in one widget with its inputs teleported in. The Graphix-optimized formula (hamsim.B.qsvt.M.opt) holds for Cabaliser too, exactly on the grid: both compilers end with one measured vertex per non-Clifford rotation, so they agree on M. Counts are recorded by experiments/compilers/run.py in the pinned RRE environment (Cabaliser 10f5c4e).
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/analysis.py, src/mbqc_verify/compile/compilers.py, src/mbqc_verify/compile/cabaliser_adapter.py,
+  experiments/compilers/results/cabaliser.json]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: qsvt_calls_per_sequence, compiler: cabaliser}
+depends_on:
+- {node: hamsim.B.qsvt.M.opt, kind: variant_of}
+- {node: hamsim.B.cabaliser_graphs_match, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: qsvt
+    compiler: cabaliser
+    quantity: M
+    coef: [36, -18, 88, -21]
+- kind: mutation
+  params: {target: scaling}
+tags: [hamsim, qsvt, resources, cabaliser, compiler-variant]

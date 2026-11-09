@@ -5,13 +5,16 @@ title: GQSP N formula (unoptimized)
 statement: |
   Compiling the GQSP circuit for n ≥ 2 data qubits gate by gate (unoptimized), with d ≥ 1, gives a pattern with N = (436n − 244)d + 4n + 10 vertices.
 statement_tex: N = (436n - 244)d + 4n + 10
+lean_decl: MBQC.Results.HamSim.gqsp_vertices_unopt
 code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
-conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: gqsp_laurent_degree}
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: gqsp_laurent_degree, compiler: graphix}
 depends_on:
 - {node: transfer.gate_to_mbqc, kind: instantiates}
-- {node: transfer.gate_to_mbqc_counts, kind: instantiates}
-- {node: def.resource_counts, kind: uses}
 - {node: def.jcz_construction, kind: uses}
+- {node: def.graphix_gates, kind: uses}
+- {node: transfer.gate_counts, kind: uses}
+- {node: transfer.gate_to_mbqc_counts, kind: uses}
+- {node: assume.hamsim.gqsp_unopt_gates, kind: assumes}
 checks:
 - kind: scaling
   params:
@@ -23,4 +26,8 @@ checks:
   params: {target: scaling}
 - kind: differential
   params: {method: gqsp}
+- {kind: lean}
+- {kind: vocabulary}
+- kind: nonvacuity
+  params: {witness: MBQC.Results.HamSim.gqsp_unopt_nonvacuous}
 tags: [hamsim, gqsp, resources, unoptimized]

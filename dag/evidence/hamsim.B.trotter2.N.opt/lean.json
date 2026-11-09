@@ -1,0 +1,89 @@
+{
+ "input_hash": "16ad954c41a54cc1",
+ "inputs": {
+  "check_code": {
+   "verification/truth/lean/check.py": "029219c782e5286887cdcfb44b0b501ccf6fbfc576d524fddc51a7afb4b31807",
+   "verification/truth/lean/leanrun.py": "6cea0e6e8353cc39b75cc5e8e95ada1dba194a8cdf6dc71a55324b54fc69fb96",
+   "verification/truth/lean/proof.py": "6525c42aa321ab57f1107009507be1bb1cd81ebd4f58d40fa8f73866e082e7c5"
+  },
+  "check_params": "44136fa355b3678a",
+  "code": {
+   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
+   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
+   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+  },
+  "definitions": {
+   "def.graph_state": "49d988a8e94f1186",
+   "def.pattern": "20379a417004e168",
+   "def.resource_counts": "b75d507a2b247ac8"
+  },
+  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
+  "parents": {
+   "assume.hamsim.trotter2_opt_N": "46c96c64ea8c711e:750aa105",
+   "lemma.bilinear_interpolation": "7dbe5f6a13a24a28:6d232117",
+   "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
+  },
+  "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
+  "statement": "1bd6a9f5f097551f"
+ },
+ "kind": "lean",
+ "name": "lean",
+ "node": "hamsim.B.trotter2.N.opt",
+ "params": {},
+ "provenance": {
+  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "dirty": true,
+  "finished": "2026-11-09T16:40:37+00:00",
+  "quick": false,
+  "seconds": 0.01,
+  "versions": {
+   "graphix": "0.4.1",
+   "numpy": "2.5.4",
+   "python": "3.13.18",
+   "qiskit": "2.5.0",
+   "scipy": "1.18.1",
+   "sympy": "1.14.0"
+  }
+ },
+ "result": {
+  "domain": "all values in the statement",
+  "evidence": {
+   "assumption_axioms": [
+    "MBQC.Assumptions.HamSim.Trotter2OptN.affine_k",
+    "MBQC.Assumptions.HamSim.Trotter2OptN.affine_n",
+    "MBQC.Assumptions.HamSim.Trotter2OptN.at_2_1",
+    "MBQC.Assumptions.HamSim.Trotter2OptN.at_2_2",
+    "MBQC.Assumptions.HamSim.Trotter2OptN.at_3_1",
+    "MBQC.Assumptions.HamSim.Trotter2OptN.at_3_2"
+   ],
+   "assumption_nodes": [
+    "assume.hamsim.trotter2_opt_N"
+   ],
+   "axioms": [
+    "Classical.choice",
+    "MBQC.Assumptions.HamSim.Trotter2OptN.affine_k",
+    "MBQC.Assumptions.HamSim.Trotter2OptN.affine_n",
+    "MBQC.Assumptions.HamSim.Trotter2OptN.at_2_1",
+    "MBQC.Assumptions.HamSim.Trotter2OptN.at_2_2",
+    "MBQC.Assumptions.HamSim.Trotter2OptN.at_3_1",
+    "MBQC.Assumptions.HamSim.Trotter2OptN.at_3_2",
+    "Quot.sound",
+    "propext"
+   ],
+   "decl": "MBQC.Results.HamSim.trotter2_vertices_opt",
+   "module": "MBQC.Results.HamSim.Opt",
+   "node_deps": [
+    "assume.hamsim.trotter2_opt_N",
+    "lemma.bilinear_interpolation"
+   ]
+  },
+  "frontier": [
+   "assume.hamsim.trotter2_opt_N"
+  ],
+  "grants": "proved_modulo",
+  "outcome": "pass",
+  "seed": null,
+  "summary": "proved in Lean from 6 assumption axiom(s) of assume.hamsim.trotter2_opt_N"
+ }
+}

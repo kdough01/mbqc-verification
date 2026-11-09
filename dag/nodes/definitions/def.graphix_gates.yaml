@@ -1,0 +1,24 @@
+id: def.graphix_gates
+kind: definition
+title: Graphix's per-gate J/CZ decompositions
+statement: |
+  A circuit is a list of Graphix gates (CNOT, CZ, RZZ, CCX, H, X, RX, RY, RZ, U). Each gate becomes a fixed sequence of J and CZ instructions (CNOT: J t, CZ c t, J t; H: one J; RZZ: 6 J and 2 CZ; CCX: 30 J and 6 CZ; X, RX, RZ: 2 J; RY, U: 4 J; CZ: one CZ), and a circuit's J/CZ stream is the concatenation of its gates' sequences. countKind counts a circuit's gates of one kind; NoCancel says no CZ of a stream toggles off an edge that is already there.
+description: |
+  How Graphix 0.4.1 turns gates into J/CZ instructions (instructions_to_jcz), reimplemented in Lean (lean/MBQC/Defs/GraphixGates.lean) with angles and global phases dropped, since they change no count. The differential check compares the two streams token for token, on every gate kind with several qubit orders and on whole transpiled circuits.
+lean_decl: [MBQC.Defs.GateKind, MBQC.Defs.Gate, MBQC.Defs.gatesToJcz, MBQC.Defs.countKind, MBQC.Defs.noCancelFrom, MBQC.Defs.NoCancel]
+code: [src/mbqc_verify/compile/qiskit_to_mbqc.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped}
+depends_on:
+- {node: def.jcz_construction, kind: uses}
+checks:
+- kind: differential
+  params:
+    gates: true
+    instances:
+    - {method: trotter2, n: 2, k: 1}
+    - {method: trotter2, n: 5, k: 4}
+    - {method: qsvt, n: 2, k: 3}
+    - {method: qsvt, n: 3, k: 5}
+    - {method: gqsp, n: 2, k: 1}
+    - {method: gqsp, n: 4, k: 3}
+tags: [mbqc, vocabulary, graphix]

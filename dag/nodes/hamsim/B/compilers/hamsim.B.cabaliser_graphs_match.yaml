@@ -1,0 +1,17 @@
+id: hamsim.B.cabaliser_graphs_match
+kind: theorem
+layer: B
+title: Cabaliser's graph states implement their circuits
+statement: |
+  For the listed second-order Trotter instances, the graph state Cabaliser compiles from the circuit, measured as Cabaliser schedules it, maps every input state to the circuit's output state (post-selected branch).
+description: |
+  Translation validation for the Cabaliser adapter: without it, its counts could be counts of a wrongly translated circuit. The compiled graph is simulated as a statevector with the semantics of Cabaliser's own local_simulator (checked against it on small widgets), on every computational basis input and on random inputs. Only the instances whose inputs and graph vertices fit in one statevector are simulated; the QSVT and GQSP graphs have hundreds of vertices. Each non-Clifford Rz gets its own tag with its own angle, so the check uses the circuit's real angles (RRE's compiled output keeps only that a rotation is arbitrary).
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/analysis.py, src/mbqc_verify/compile/compilers.py, src/mbqc_verify/compile/cabaliser_adapter.py,
+  experiments/compilers/results/cabaliser.json]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, compiler: cabaliser}
+depends_on:
+- {node: hamsim.compiled_patterns_match, kind: variant_of}
+checks:
+- kind: translation
+  params: {compiler: cabaliser, atol: 1.0e-09}
+tags: [mbqc, translation-validation, cabaliser, compiler-variant]

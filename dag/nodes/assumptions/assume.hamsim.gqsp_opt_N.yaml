@@ -1,0 +1,20 @@
+id: assume.hamsim.gqsp_opt_N
+kind: assumption
+title: 'Graphix-optimized GQSP vertex counts: structure and corners'
+statement: |
+  Let N(n, d) be the vertex count of the Graphix-optimized GQSP pattern (n ≥ 2, d ≥ 1). (i) N(n, d + 1) − N(n, d) does not depend on d; (ii) N(n + 1, d) − N(n, d) does not depend on n; (iii) N(2, 1) = 138, N(2, 2) = 258, N(3, 1) = 226, N(3, 2) = 426.
+description: |
+  What Lean cannot compute: facts about Graphix's output, stated as the axioms of MBQC.Assumptions.HamSim.GqspOptN (lean/MBQC/Assumptions/HamSimOpt.lean). The scaling check counts the real patterns on the whole grid, held-out points included. A reviewer should judge whether (i) and (ii) are plausible for the Graphix-optimized (Pauli-removed) pattern beyond the grid.
+lean_decl: [MBQC.Assumptions.HamSim.GqspOptN]
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: gqsp_laurent_degree, compiler: graphix_opt}
+depends_on:
+- {node: def.resource_counts, kind: uses}
+checks:
+- kind: scaling
+  params:
+    method: gqsp
+    optimize: true
+    quantity: N
+    coef: [80, -40, 8, 2]
+tags: [hamsim, gqsp, resources, Graphix-optimized]

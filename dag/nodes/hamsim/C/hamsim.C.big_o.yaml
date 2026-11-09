@@ -3,12 +3,22 @@ kind: theorem
 layer: C
 title: Same Big-O, different prefactors
 statement: |
-  For QSVT and GQSP, N, M, E = O(n · (1 + α|t| + log(1/ε))), since the degree needed for accuracy ε is O(1 + α|t| + log(1/ε)) and each cost is linear in n per degree.
+  For QSVT and GQSP, N, M, E = O(n · (1 + α|t| + log(1/ε))), since the degree needed for accuracy ε is O(1 + α|t| + log(1/ε)) and each cost is linear in n per degree. Explicitly, for the unoptimized patterns: if D, d ≤ c(1 + X), every one of the six counts is at most 800 · n · c(1 + X).
 statement_tex: N, M, E = O\big(n\,[1 + \alpha|t| + \log(1/\epsilon)]\big)
 description: |
-  No check yet. Needs a bound on the smallest degree from the Bessel tail, plus the Layer B formulas.
+  Lean proves the explicit form (MBQC.Results.HamSim.big_o_unopt) from the six unoptimized Layer B formulas: the per-degree cost is linear in n with a coefficient below 800. That the degree needed for accuracy ε is O(1 + α|t| + log(1/ε)) enters as the hypothesis D, d ≤ c(1 + X), where X bounds α|t| + log(1/ε); it follows from the Jacobi–Anger truncation (the Bessel tail decays superexponentially past α|t|), which Lean does not prove yet.
+lean_decl: MBQC.Results.HamSim.big_o_unopt
 depends_on:
 - {node: hamsim.B.qsvt.N.unopt, kind: uses}
+- {node: hamsim.B.qsvt.M.unopt, kind: uses}
+- {node: hamsim.B.qsvt.E.unopt, kind: uses}
 - {node: hamsim.B.gqsp.N.unopt, kind: uses}
+- {node: hamsim.B.gqsp.M.unopt, kind: uses}
+- {node: hamsim.B.gqsp.E.unopt, kind: uses}
 - {node: assume.jacobi_anger_truncation, kind: assumes}
 tags: [hamsim, consequence, asymptotics]
+checks:
+- {kind: lean}
+- {kind: vocabulary}
+- kind: nonvacuity
+  params: {witness: MBQC.Results.HamSim.big_o_unopt_nonvacuous}

@@ -1,13 +1,13 @@
 {
- "input_hash": "ebff5a6340a2f6ef",
+ "input_hash": "59ef450633ceeb63",
  "inputs": {
   "check_code": {
-   "verification/faithfulness/differential/check.py": "de20c4cbe92ef720ed4bdc04054eabbdc3524a686c5ee9a6735b93e1018c197d",
-   "verification/truth/lean/check.py": "7d80b6820748d5428f83693c97f8a28bf2a0343a469ad283155dbdaf1a514af1",
-   "verification/truth/lean/leanrun.py": "140e3dbe3f2f98ad8fa172e5833f3b5bc08e07d2e82abbce0c755e2eba102f9c",
+   "verification/faithfulness/differential/check.py": "c3bd14a9b21d289d8d112a3a573597245e33f1acaa3b60092ec374a81c90081e",
+   "verification/truth/lean/check.py": "029219c782e5286887cdcfb44b0b501ccf6fbfc576d524fddc51a7afb4b31807",
+   "verification/truth/lean/leanrun.py": "6cea0e6e8353cc39b75cc5e8e95ada1dba194a8cdf6dc71a55324b54fc69fb96",
    "verification/truth/lean/proof.py": "6525c42aa321ab57f1107009507be1bb1cd81ebd4f58d40fa8f73866e082e7c5",
-   "verification/truth/scaling/check.py": "ef885ffc8ea324e15bae0281a893be69bfe6a0979819878f65123841873c8455",
-   "verification/truth/scaling/grids.py": "86b9cf52a70abea2dfbad04af6928bfddb626a30c8d5d4291e6e49135c00595f"
+   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
+   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
   },
   "check_params": "9e70643782504bae",
   "code": {
@@ -17,20 +17,22 @@
   },
   "definitions": {
    "def.graph_state": "49d988a8e94f1186",
+   "def.graphix_gates": "17ace17c95ba5577",
    "def.jcz_construction": "392cb6fd4770bc56",
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
-  "lean_sources": "2ae7e14ff97f62a25967c9b04792ede9c324c71f296cb881a9a5c2642a01fb87",
+  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
+   "assume.hamsim.gqsp_unopt_gates": "5465e0b3b736ec34:6c8a0443",
+   "def.graphix_gates": "17ace17c95ba5577:6029ded9",
    "def.jcz_construction": "392cb6fd4770bc56:b8ffd8b5",
-   "def.resource_counts": "b75d507a2b247ac8:4f53cda1",
-   "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1",
-   "transfer.gate_to_mbqc_counts": "34befe39e1070a89:964b423a"
+   "transfer.gate_counts": "9740a55b0cf730e9:964b423a",
+   "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
-  "statement": "01909130ecf68cd0"
+  "statement": "ed2e1bad65aa8a37"
  },
  "kind": "differential",
  "name": "differential",
@@ -39,11 +41,11 @@
   "method": "gqsp"
  },
  "provenance": {
-  "commit": "51d996c639f8bb97ed0f1d96444e632bd3f07538",
+  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
   "dirty": true,
-  "finished": "2026-11-08T17:49:53+00:00",
+  "finished": "2026-11-09T16:40:29+00:00",
   "quick": false,
-  "seconds": 1.57,
+  "seconds": 1.41,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",

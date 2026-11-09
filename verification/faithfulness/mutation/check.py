@@ -16,7 +16,8 @@ Node params:
 from __future__ import annotations
 
 from verification.base import Check, CheckResult, register
-from verification.truth.scaling.grids import counts, mismatches
+from verification.truth.scaling.check import compiler_of
+from verification.truth.scaling.grids import compiler_counts, gate_counts, mismatches
 
 
 @register
@@ -31,7 +32,9 @@ class MutationCheck(Check):
             raise ValueError(f"unknown mutation target {params.get('target')!r}")
         spec = next(c for c in node.checks if c.kind == "scaling")
         sp = spec.params
-        data = counts(sp["method"], bool(sp["optimize"]), ctx.quick, ctx.cache)
+        q = sp["quantity"]
+        data = (gate_counts(sp["method"], ctx.quick, ctx.cache) if q.startswith("gate:") or q == "width"
+                else compiler_counts(compiler_of(sp), sp["method"], ctx.quick, ctx.cache))
         base = [str(c) for c in sp["coef"]]
         if mismatches(base, data, sp["quantity"]):
             return CheckResult("skip", summary="the unmutated formula already fails; nothing to compare")

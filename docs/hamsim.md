@@ -13,11 +13,14 @@ It rebuilds everything the slide talks about, runs it, and tests each claim. Eve
 | `src/mbqc_verify/hamsim/analysis.py` | Repetitions for accuracy ε, post-selected operators, MBQC resource counts |
 | `src/mbqc_verify/hamsim/slide.py` | The slide's formulas, as data |
 | `src/mbqc_verify/compile/qiskit_to_mbqc.py` | Qiskit circuit → Graphix pattern, resource counts, equivalence check |
+| `src/mbqc_verify/compile/compilers.py` | One interface for every compiler compared (Graphix unoptimized, Graphix-optimized, Cabaliser, …) |
+| `src/mbqc_verify/compile/cabaliser_adapter.py`, `experiments/compilers/run.py` | Cabaliser in the pinned RRE environment; records its counts and translation runs |
 | `verification/truth/numerical/` | Layer A accuracy; equal-accuracy comparison |
 | `verification/truth/translation/` | Compiled pattern equals its circuit, per instance |
 | `verification/truth/scaling/` | Layer B formulas against compiled counts |
 | `verification/truth/symbolic/`, `verification/truth/refuter/` | Layer C: positivity certificate; counterexample search |
-| `lean/MBQC/Results/HamSim/` | Lean proofs of the Layer C claims and of the optimized QSVT vertex formula |
+| `lean/MBQC/Results/HamSim/` | Lean proofs: the slide's Layer C claims, all 9 unoptimized and 6 Graphix-optimized formulas (modulo named assumptions), the disproofs of the slide's claim with our formulas, and the Big-O bound |
+| `lean/MBQC/Defs/GraphixGates.lean`, `lean/MBQC/Assumptions/HamSim*.lean` | Graphix's per-gate J/CZ decompositions; what Lean takes on trust about the transpiled circuits and optimized patterns |
 | `experiments/hamsim/run_all.py` | The full printed report; writes `results/hamsim_results.json` |
 | `experiments/hamsim/plot_results.py` | Six figures from the results file into `figures/` |
 
@@ -26,7 +29,7 @@ It rebuilds everything the slide talks about, runs it, and tests each claim. Eve
 | Layer | Claim | Comes from | Checked by | DAG nodes |
 | --- | --- | --- | --- | --- |
 | **A. Accuracy** | "This many repetitions gives error ≤ ε" | Known circuit-model results | Build the circuit, simulate it, compare with the exact e^{−iHt} | `hamsim.A.*` |
-| **B. Cost formulas** | "N, E, M = (per-repetition cost) × repetitions + setup" | The MBQC compilation | Compile over a grid of (n, repetitions), count, test the formula on held-out points; Lean for one formula | `hamsim.B.*` |
+| **B. Cost formulas** | "N, E, M = (per-repetition cost) × repetitions + setup" | The MBQC compilation | Lean, from the circuits' gate counts (unoptimized) or four corners and affinity (optimized); the same formulas compiled over a grid, tested on held-out points, per compiler | `hamsim.B.*` |
 | **C. Consequences** | Big-O, and "d ≥ g ⇒ GQSP is cheaper" | Algebra on layer B | Positivity certificate (sympy), Lean proof, counterexample search | `hamsim.C.*` |
 
 "Repetitions" means Trotter steps r, the QSVT degree D, or the GQSP degree d.
@@ -42,16 +45,27 @@ It rebuilds everything the slide talks about, runs it, and tests each claim. Eve
 - Compiled MBQC patterns match their circuits exactly on random input states (`hamsim.compiled_patterns_match`,
   bounded).
 
-**Layer B: the cost formulas are exact, and one is now proved modulo named assumptions.**
+**Layer B: the cost formulas are exact, and every one with a formula is proved in Lean modulo named assumptions.**
 - Unoptimized patterns give exact bilinear formulas for N, E and M for all three methods, on held-out points too. Lean's
   independent model of Graphix's J-∧z construction reproduces every one of those counts (differential check).
+- **All nine unoptimized formulas are proved in Lean** for all n and repetitions (`MBQC.Results.HamSim.*_unopt`). Lean
+  models Graphix's per-gate J/CZ decomposition (`def.graphix_gates`; token-for-token equal to Graphix's on every gate
+  kind and on whole circuits) and proves how gate counts become N, M and E (`transfer.gate_counts`). What it takes on
+  trust is what Qiskit's transpiler outputs: exact bilinear counts of each gate kind and that no CZ cancels an edge
+  (`assume.hamsim.<method>_unopt_gates`), each checked by counting the real circuits on the grid.
 - Graphix-optimized patterns give exact formulas for N and M but **not for E**. Removing Pauli measurements rewires edges
   depending on the graph's details. The scaling check now proves this on the grid: the unique bilinear formula through
   the four corner points misses other points.
 - **Our optimized QSVT costs exactly 36n − 18 vertices per degree, the slide's coefficient**, from an independent
   implementation. The setup term differs: 92n − 20 for us, 14n + 23 on the slide. In Lean, N = (36n − 18)D + 92n − 20
   for *all* n ≥ 2 and odd D ≥ 3 follows from the interpolation lemma, given four corner counts and affinity in each
-  argument (`assume.hamsim.qsvt_opt_N`).
+  argument (`assume.hamsim.qsvt_opt_N`). The same argument now proves the other four Graphix-optimized formulas
+  (Trotter N and M, GQSP N and M, QSVT M).
+- **Other compilers.** Each formula is a claim about one compiler (the `compiler` convention), and variants test it on
+  others (`hamsim.B.<method>.<N|M|E>.cabaliser`). With Cabaliser, N and M follow the Graphix-optimized formulas exactly for
+  Trotter and QSVT, and for GQSP with exactly one more vertex; Cabaliser's Trotter E is bilinear, (4n − 2)r + 2n, where
+  Graphix-optimized E is not; QSVT and GQSP E have no formula under either. Cabaliser's compiled graphs reproduce
+  their circuits on every input for the Trotter instances small enough to simulate (`hamsim.B.cabaliser_graphs_match`).
 - **Our GQSP doesn't match.** Ours costs 80n − 40 per degree, the slide's 12n − 6. Each of our GQSP degrees uses two
   *controlled* block-encoding calls, and controlling SELECT costs a Toffoli per term. The slide's GQSP per degree costs
   exactly one *uncontrolled* call in our compiler: 12n − 6 = (36n − 18)/3. **How it avoids that control overhead is the
@@ -63,7 +77,11 @@ It rebuilds everything the slide talks about, runs it, and tests each claim. Eve
 - The slide's claim (d ≥ g ⇒ QSVT uses more vertices, CZs and measurements, for all n ≥ 2) is **proved in Lean** from
   its formulas, by the same positivity certificate sympy finds.
 - With our formulas the same claim is **refuted** (counterexamples recorded in the evidence), except optimized E,
-  which has no formula and holds on every grid pair compared.
+  which has no formula and holds on every grid pair compared. Lean **disproves** it too, from the Layer B formulas:
+  at n = 2, D = d = 5 (unoptimized) and n = 2, D = d = 3 (optimized), QSVT costs less.
+- **Same Big-O** (`hamsim.C.big_o`, Lean): if both degrees are at most c(1 + X), every unoptimized count of QSVT and
+  GQSP is at most 800 · n · c(1 + X). That the degree needed is O(1 + α|t| + log(1/ε)) is the Jacobi–Anger part,
+  which enters as that hypothesis.
 - That comparison pairs our QSVT D with our GQSP d, which count different things; the convention check flags it. At
   equal accuracy (the comparison that doesn't depend on degree conventions), second-order Trotter is cheapest at low
   precision and QSVT at high precision, and our GQSP is never cheapest. This holds with both the unoptimized and the
