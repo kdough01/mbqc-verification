@@ -86,7 +86,7 @@ Other commands: `dagtool show <id>`, `dagtool queue`, `dagtool render`, `dagtool
 
 ## Papers from the Thrust 2 review site
 
-The team's review site ([genesis-thrust2-review.fly.dev](https://genesis-thrust2-review.fly.dev), code in
+The team's review site ([genesis-thrust2-review.northcentralus.cloudapp.azure.com](https://genesis-thrust2-review.northcentralus.cloudapp.azure.com), code in
 `doe-genesis-ai-quantum/thrusts/2-theorem-transfer/review-site`) splits each uploaded paper into modules. Every theorem
 module becomes a DAG theorem, and the site's **Theorem DAG** tab shows this DAG.
 

@@ -1,5 +1,5 @@
 """
-papers.py — the link to the Thrust 2 review site (Modulus, genesis-thrust2-review.fly.dev).
+papers.py — the link to the Thrust 2 review site (Modulus, genesis-thrust2-review.northcentralus.cloudapp.azure.com).
 
     dagtool pull-papers --server URL   add every open paper theorem as dag/nodes/papers/<paper>/<id>.yaml
     dagtool export [--out FILE]        the computed DAG as JSON: what the site's Theorem DAG tab shows
@@ -25,7 +25,7 @@ import yaml
 
 from .model import Dag
 
-DEFAULT_SERVER = "https://genesis-thrust2-review.fly.dev"
+DEFAULT_SERVER = "https://genesis-thrust2-review.northcentralus.cloudapp.azure.com"
 STATEMENT_LIMIT = 6000
 
 

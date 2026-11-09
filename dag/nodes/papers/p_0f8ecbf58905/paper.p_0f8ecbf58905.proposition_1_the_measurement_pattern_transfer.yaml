@@ -15,7 +15,7 @@ description: From "From sparse-oracle quantum signal processing to compiled meas
   estimates", pages 2, 3 on the review site. Added by `dagtool pull-papers`; it stays open until depends_on
   edges and checks are added.
 paper:
-  server: https://genesis-thrust2-review.fly.dev
+  server: https://genesis-thrust2-review.northcentralus.cloudapp.azure.com
   theorem_id: paper.p_0f8ecbf58905.proposition_1_the_measurement_pattern_transfer
   paper_id: p_0f8ecbf58905
   module_id: m_30d61b8cb04a
