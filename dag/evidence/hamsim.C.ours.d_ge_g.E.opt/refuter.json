@@ -1,5 +1,5 @@
 {
- "input_hash": "8fc7c6d4c231de7d",
+ "input_hash": "64a4e7f2e6fa6b8f",
  "inputs": {
   "check_code": {
    "requirements-tools.txt": "10d7364009957536e3eafb782d1920d29f038968b0e734b33737e6f82d92f630",
@@ -24,7 +24,7 @@
    "hamsim.B.qsvt.E.opt": "0b08245be78fc110:a66af63b"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
-  "statement": "4a599b2124f2fe45"
+  "statement": "292365596ac0e21b"
  },
  "kind": "refuter",
  "name": "refuter",
@@ -35,11 +35,11 @@
   "source": "counts"
  },
  "provenance": {
-  "commit": "974c33a799e6a4968fded220d703793704238d16",
-  "dirty": false,
-  "finished": "2026-11-08T18:26:38+00:00",
+  "commit": "490da67a64b039b4ce5fa5640da725cfa33d2506",
+  "dirty": true,
+  "finished": "2026-11-09T15:37:32+00:00",
   "quick": false,
-  "seconds": 279.98,
+  "seconds": 0.02,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",

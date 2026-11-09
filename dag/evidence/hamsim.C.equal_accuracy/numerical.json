@@ -1,5 +1,5 @@
 {
- "input_hash": "ef485c1996065ffb",
+ "input_hash": "e5d630e2e97e61d3",
  "inputs": {
   "check_code": {
    "verification/truth/numerical/check.py": "f283567880e456ab56867e2f4128390e417708e0ee723d77aab3a4d344e6deab",
@@ -22,15 +22,15 @@
    "hamsim.A.gqsp_accuracy": "70ccbb305f13986b:42cfa68b",
    "hamsim.A.qsvt_accuracy": "aac2e271ba02870f:5ba13820",
    "hamsim.A.trotter2_accuracy": "c0b75c67d96f5148:aa669e6e",
-   "hamsim.B.gqsp.N.opt": "d2fe577177b7638b:f1d24151",
+   "hamsim.B.gqsp.N.opt": "3c3772d0101ab166:f1d24151",
    "hamsim.B.gqsp.N.unopt": "86b6ef576cce0076:d5a4fd29",
-   "hamsim.B.qsvt.N.opt": "083816082dc7a3c4:1db8577b",
+   "hamsim.B.qsvt.N.opt": "42128ef7c94bc07e:1db8577b",
    "hamsim.B.qsvt.N.unopt": "a5eec036b0d93dc9:57f0a7fc",
-   "hamsim.B.trotter2.N.opt": "eb7613d57222d436:5e2d000d",
+   "hamsim.B.trotter2.N.opt": "83075ea3f34c02dd:5e2d000d",
    "hamsim.B.trotter2.N.unopt": "695d386abb66078f:4f78ea5e"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
-  "statement": "51078822e77ab0e7"
+  "statement": "278860c2dcc10ac1"
  },
  "kind": "numerical",
  "name": "numerical",
@@ -60,14 +60,14 @@
   "which": "equal_accuracy"
  },
  "provenance": {
-  "commit": null,
-  "dirty": null,
-  "finished": "2026-10-29T13:28:03+00:00",
+  "commit": "490da67a64b039b4ce5fa5640da725cfa33d2506",
+  "dirty": true,
+  "finished": "2026-11-09T15:37:53+00:00",
   "quick": false,
-  "seconds": 39.94,
+  "seconds": 20.13,
   "versions": {
    "graphix": "0.4.1",
-   "numpy": "2.5.3",
+   "numpy": "2.5.4",
    "python": "3.13.18",
    "qiskit": "2.5.0",
    "scipy": "1.18.1",
