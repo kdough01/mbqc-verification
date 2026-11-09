@@ -3,7 +3,7 @@ kind: theorem
 layer: C
 title: Cheapest method at equal accuracy
 statement: |
-  At equal accuracy, for n ∈ {4, 16, 64}, t ∈ {1, 10} and ε ∈ {10⁻², 10⁻⁴, 10⁻⁸}, with either our unoptimized or optimized vertex formulas: GQSP is never the method with the fewest vertices, second-order Trotter is cheapest at ε = 10⁻², and QSVT is cheapest at ε = 10⁻⁸.
+  At equal accuracy, for n ∈ {4, 16, 64}, t ∈ {1, 10} and ε ∈ {10⁻², 10⁻⁴, 10⁻⁸}, with either our unoptimized or Graphix-optimized vertex formulas: GQSP is never the method with the fewest vertices, second-order Trotter is cheapest at ε = 10⁻², and QSVT is cheapest at ε = 10⁻⁸.
 description: |
   This comparison does not depend on how each method counts degree. Trotter steps use the triangle-inequality norm bound, which overestimates them, so Trotter does even better in practice.
 code: [src/mbqc_verify/hamsim/analysis.py, src/mbqc_verify/hamsim/qsp_angles.py]

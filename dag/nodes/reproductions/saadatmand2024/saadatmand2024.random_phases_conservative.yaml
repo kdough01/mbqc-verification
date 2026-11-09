@@ -4,7 +4,7 @@ title: Random QSP phases give a conservative estimate
 statement: 'Building the QSP circuit with random phase angles (and the correct number of them) gives resource counts
   at least as large as with the accurate phases: “This provides a conservative overestimate of the resource estimations”
   (§III.3).'
-description: experiments/rre/phases.py compares pyLIQTR 1.3.3's random and optimized phases for FH 2×2 and 4×4.
+description: experiments/rre/phases.py compares pyLIQTR 1.3.3's random and Graphix-optimized phases for FH 2×2 and 4×4.
   pyLIQTR's random mode uses the cosine phase count for the sine sequence too (23/23 instead of 23/24 at 2×2), so
   the random circuit is slightly smaller.
 code:
@@ -39,7 +39,7 @@ checks:
     domain: FH 4x4, pyLIQTR 1.3.3 estimate_resources
 acknowledged:
 - code: refuted
-  reason: 'Recorded counterexample: random phases give fewer T gates than optimized phases at 2x2 and 4x4 (one phase
+  reason: 'Recorded counterexample: random phases give fewer T gates than Graphix-optimized phases at 2x2 and 4x4 (one phase
     fewer). Small (0.5-2%), but the claimed direction does not hold.'
 tags:
 - qsp

@@ -314,7 +314,7 @@ a { color: var(--accent); }
           <div class="seg" id="circview" role="group" aria-label="What to show">
             <button data-v="circuit" aria-pressed="true">Qiskit circuit</button>
             <button data-v="unopt" aria-pressed="false">MBQC pattern</button>
-            <button data-v="opt" aria-pressed="false">Optimized pattern</button>
+            <button data-v="opt" aria-pressed="false">Graphix-optimized pattern</button>
           </div>
           <span class="circstats" id="circstats"></span>
         </div>
@@ -350,7 +350,7 @@ a { color: var(--accent); }
     proved: "Lean proof with only standard axioms", proved_modulo: "proved, given the assumptions in its frontier",
     defined: "a definition: reviewed, not proved", assumed: "imported from the literature",
     bounded: "proved on a stated finite domain or instance", empirical: "evidence on a stated domain, no proof",
-    conjecture: "no evidence yet", broken: "relies on a refuted node", refuted: "a counterexample exists"};
+    conjecture: "no evidence yet", broken: "relies on a refuted node", refuted: "a check refuted it (the sheet says which kind: a counterexample, a failed reproduction, a scaling fit, ...)"};
   const FAITH_LABEL = {unreviewed: "unreviewed", tested: "tested", human_reviewed: "human-reviewed"};
   const KIND_LABEL = {definition: "Definition", core: "Core lemma", assumption: "Assumption", transfer: "Transfer theorem", lemma: "Lemma", theorem: "Theorem"};
   const tcolor = t => `var(${TRUTH_VAR[t] || "--t-conjecture"})`;
@@ -710,7 +710,7 @@ a { color: var(--accent); }
     circSvg.innerHTML = out.join("");
     const st = P.stats, other = inst.patterns[which === "opt" ? "unopt" : "opt"].stats;
     $("#circstats").textContent = `N ${fmt(st.N)} vertices · E ${fmt(st.E)} CZ edges · M ${fmt(st.M)} measurements · peak ${fmt(st.space)} live qubits` +
-      (which === "opt" ? ` (unoptimized: N ${fmt(other.N)}, E ${fmt(other.E)})` : "");
+      (which === "opt" ? ` (Graphix unoptimized: N ${fmt(other.N)}, E ${fmt(other.E)})` : "");
     $("#circlegend").innerHTML = [["input", `<rect x="1" y="1" width="9" height="9" fill="var(--ink-3)" stroke="var(--ink)"/>`],
       ["Pauli measurement", `<circle cx="5.5" cy="5.5" r="4.5" fill="var(--ink-3)"/>`],
       ["non-Pauli measurement", `<circle cx="5.5" cy="5.5" r="4.5" fill="var(--pat-nonpauli)"/>`],
@@ -874,7 +874,7 @@ a { color: var(--accent); }
     const inst = CIRCUITS.find(c => c.method === n.method);
     if (!inst) return "";
     return `<div class="section"><h4>Circuit</h4><p class="prose">Smallest instance: ${esc(inst.label)}. The circuit is drawn as built in Qiskit; the patterns are what the compiler produces from it.</p>
-      <div class="circbtns"><button data-circ="circuit">Qiskit circuit</button><button data-circ="unopt">MBQC pattern</button><button data-circ="opt">Optimized pattern</button></div></div>`;
+      <div class="circbtns"><button data-circ="circuit">Qiskit circuit</button><button data-circ="unopt">MBQC pattern</button><button data-circ="opt">Graphix-optimized pattern</button></div></div>`;
   }
   const TEST_LABEL = { passed: "passed", failed: "failed", skipped: "skipped", stale: "stale", not_run: "not run" };
   const TEST_PILL = { passed: "pass", failed: "fail", skipped: "skip", stale: "stale", not_run: "skip" };
@@ -936,8 +936,9 @@ a { color: var(--accent); }
       <div class="thm${["definition"].includes(n.kind) ? " upright" : ""}"><b>${esc(KIND_LABEL[n.kind])}.</b> <span class="body">${esc(n.statement)}</span>
         ${n.statement_tex ? `<details style="margin-top:8px"><summary>TeX</summary><pre>${esc(n.statement_tex)}</pre></details>` : ""}</div>
       <div class="statgrid">
-        <div class="stat"><div class="k">Truth</div><div class="v"><i class="sw" style="background:${tcolor(s.truth)}"></i>${TRUTH_LABEL[s.truth]}</div>
-          <div class="d">${esc(TRUTH_HELP[s.truth])}${s.own_truth !== s.truth && s.truth !== "broken" ? `; own evidence: ${TRUTH_LABEL[s.own_truth]}` : ""}</div>
+        <div class="stat"><div class="k">Truth</div><div class="v"><i class="sw" style="background:${tcolor(s.truth)}"></i>${
+            n.verdict && n.verdict.state === "rejected" && n.verdict.label ? esc(n.verdict.label) : TRUTH_LABEL[s.truth]}</div>
+          <div class="d">${esc(n.verdict && n.verdict.state === "rejected" && n.verdict.explain ? n.verdict.explain : TRUTH_HELP[s.truth])}${s.own_truth !== s.truth && s.truth !== "broken" ? `; own evidence: ${TRUTH_LABEL[s.own_truth]}` : ""}</div>
           ${s.domain ? `<div class="d">On: ${esc(s.domain)}</div>` : ""}
           ${s.frontier.length ? `<div class="d">Frontier (unproved, assumed):</div><div class="frontier">${s.frontier.map(f => `<button class="fchip" data-goto="${esc(f)}">${esc(f)}</button>`).join("")}</div>` : ""}
           ${s.stale ? `<div class="d" style="color:var(--warn)">Stale: inputs changed since the evidence ran.</div>` : s.upstream_stale ? `<div class="d" style="color:var(--warn)">Something it relies on is stale.</div>` : ""}</div>

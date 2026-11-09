@@ -1,7 +1,7 @@
 id: hamsim.B.trotter2.E.opt
 kind: theorem
 layer: B
-title: 'second-order Trotter: optimized E has no bilinear formula'
+title: 'second-order Trotter: Graphix-optimized E has no bilinear formula'
 statement: |
   Compiling the second-order Trotter circuit and then after standardizing and removing Pauli measurements, the number of CZ edges E is not of the form (an + b)r + cn + e for any rationals a, b, c, e.
 description: |
@@ -15,4 +15,4 @@ depends_on:
 checks:
 - kind: scaling
   params: {method: trotter2, optimize: true, quantity: E, claim: not_bilinear}
-tags: [hamsim, trotter2, resources, optimized]
+tags: [hamsim, trotter2, resources, Graphix-optimized]

@@ -1,7 +1,7 @@
 id: hamsim.B.qsvt.E.opt
 kind: theorem
 layer: B
-title: 'QSVT: optimized E has no bilinear formula'
+title: 'QSVT: Graphix-optimized E has no bilinear formula'
 statement: |
   Compiling the QSVT circuit and then after standardizing and removing Pauli measurements, the number of CZ edges E is not of the form (an + b)D + cn + e for any rationals a, b, c, e.
 description: |
@@ -15,4 +15,4 @@ depends_on:
 checks:
 - kind: scaling
   params: {method: qsvt, optimize: true, quantity: E, claim: not_bilinear}
-tags: [hamsim, qsvt, resources, optimized]
+tags: [hamsim, qsvt, resources, Graphix-optimized]

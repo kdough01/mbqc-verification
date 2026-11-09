@@ -1,7 +1,7 @@
 id: hamsim.B.gqsp.E.opt
 kind: theorem
 layer: B
-title: 'GQSP: optimized E has no bilinear formula'
+title: 'GQSP: Graphix-optimized E has no bilinear formula'
 statement: |
   Compiling the GQSP circuit and then after standardizing and removing Pauli measurements, the number of CZ edges E is not of the form (an + b)d + cn + e for any rationals a, b, c, e.
 description: |
@@ -15,4 +15,4 @@ depends_on:
 checks:
 - kind: scaling
   params: {method: gqsp, optimize: true, quantity: E, claim: not_bilinear}
-tags: [hamsim, gqsp, resources, optimized]
+tags: [hamsim, gqsp, resources, Graphix-optimized]
