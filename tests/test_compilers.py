@@ -9,10 +9,10 @@ import numpy as np
 import pytest
 from qiskit import QuantumCircuit
 
-from mbqc_verify.compile.cabaliser_adapter import clifford_rz_ops
-from mbqc_verify.compile.compilers import COMPILERS, get
+from mbqc_verify.compilers.cabaliser import clifford_rz_ops
+from mbqc_verify.compilers import COMPILERS, get
 from mbqc_verify.hamsim.analysis import count, generic_circuit
-from verification.truth.scaling import grids
+from checks._shared import grids
 
 
 def test_graphix_compilers_give_the_scaling_counts():

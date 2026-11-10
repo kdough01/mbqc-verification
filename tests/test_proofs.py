@@ -56,7 +56,7 @@ def test_a_second_proof_is_recorded_as_a_lean_proof_check(repo):
     rows = pr.apply(repo, submit(repo, PROOF_2, proof_prop()), run_checks=False, echo=quiet)
     assert rows[0]["outcome"] == "proof_added" and rows[0]["index"] == 2, rows
     r = raw(repo)
-    assert r["checks"][-1]["kind"] == "lean_proof" and r["checks"][-1]["name"] == "lean-proof-2"
+    assert r["checks"][-1]["test"] == "lean_proof/independent_proof" and r["checks"][-1]["name"] == "lean-proof-2"
     assert r["checks"][-1]["params"]["decl"] == f"{P2}.counts_add"
     assert r["checks"][-1]["params"]["approach"] == "Nat.add_sub_of_le instead of linear arithmetic"
     assert r["lean_decl"] == f"{NS}.counts_add" and r["statement"] == "Theorem 1. Counts add up."   # untouched

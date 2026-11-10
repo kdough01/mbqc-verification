@@ -5,9 +5,9 @@ from __future__ import annotations
 from fractions import Fraction
 
 from mbqc_verify.conventions import Conventions
-from verification.kinds import clamp_truth
-from verification.truth.scaling.grids import corners, interpolate, mismatches
-from verification.truth.symbolic.coeff_positivity import certificate
+from checks._kinds import clamp_truth
+from checks._shared.grids import corners, interpolate, mismatches
+from checks.symbolic._certificate import certificate
 
 
 def bilinear(a, b, c, e):

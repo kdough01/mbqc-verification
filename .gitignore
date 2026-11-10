@@ -16,3 +16,4 @@ lean/.lake/
 
 # experiments/rre build environment (environment.sh)
 .rre/
+.hypothesis/

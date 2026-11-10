@@ -9,9 +9,10 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 
 # what must never change without the owner's review (README, toolkit "Proposals may only write to an allow-list")
-PROTECTED = ["verification/kinds.py", "verification/truth/tool/check.py", "tools/dagtool/proposals.py",
+PROTECTED = ["checks/_kinds.py", "checks/_framework.py", "checks/tool/_run.py", "checks/scaling/bilinear_formula.py",
+             "dagtool/proposals.py", "dag/suites/policy.yaml", "tools/rre/environment.sh",
              "dag/schema/node.schema.json", "experiments/rre/paper_v3_table2.yaml", "experiments/rre/settings_space.yaml",
-             "dag/heldout/x.json", "lean/scripts/Inspect.lean", "requirements.txt", "requirements-tools.txt",
+             "dag/heldout/x.json", "lean/scripts/Inspect.lean", "requirements.txt", "tools/requirements.txt",
              ".github/workflows/proposals.yml", ".github/CODEOWNERS", "dag/reports/toolkit.yaml"]
 
 

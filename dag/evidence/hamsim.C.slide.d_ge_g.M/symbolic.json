@@ -1,22 +1,22 @@
 {
- "input_hash": "ce66471e8aa65ffa",
+ "input_hash": "fbdd5e4de6cb2ca3",
  "inputs": {
   "check_code": {
-   "verification/truth/symbolic/check.py": "63d2d0c5709e9cf094fdccc786336cbe2c5971e5debaa5f22477f84ad209a518",
-   "verification/truth/symbolic/coeff_positivity.py": "b2376ab044fe60e0f3eb10dcbea117681008845b7c39832f73ca5072c4c46483"
+   "checks/symbolic/_certificate.py": "ac1349981a1660017bafa20a7d78446205b59e01decd4be40e6b226912e31f18",
+   "checks/symbolic/slide_positivity.py": "201f3aec433e2de74a2673c99e81568f225585a3d51f77f53955973e7a67f966"
   },
-  "check_params": "063b11d694038a27",
+  "check_params": "8f8d39d2a7bdb06a",
   "code": {
    "src/mbqc_verify/hamsim/slide.py": "d16d18ac21475ebe60c2984dc1b3a54bfff3ba013d33678c3edd72c78472623f"
   },
   "definitions": {
    "def.hamsim.slide_formulas": "5c1e5f2f83715021"
   },
-  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_sources": "70186db16941b81859b28589b418b3a69f519ce68964557d375181d587b317d8",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
    "def.hamsim.slide_formulas": "5c1e5f2f83715021:4f53cda1",
-   "hamsim.C.slide.d_ge_g.N": "fce89b283a9fed73:8ea9b935"
+   "hamsim.C.slide.d_ge_g.N": "fce89b283a9fed73:789132b8"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
   "statement": "06fbf43813cda372"
@@ -25,13 +25,12 @@
  "name": "symbolic",
  "node": "hamsim.C.slide.d_ge_g.M",
  "params": {
-  "certificate": "slide_d_ge_g",
   "quantity": "M"
  },
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:26+00:00",
+  "finished": "2026-11-10T18:13:02+00:00",
   "quick": false,
   "seconds": 0.01,
   "versions": {
@@ -91,5 +90,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "QSVT - GQSP is a positive-coefficient polynomial in all 3 cases"
- }
+ },
+ "test": "symbolic/slide_positivity"
 }

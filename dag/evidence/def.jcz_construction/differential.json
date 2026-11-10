@@ -1,24 +1,22 @@
 {
- "input_hash": "66b57af1a56750d5",
+ "input_hash": "9d96501906b85a27",
  "inputs": {
   "check_code": {
-   "verification/faithfulness/differential/check.py": "c3bd14a9b21d289d8d112a3a573597245e33f1acaa3b60092ec374a81c90081e",
-   "verification/truth/lean/check.py": "029219c782e5286887cdcfb44b0b501ccf6fbfc576d524fddc51a7afb4b31807",
-   "verification/truth/lean/leanrun.py": "6cea0e6e8353cc39b75cc5e8e95ada1dba194a8cdf6dc71a55324b54fc69fb96",
-   "verification/truth/lean/proof.py": "6525c42aa321ab57f1107009507be1bb1cd81ebd4f58d40fa8f73866e082e7c5",
-   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
-   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
+   "checks/_shared/grids.py": "0c5797261a67e7696eb32c9353644d6b9c0951aaa165b7fb96fa5df13d0834fe",
+   "checks/_shared/lean.py": "2a2901de98a2fcc7261dd2d3cfeb4e6ad73014ebedc11bfa22ec700c91448fc1",
+   "checks/differential/_streams.py": "43bcbde24733d2f8554a9ec04b27d4cca0f0b1071674ba73d2b95b43fa8cf62c",
+   "checks/differential/lean_counts.py": "e471ad2023f98239b1cc6b3101652d6093c769ed8030bc713277add04f79478c"
   },
   "check_params": "c4f7ad2360321608",
   "code": {
-   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a"
+   "src/mbqc_verify/compilers/graphix.py": "f435644e7a21a0782ef6f49f815d85e1c19ba45fb396a1acca91f6f3ac8b8d8f"
   },
   "definitions": {
    "def.graph_state": "49d988a8e94f1186",
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
-  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_sources": "70186db16941b81859b28589b418b3a69f519ce68964557d375181d587b317d8",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
    "def.pattern": "20379a417004e168:4f53cda1",
@@ -65,11 +63,11 @@
   ]
  },
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:25+00:00",
+  "finished": "2026-11-10T18:12:50+00:00",
   "quick": false,
-  "seconds": 0.8,
+  "seconds": 0.56,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
@@ -186,5 +184,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "Lean and Graphix agree on N, E, M for all 6 instances"
- }
+ },
+ "test": "differential/lean_counts"
 }

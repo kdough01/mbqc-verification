@@ -15,7 +15,7 @@ Every builder returns a HamSimCircuit: the circuit, the qubit layout, and the
 ancilla bits to post-select on. With the ancillas starting in |0...0>, the
 operator applied to the data qubits *given* that post-selection is the
 method's approximation of e^{-iHt}; analysis.postselected_block() extracts it,
-and the checks under verification/ test it.
+and the tests under checks/ test it.
 
 Qubit layout (Qiskit indices):
     0 .. n-1          data qubits

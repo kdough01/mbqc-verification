@@ -1,10 +1,11 @@
 {
- "input_hash": "6bcd9f1ab1cb5a5e",
+ "input_hash": "e79e551b712c5c5a",
  "inputs": {
   "check_code": {
-   "requirements-tools.txt": "10d7364009957536e3eafb782d1920d29f038968b0e734b33737e6f82d92f630",
-   "verification/truth/heldout/heldout.py": "2975e24a77dcab506d8ba50c9f7293c72e0c33fa6414d2b37102fec397faf178",
-   "verification/truth/reproduction/check.py": "adc218c52056ec69b53ed81fb1d87de902c0d85a7116f410bd3d4d0c90b0fe3e"
+   "checks/_shared/compare.py": "527701d548e2713c83f11be81c9450270f91eed82ac627e1f760979964c81b0e",
+   "checks/_shared/heldout.py": "2975e24a77dcab506d8ba50c9f7293c72e0c33fa6414d2b37102fec397faf178",
+   "checks/reproduction/recorded_value.py": "2f284ed9cc4b26e2401374d34fe373ae0f34dc61b8949e11d0f04cf57f3743cb",
+   "tools/requirements.txt": "e64646ef2ec1c77b9fb68c62f11e7f4476fd72d8b3533e1d05c0afb9144dfad6"
   },
   "check_params": "68b692e19a0a20e0",
   "code": {
@@ -33,11 +34,11 @@
   "results": "experiments/rre/results/calibrated/calibration.json"
  },
  "provenance": {
-  "commit": "51d996c639f8bb97ed0f1d96444e632bd3f07538",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-08T17:49:24+00:00",
+  "finished": "2026-11-10T18:13:02+00:00",
   "quick": false,
-  "seconds": 0.02,
+  "seconds": 0.01,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
@@ -64,5 +65,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "reproduced: summary.best_by_axis.coeffs.1.best = 15 vs 22 (the claim): \u2264"
- }
+ },
+ "test": "reproduction/recorded_value"
 }

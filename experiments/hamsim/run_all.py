@@ -2,18 +2,18 @@
 run_all.py — the full Hamiltonian-simulation report (formerly ham_sim.py).
 
 Prints every layer of the slide check and writes results/hamsim_results.json,
-the input for plot_results.py. The checks themselves live under verification/
+the input for plot_results.py. The checks themselves live under checks/
 and also run through `dagtool run`, which records them as DAG evidence; this
 script is the human-readable tour of the same computations.
 
 The slide's result has three layers (see docs/hamsim.md):
 
   A. ACCURACY      "degree d_eps (or r_eps Trotter steps) gives error <= eps".
-                   verification/truth/numerical
+                   checks/numerical
   B. COST FORMULAS "N, E, M = (per-repetition cost) x repetitions + setup".
-                   verification/truth/scaling
+                   checks/scaling
   C. CONSEQUENCES  Big-O and "d >= g  =>  GQSP is cheaper".
-                   verification/truth/symbolic, verification/truth/refuter
+                   checks/symbolic, checks/refuter
 
 Run from the repository root:
        python experiments/hamsim/run_all.py           (about six minutes)
@@ -32,10 +32,9 @@ import numpy as np
 
 from mbqc_verify.hamsim.analysis import REP_SYMBOL, cost_at_equal_accuracy, format_formula
 from mbqc_verify.hamsim.slide import SLIDE_N
-from verification.truth.numerical.hamsim_accuracy import (check_accuracy,
-                                                          check_trotter_circuit_matches_formula)
-from verification.truth.symbolic.coeff_positivity import certificate
-from verification.truth.scaling.grids import GRIDS, counts, grid
+from checks._shared.grids import GRIDS, counts, grid
+from checks.numerical._accuracy import check_accuracy, check_trotter_circuit_matches_formula
+from checks.symbolic._certificate import certificate
 
 HERE = Path(__file__).resolve().parent
 RESULTS = HERE / "results" / "hamsim_results.json"
@@ -49,8 +48,8 @@ MBQC_INSTANCES = [   # same instances as the original harness
 
 
 def check_mbqc_equivalence() -> list[tuple[str, float]]:
-    from verification.truth.translation.check import _circuit, _label
-    from mbqc_verify.compile.qiskit_to_mbqc import qiskit_to_pattern, verify
+    from checks.translation.graphix_pattern import _circuit, _label
+    from mbqc_verify.compilers.graphix import qiskit_to_pattern, verify
     out = []
     for inst in MBQC_INSTANCES:
         hc = _circuit(inst)

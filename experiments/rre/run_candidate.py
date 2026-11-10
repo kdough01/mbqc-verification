@@ -7,7 +7,7 @@ Validates the candidate against settings_space.yaml first (nothing runs if it is
 instance with exactly those settings and writes DIR/<family>_<label>.json and DIR/table2_<family>_<label>.json,
 named like the committed results, so `dagtool feedback --node ID --results-root DIR` scores them against the
 node's frozen expected values. DIR/candidate.json records the candidate, the resolved settings and timings.
-Needs the RRE environment (environment.sh).
+Needs the RRE environment (tools/rre/environment.sh).
 """
 
 from __future__ import annotations

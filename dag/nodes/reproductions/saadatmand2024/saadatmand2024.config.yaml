@@ -22,7 +22,7 @@ source:
     ftqc.inter_handover_timescale_sec, decoder_char_timescale_sec, ftqc.processor.num_qubits, distill_widget_table
     (Table I footprints W×L, Q, C, p_out).'
 checks:
-- kind: literature
+- test: literature/source_record
 tags:
 - config
 - saadatmand2024

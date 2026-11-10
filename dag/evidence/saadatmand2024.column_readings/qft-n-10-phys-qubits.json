@@ -1,10 +1,11 @@
 {
- "input_hash": "d6853e017482b2d6",
+ "input_hash": "9100812e2c61f776",
  "inputs": {
   "check_code": {
-   "requirements-tools.txt": "10d7364009957536e3eafb782d1920d29f038968b0e734b33737e6f82d92f630",
-   "verification/truth/heldout/heldout.py": "2975e24a77dcab506d8ba50c9f7293c72e0c33fa6414d2b37102fec397faf178",
-   "verification/truth/reproduction/check.py": "adc218c52056ec69b53ed81fb1d87de902c0d85a7116f410bd3d4d0c90b0fe3e"
+   "checks/_shared/compare.py": "527701d548e2713c83f11be81c9450270f91eed82ac627e1f760979964c81b0e",
+   "checks/_shared/heldout.py": "2975e24a77dcab506d8ba50c9f7293c72e0c33fa6414d2b37102fec397faf178",
+   "checks/reproduction/recorded_value.py": "2f284ed9cc4b26e2401374d34fe373ae0f34dc61b8949e11d0f04cf57f3743cb",
+   "tools/requirements.txt": "e64646ef2ec1c77b9fb68c62f11e7f4476fd72d8b3533e1d05c0afb9144dfad6"
   },
   "check_params": "f26f217eddf37b32",
   "code": {
@@ -34,11 +35,11 @@
   "results": "experiments/rre/results/calibrated/table2_qft_N-10.json"
  },
  "provenance": {
-  "commit": "51d996c639f8bb97ed0f1d96444e632bd3f07538",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-08T17:49:24+00:00",
+  "finished": "2026-11-10T18:13:02+00:00",
   "quick": false,
-  "seconds": 0.02,
+  "seconds": 0.01,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
@@ -65,5 +66,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "reproduced: quantities.phys_qubits.ours = 1.28838e+06 vs 1.29e+06 (experiments/rre/results/calibrated/table2_qft_N-10.json:quantities.phys_qubits.paper): within 1%"
- }
+ },
+ "test": "reproduction/recorded_value"
 }

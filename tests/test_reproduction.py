@@ -8,9 +8,8 @@ from types import SimpleNamespace
 
 import pytest
 
-import verification.truth.reproduction.check  # noqa: F401  (registers the kind)
-from verification.base import REGISTRY
-from verification.kinds import CHECK_KINDS
+from checks._framework import discover, module
+from checks._kinds import CHECK_KINDS
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -22,15 +21,14 @@ def run(tmp_path):
         "rows": [{"f": 0.4}, {"f": 1.0}], "provenance": {"rre_commit": "abc"}}))
     (tmp_path / "other.json").write_text(json.dumps({"x": 87}))
     ctx = SimpleNamespace(dag=SimpleNamespace(root=tmp_path))
-    check = REGISTRY["reproduction"]()
-
     def go(**params):
-        return check.run(None, {"results": "res.json", **params}, ctx)
+        from checks._framework import run as run_test
+        return run_test("reproduction/recorded_value", None, {"results": "res.json", **params}, ctx)
     return go
 
 
 def test_kind_is_registered_with_empirical_ceiling():
-    assert "reproduction" in REGISTRY
+    assert "reproduction/recorded_value" in discover()
     assert CHECK_KINDS["reproduction"].ceiling == "empirical"
 
 
@@ -59,19 +57,20 @@ def test_ops_and_list_paths(run):
 
 
 def test_missing_results_skip_and_bad_params_error(run):
-    assert run(results="nope.json", path="a").outcome == "skip"
+    assert run(results="nope.json", path="a", expect=1).outcome == "skip"
     assert run(path="quantities.missing.ours", expect=1).outcome == "error"
     assert run(path="quantities.q.ours", expect=1, op="between").outcome == "error"
-    assert REGISTRY["reproduction"]().run(None, {}, None).outcome == "error"
+    assert run(path=None, expect=1).outcome == "error"           # invalid params are an error, not a crash
 
 
 def test_saadatmand_results_cover_every_reproduction_check():
     """Every committed small-instance node points at values that exist (large instances may skip)."""
     import yaml
+    check = module("reproduction/recorded_value")
     for f in (REPO / "dag" / "nodes" / "reproductions").rglob("*.yaml"):
         node = yaml.safe_load(f.read_text(encoding="utf-8"))
         for c in node.get("checks", []):
-            if c["kind"] != "reproduction":
+            if c["test"] != "reproduction/recorded_value":
                 continue
             res = REPO / c["params"]["results"]
             if not res.exists():
@@ -79,5 +78,5 @@ def test_saadatmand_results_cover_every_reproduction_check():
                 assert any(s in node["id"] for s in large), f"{node['id']}: {res} missing"
                 continue
             ctx = SimpleNamespace(dag=SimpleNamespace(root=REPO))
-            r = REGISTRY["reproduction"]().run(None, c["params"], ctx)
+            r = check.run(None, c["params"], ctx)
             assert r.outcome in ("pass", "fail"), f"{node['id']} {c.get('name')}: {r.summary}"

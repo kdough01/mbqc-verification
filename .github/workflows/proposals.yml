@@ -48,7 +48,7 @@ jobs:
           git diff --name-only "origin/$BASE...pr-head" > "$RUNNER_TEMP/changed.txt"
           cat "$RUNNER_TEMP/changed.txt"
           python -m pip install -q pyyaml jsonschema
-          PYTHONPATH=tools:src:. python -m dagtool proposal-paths < "$RUNNER_TEMP/changed.txt"
+          PYTHONPATH=src:. python -m dagtool proposal-paths < "$RUNNER_TEMP/changed.txt"
           mkdir -p "$RUNNER_TEMP/in"
           while IFS= read -r f; do
             [ -n "$f" ] || continue

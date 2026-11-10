@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from mbqc_verify.compile.export import circuit_json, pattern_json
-from mbqc_verify.compile.qiskit_to_mbqc import pattern_stats
+from mbqc_verify.compilers.graphix_export import circuit_json, pattern_json
+from mbqc_verify.compilers.graphix import pattern_stats
 from mbqc_verify.hamsim.circuits import IsingChain, trotter_circuit
 
 

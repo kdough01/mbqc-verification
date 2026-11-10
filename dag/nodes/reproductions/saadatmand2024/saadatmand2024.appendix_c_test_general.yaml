@@ -16,7 +16,7 @@ source:
   url: https://arxiv.org/abs/2406.06015v3
   exact_form: Appendix C; RRE tests/verify_n_validate/test_unitary_verif_cabaliser.py
 checks:
-- kind: reproduction
+- test: reproduction/recorded_value
   name: published-table-random-inputs
   params:
     results: experiments/rre/results/cabaliser_inputs_rre_test_table.json

@@ -5,7 +5,7 @@ Everything here computes something about the Hamiltonian-simulation circuits:
 how many repetitions each method needs for accuracy eps, the operator a
 circuit applies after post-selection, the exact product formula, and the MBQC
 resource counts of a compiled pattern. Nothing here decides whether a claim is
-true; the checks under verification/ do that, and import these functions.
+true; the tests under checks/ do that, and import these functions.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ import numpy as np
 from qiskit.quantum_info import SparsePauliOp, Statevector
 from scipy.linalg import expm
 
-from ..compile.qiskit_to_mbqc import pattern_stats, qiskit_to_pattern
+from ..compilers.graphix import pattern_stats, qiskit_to_pattern
 from .circuits import HamSimCircuit, IsingChain, gqsp_circuit, qsvt_circuit, trotter_circuit
 from .qsp_angles import (chebyshev_coeffs_cos_sin, gqsp_angles, gqsp_hamsim_polynomial,
                          qsvt_phases, smallest_degree)

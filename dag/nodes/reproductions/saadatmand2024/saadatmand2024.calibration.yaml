@@ -24,7 +24,7 @@ source:
   url: https://arxiv.org/abs/2406.06015v3
   exact_form: Table II, QFT rows; §III.2.3 (p_algo = 0.95); Table I
 checks:
-- kind: reproduction
+- test: reproduction/recorded_value
   name: best-point
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -32,7 +32,7 @@ checks:
     expect: 26
     op: ge
     domain: QFT N-4, N-10, N-25 × 48 settings
-- kind: reproduction
+- test: reproduction/recorded_value
   name: runner-up
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -40,7 +40,7 @@ checks:
     expect: 22
     op: le
     domain: QFT N-4, N-10, N-25 × 48 settings
-- kind: reproduction
+- test: reproduction/recorded_value
   name: failure-budget-0-05
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -48,7 +48,7 @@ checks:
     expect: 26
     op: ge
     domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
-- kind: reproduction
+- test: reproduction/recorded_value
   name: failure-budget-0-95
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -56,7 +56,7 @@ checks:
     expect: 22
     op: le
     domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
-- kind: reproduction
+- test: reproduction/recorded_value
   name: failure-budget-0-5
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -64,7 +64,7 @@ checks:
     expect: 22
     op: le
     domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
-- kind: reproduction
+- test: reproduction/recorded_value
   name: error-fit-paper
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -72,7 +72,7 @@ checks:
     expect: 26
     op: ge
     domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
-- kind: reproduction
+- test: reproduction/recorded_value
   name: error-fit-rre
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -80,7 +80,7 @@ checks:
     expect: 22
     op: le
     domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
-- kind: reproduction
+- test: reproduction/recorded_value
   name: factory-table-rre
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -88,7 +88,7 @@ checks:
     expect: 26
     op: ge
     domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
-- kind: reproduction
+- test: reproduction/recorded_value
   name: factory-table-table-i
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -96,7 +96,7 @@ checks:
     expect: 22
     op: le
     domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
-- kind: reproduction
+- test: reproduction/recorded_value
   name: gate-time-200ns
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -104,7 +104,7 @@ checks:
     expect: 26
     op: ge
     domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
-- kind: reproduction
+- test: reproduction/recorded_value
   name: gate-time-50ns
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -112,7 +112,7 @@ checks:
     expect: 22
     op: le
     domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
-- kind: reproduction
+- test: reproduction/recorded_value
   name: widgets-one
   params:
     results: experiments/rre/results/calibrated/calibration.json
@@ -120,7 +120,7 @@ checks:
     expect: 26
     op: ge
     domain: QFT N-4, N-10, N-25 × 48 settings, 27 Table II columns
-- kind: reproduction
+- test: reproduction/recorded_value
   name: widgets-rre-example
   params:
     results: experiments/rre/results/calibrated/calibration.json

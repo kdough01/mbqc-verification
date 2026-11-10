@@ -1,19 +1,17 @@
 {
- "input_hash": "2634bc93dffb0e7f",
+ "input_hash": "336f08b051ce2a82",
  "inputs": {
   "check_code": {
-   "verification/faithfulness/differential/check.py": "c3bd14a9b21d289d8d112a3a573597245e33f1acaa3b60092ec374a81c90081e",
-   "verification/truth/lean/check.py": "029219c782e5286887cdcfb44b0b501ccf6fbfc576d524fddc51a7afb4b31807",
-   "verification/truth/lean/leanrun.py": "6cea0e6e8353cc39b75cc5e8e95ada1dba194a8cdf6dc71a55324b54fc69fb96",
-   "verification/truth/lean/proof.py": "6525c42aa321ab57f1107009507be1bb1cd81ebd4f58d40fa8f73866e082e7c5",
-   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
-   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
+   "checks/_shared/grids.py": "0c5797261a67e7696eb32c9353644d6b9c0951aaa165b7fb96fa5df13d0834fe",
+   "checks/_shared/lean.py": "2a2901de98a2fcc7261dd2d3cfeb4e6ad73014ebedc11bfa22ec700c91448fc1",
+   "checks/differential/_streams.py": "43bcbde24733d2f8554a9ec04b27d4cca0f0b1071674ba73d2b95b43fa8cf62c",
+   "checks/differential/lean_counts.py": "e471ad2023f98239b1cc6b3101652d6093c769ed8030bc713277add04f79478c"
   },
   "check_params": "291ff7fe66e2a597",
   "code": {
-   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
-   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
-   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+   "src/mbqc_verify/compilers/graphix.py": "f435644e7a21a0782ef6f49f815d85e1c19ba45fb396a1acca91f6f3ac8b8d8f",
+   "src/mbqc_verify/hamsim/analysis.py": "5889b248fb7f1e5b4eca83915882e8e6d667765ee4918dd59589cc86343779ef",
+   "src/mbqc_verify/hamsim/circuits.py": "40d1186477ef327acf62f99b60e9274d8111d7dfccdaae46a7dcbec34111576a"
   },
   "definitions": {
    "def.graph_state": "49d988a8e94f1186",
@@ -22,11 +20,11 @@
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
-  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_sources": "70186db16941b81859b28589b418b3a69f519ce68964557d375181d587b317d8",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
-   "assume.hamsim.qsvt_unopt_gates": "2ef8d14e50a46ab9:05d94ceb",
-   "def.graphix_gates": "17ace17c95ba5577:6029ded9",
+   "assume.hamsim.qsvt_unopt_gates": "2ef8d14e50a46ab9:5ea3bb7b",
+   "def.graphix_gates": "17ace17c95ba5577:b8ffd8b5",
    "def.jcz_construction": "392cb6fd4770bc56:b8ffd8b5",
    "transfer.gate_counts": "9740a55b0cf730e9:964b423a",
    "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
@@ -41,11 +39,11 @@
   "method": "qsvt"
  },
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:36+00:00",
+  "finished": "2026-11-10T18:13:13+00:00",
   "quick": false,
-  "seconds": 4.66,
+  "seconds": 4.19,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
@@ -226,5 +224,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "Lean and Graphix agree on N, E, M for all 10 instances"
- }
+ },
+ "test": "differential/lean_counts"
 }

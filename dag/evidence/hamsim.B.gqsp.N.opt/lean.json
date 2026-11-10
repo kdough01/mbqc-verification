@@ -1,26 +1,26 @@
 {
- "input_hash": "28f33c97a90e9925",
+ "input_hash": "43190fd90c2c7edd",
  "inputs": {
   "check_code": {
-   "verification/truth/lean/check.py": "029219c782e5286887cdcfb44b0b501ccf6fbfc576d524fddc51a7afb4b31807",
-   "verification/truth/lean/leanrun.py": "6cea0e6e8353cc39b75cc5e8e95ada1dba194a8cdf6dc71a55324b54fc69fb96",
-   "verification/truth/lean/proof.py": "6525c42aa321ab57f1107009507be1bb1cd81ebd4f58d40fa8f73866e082e7c5"
+   "checks/_shared/lean.py": "2a2901de98a2fcc7261dd2d3cfeb4e6ad73014ebedc11bfa22ec700c91448fc1",
+   "checks/lean/_axioms.py": "290988fe50a07ba3353f7a215a7ad67e64f05fadbc168e0881641790186b45d1",
+   "checks/lean/proof.py": "80e446ccd5d9a802ecb91710293aa5e3d9ce59e19965a2e817d81ea0f72683e1"
   },
   "check_params": "44136fa355b3678a",
   "code": {
-   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
-   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
-   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+   "src/mbqc_verify/compilers/graphix.py": "f435644e7a21a0782ef6f49f815d85e1c19ba45fb396a1acca91f6f3ac8b8d8f",
+   "src/mbqc_verify/hamsim/analysis.py": "5889b248fb7f1e5b4eca83915882e8e6d667765ee4918dd59589cc86343779ef",
+   "src/mbqc_verify/hamsim/circuits.py": "40d1186477ef327acf62f99b60e9274d8111d7dfccdaae46a7dcbec34111576a"
   },
   "definitions": {
    "def.graph_state": "49d988a8e94f1186",
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
-  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_sources": "70186db16941b81859b28589b418b3a69f519ce68964557d375181d587b317d8",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
-   "assume.hamsim.gqsp_opt_N": "7dc29a827674b21c:100099ba",
+   "assume.hamsim.gqsp_opt_N": "7dc29a827674b21c:5d452cb2",
    "lemma.bilinear_interpolation": "7dbe5f6a13a24a28:6d232117",
    "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
   },
@@ -32,9 +32,9 @@
  "node": "hamsim.B.gqsp.N.opt",
  "params": {},
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:29+00:00",
+  "finished": "2026-11-10T18:13:06+00:00",
   "quick": false,
   "seconds": 0.01,
   "versions": {
@@ -85,5 +85,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "proved in Lean from 6 assumption axiom(s) of assume.hamsim.gqsp_opt_N"
- }
+ },
+ "test": "lean/proof"
 }

@@ -18,9 +18,8 @@ depends_on:
 - {node: hamsim.A.qsvt_accuracy, kind: uses}
 - {node: hamsim.A.gqsp_accuracy, kind: uses}
 checks:
-- kind: numerical
+- test: numerical/equal_accuracy
   params:
-    which: equal_accuracy
     formulas:
       unopt: {trotter2: hamsim.B.trotter2.N.unopt, qsvt: hamsim.B.qsvt.N.unopt, gqsp: hamsim.B.gqsp.N.unopt}
       opt: {trotter2: hamsim.B.trotter2.N.opt, qsvt: hamsim.B.qsvt.N.opt, gqsp: hamsim.B.gqsp.N.opt}

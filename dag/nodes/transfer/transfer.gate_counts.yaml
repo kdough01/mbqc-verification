@@ -14,7 +14,7 @@ depends_on:
 - {node: def.graphix_gates, kind: uses}
 - {node: def.jcz_construction, kind: uses}
 checks:
-- {kind: lean}
-- {kind: vocabulary}
-- {kind: nonvacuity}
+- test: lean/proof
+- test: vocabulary/vetted_constants
+- test: nonvacuity/witness
 tags: [mbqc, transfer, resources]

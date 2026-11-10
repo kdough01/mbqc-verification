@@ -1,26 +1,26 @@
 {
- "input_hash": "c47986ce4948db1f",
+ "input_hash": "f19a05ae39345aa0",
  "inputs": {
   "check_code": {
-   "verification/faithfulness/mutation/check.py": "cbea16855919e7fa8b0abbd788652210b6a7126b2acda49c2c88d78d136fd97d",
-   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
-   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
+   "checks/_shared/grids.py": "0c5797261a67e7696eb32c9353644d6b9c0951aaa165b7fb96fa5df13d0834fe",
+   "checks/mutation/scaling_coefficients.py": "da2c6742fb0bb84c05046c559dd0998199296bf48c9045e535ba793d59749723",
+   "checks/scaling/_compare.py": "f4f6d53e502987dcb5157e2b3234629dd9c5fb406d673d308391424d0374ce94"
   },
-  "check_params": "cdb6ce06dd262a68",
+  "check_params": "44136fa355b3678a",
   "code": {
-   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
-   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
-   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+   "src/mbqc_verify/compilers/graphix.py": "f435644e7a21a0782ef6f49f815d85e1c19ba45fb396a1acca91f6f3ac8b8d8f",
+   "src/mbqc_verify/hamsim/analysis.py": "5889b248fb7f1e5b4eca83915882e8e6d667765ee4918dd59589cc86343779ef",
+   "src/mbqc_verify/hamsim/circuits.py": "40d1186477ef327acf62f99b60e9274d8111d7dfccdaae46a7dcbec34111576a"
   },
   "definitions": {
    "def.graph_state": "49d988a8e94f1186",
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
-  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_sources": "70186db16941b81859b28589b418b3a69f519ce68964557d375181d587b317d8",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
-   "assume.hamsim.qsvt_opt_N": "428b1bd964aeb94b:a442d378",
+   "assume.hamsim.qsvt_opt_N": "428b1bd964aeb94b:07ec54e5",
    "lemma.bilinear_interpolation": "7dbe5f6a13a24a28:6d232117",
    "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1"
   },
@@ -30,13 +30,11 @@
  "kind": "mutation",
  "name": "mutation",
  "node": "hamsim.B.qsvt.N.opt",
- "params": {
-  "target": "scaling"
- },
+ "params": {},
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:37+00:00",
+  "finished": "2026-11-10T18:13:13+00:00",
   "quick": false,
   "seconds": 0.01,
   "versions": {
@@ -187,5 +185,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "all 8 coefficient mutants rejected"
- }
+ },
+ "test": "mutation/scaling_coefficients"
 }

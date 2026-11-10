@@ -1,14 +1,14 @@
 {
- "input_hash": "0eb8c8331a8af237",
+ "input_hash": "aff52ef9d415d594",
  "inputs": {
   "check_code": {
-   "verification/truth/translation/check.py": "ce2bda666b3d6b10cab6979984b22304f82d74127d5e059dfd7f9d68fb83baf4"
+   "checks/translation/graphix_pattern.py": "cb5fdc55815c418a1eaeee596658b60aed98108afe3e9ef9a57ee449122fbcd3"
   },
   "check_params": "32b364c8d7c5312c",
   "code": {
-   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
-   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
-   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+   "src/mbqc_verify/compilers/graphix.py": "f435644e7a21a0782ef6f49f815d85e1c19ba45fb396a1acca91f6f3ac8b8d8f",
+   "src/mbqc_verify/hamsim/analysis.py": "5889b248fb7f1e5b4eca83915882e8e6d667765ee4918dd59589cc86343779ef",
+   "src/mbqc_verify/hamsim/circuits.py": "40d1186477ef327acf62f99b60e9274d8111d7dfccdaae46a7dcbec34111576a"
   },
   "definitions": {
    "def.graph_state": "49d988a8e94f1186",
@@ -64,11 +64,11 @@
   ]
  },
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:39+00:00",
+  "finished": "2026-11-10T18:13:15+00:00",
   "quick": false,
-  "seconds": 1.75,
+  "seconds": 1.41,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
@@ -110,5 +110,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "4 instances match; worst |overlap| = 1.000000000000"
- }
+ },
+ "test": "translation/graphix_pattern"
 }

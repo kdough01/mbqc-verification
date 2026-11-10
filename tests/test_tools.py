@@ -1,4 +1,4 @@
-"""The pinned external tools (requirements-tools.txt) and the checks that call them: tool, held-out values,
+"""The pinned external tools (tools/requirements.txt) and the checks that call them: tool, held-out values,
 finite, the Hypothesis refuter search, and Lean equivalence."""
 
 from __future__ import annotations
@@ -11,14 +11,20 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
-from verification.base import load_all
-from verification.kinds import CHECK_KINDS, TOOL_KINDS
-from verification.truth.heldout import heldout as ho
-from verification.truth.tool import azure_re, gridsynth, qualtran_cost, surface_code
-from verification.truth.tool.check import TOOLS, run_tool
+from checks import _framework as framework
+from checks._kinds import CHECK_KINDS, TOOL_KINDS
+from checks._shared import heldout as ho
+from checks.tool._run import ADAPTERS, adapter
+from checks.tool._run import run_tool as _run_tool
+from dagtool.legacy import to_test
+from mbqc_verify.tools import azure_re, gridsynth, qualtran_cost, surface_code
 
 REPO = Path(__file__).resolve().parents[1]
-CHECKS = load_all()
+
+
+def run_tool(name, args, c):
+    fn, versions = adapter(name, c.root)
+    return _run_tool(name, fn, versions, args, c)
 
 
 def ctx(root, dag=None):
@@ -30,26 +36,32 @@ def node(code=(), lean_decl=None, nid="t.node"):
 
 
 def run(kind, params, root, n=None):
-    return CHECKS[kind]().run(n or node(), params, ctx(root))
+    """Run a check written the older way ({kind, params}); dagtool.legacy picks the test."""
+    try:
+        test, p = to_test(kind, params)
+    except KeyError:
+        return framework.Result("error", summary="unknown tool")
+    return framework.run(test, n or node(), p, ctx(root))
 
 
 # ------------------------------------------------------------------ every declared kind has an implementation
 
-def test_every_declared_kind_is_implemented():
-    assert set(CHECK_KINDS) - {"review"} <= set(CHECKS), sorted(set(CHECK_KINDS) - set(CHECKS))
-    assert {"tool", "finite", "equivalence"} <= set(CHECKS)
+def test_every_declared_type_has_tests():
+    types = {t.type for t in framework.discover().values()}
+    assert set(CHECK_KINDS) == types, sorted(set(CHECK_KINDS) ^ types)
 
 
 def test_tools_requirements_are_pinned_and_hashed():
-    lines = [l for l in (REPO / "requirements-tools.txt").read_text().splitlines() if l and not l.startswith("#")]
+    lines = [l for l in (REPO / "tools/requirements.txt").read_text().splitlines() if l and not l.startswith("#")]
     assert all("==" in l for l in lines)
     names = {l.split("==")[0].lower() for l in lines}
     assert {"stim", "pymatching", "sinter", "hypothesis", "qualtran", "pygridsynth", "qdk", "cryptography"} <= names
     base = {l.split("==")[0].lower() for l in (REPO / "requirements.txt").read_text().splitlines() if "==" in l}
-    assert not names & base, "requirements-tools.txt must not re-pin requirements.txt"
+    assert not names & base, "tools/requirements.txt must not re-pin requirements.txt"
     from dagtool.status import check_files
-    for kind in TOOL_KINDS:
-        assert REPO / "requirements-tools.txt" in check_files(REPO, kind)
+    for t in framework.discover().values():
+        if t.type in TOOL_KINDS:
+            assert REPO / "tools/requirements.txt" in check_files(REPO, t.id)
 
 
 # ------------------------------------------------------------------ adapters
@@ -102,7 +114,7 @@ def test_azure_resource_estimator_runs_locally(tmp_path):
 def test_every_tool_records_versions(tmp_path):
     out = run_tool("gridsynth.rz", {"angles": [0.5], "epsilon": "1e-3"}, ctx(tmp_path))
     assert out["versions"]["pygridsynth"]
-    assert set(TOOLS) == {"surface_code.memory", "surface_code.fit", "gridsynth.rz", "qualtran.cost",
+    assert set(ADAPTERS) == {"surface_code.memory", "surface_code.fit", "gridsynth.rz", "qualtran.cost",
                           "azure_re.logical_counts", "azure_re.qsharp"}
 
 
@@ -241,7 +253,7 @@ def test_equivalence_needs_the_exact_iff_and_no_use_of_either_proof(tmp_path):
     (root / "dag/schema").mkdir(parents=True)
     shutil.copy(REPO / "dag/schema/node.schema.json", root / "dag/schema")
     (root / "requirements.txt").write_text("numpy==1\n")
-    checks = [{"kind": "equivalence", "name": n, "params": {"other": "Probe.Equiv.other", "proof": f"Probe.Equiv.{n}"}}
+    checks = [{"test": "equivalence/iff_proof", "name": n, "params": {"other": "Probe.Equiv.other", "proof": f"Probe.Equiv.{n}"}}
               for n in ("good", "cheat", "wrong")]
     (root / "dag/nodes/core").mkdir(parents=True)
     (root / "dag/nodes/core/core.equiv.yaml").write_text(yaml.safe_dump(
@@ -250,7 +262,7 @@ def test_equivalence_needs_the_exact_iff_and_no_use_of_either_proof(tmp_path):
     dag = load_dag(root)
     c = SimpleNamespace(root=root, cache={}, quick=False, dag=dag)
     n = dag.nodes["core.equiv"]
-    res = {s.name: CHECKS["equivalence"]().run(n, s.params, c) for s in n.checks}
+    res = {s.name: framework.module("equivalence/iff_proof").run(n, s.params, c) for s in n.checks}
     assert res["good"].outcome == "pass", res["good"]
     assert res["cheat"].outcome == "fail" and "reaches the proof" in res["cheat"].summary
     assert res["wrong"].outcome == "fail" and "does not state" in res["wrong"].summary

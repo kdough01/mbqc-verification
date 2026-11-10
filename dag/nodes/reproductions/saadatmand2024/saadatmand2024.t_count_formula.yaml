@@ -16,7 +16,7 @@ source:
   url: https://arxiv.org/abs/2406.06015v3
   exact_form: Appendix A, Parameters 16–17
 checks:
-- kind: reproduction
+- test: reproduction/recorded_value
   name: t-count-2x2
   params:
     results: experiments/rre/results/rederive_2x2.json
@@ -25,7 +25,7 @@ checks:
       path: quantities.t_count.reported
     op: eq
     domain: FH 2x2, RRE outputs
-- kind: reproduction
+- test: reproduction/recorded_value
   name: t-count-4x4
   params:
     results: experiments/rre/results/rederive_4x4.json

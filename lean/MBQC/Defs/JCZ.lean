@@ -11,7 +11,7 @@ open graph (`Circuit.transpile_to_causalflow`):
   (Graphix removes the edge if it exists, otherwise adds it).
 
 This file reimplements that construction independently, so its counts can be
-compared with Graphix's (`verification/faithfulness/differential`). The angle
+compared with Graphix's (`checks/differential`). The angle
 of J does not affect any count and is omitted.
 -/
 

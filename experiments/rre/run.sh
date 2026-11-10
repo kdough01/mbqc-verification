@@ -4,7 +4,7 @@
 #   bash experiments/rre/run.sh                 # small instances, calibration, scaling and the side studies
 #   bash experiments/rre/run.sh --only fh:8 fh:16 fh:20 qft:500 qft:1000 ising:5   # the bigger machine only
 #
-# Run inside the environment that environment.sh builds (source .rre/venv/bin/activate). The calibrated runs write
+# Run inside the environment that tools/rre/environment.sh builds (source .rre/venv/bin/activate). The calibrated runs write
 # results/calibrated/<family>_<label>.json (every RRE output plus provenance) and table2_<family>_<label>.json
 # (against Table II). Without --only it also reruns the calibration grid, the scaling series, the widget levels,
 # and the first pass (fh_NxN.json, table2_NxN.json, rederive_NxN.json with config_paper_v3.yaml), phases.json,

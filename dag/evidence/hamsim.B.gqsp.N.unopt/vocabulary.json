@@ -1,17 +1,15 @@
 {
- "input_hash": "b21ab16dd4961114",
+ "input_hash": "82f84eb008268f9f",
  "inputs": {
   "check_code": {
-   "verification/faithfulness/vocabulary/check.py": "043cd0322eeb6b9af020e475ec4d988fe5fcd08222d528e91a73e8c7422cffe2",
-   "verification/truth/lean/check.py": "029219c782e5286887cdcfb44b0b501ccf6fbfc576d524fddc51a7afb4b31807",
-   "verification/truth/lean/leanrun.py": "6cea0e6e8353cc39b75cc5e8e95ada1dba194a8cdf6dc71a55324b54fc69fb96",
-   "verification/truth/lean/proof.py": "6525c42aa321ab57f1107009507be1bb1cd81ebd4f58d40fa8f73866e082e7c5"
+   "checks/_shared/lean.py": "2a2901de98a2fcc7261dd2d3cfeb4e6ad73014ebedc11bfa22ec700c91448fc1",
+   "checks/vocabulary/vetted_constants.py": "6a1df429108dd9edc3fd25921288a233fa7115de84ea90db18a78f0229f5a940"
   },
   "check_params": "44136fa355b3678a",
   "code": {
-   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
-   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
-   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+   "src/mbqc_verify/compilers/graphix.py": "f435644e7a21a0782ef6f49f815d85e1c19ba45fb396a1acca91f6f3ac8b8d8f",
+   "src/mbqc_verify/hamsim/analysis.py": "5889b248fb7f1e5b4eca83915882e8e6d667765ee4918dd59589cc86343779ef",
+   "src/mbqc_verify/hamsim/circuits.py": "40d1186477ef327acf62f99b60e9274d8111d7dfccdaae46a7dcbec34111576a"
   },
   "definitions": {
    "def.graph_state": "49d988a8e94f1186",
@@ -20,11 +18,11 @@
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
-  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_sources": "70186db16941b81859b28589b418b3a69f519ce68964557d375181d587b317d8",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
-   "assume.hamsim.gqsp_unopt_gates": "5465e0b3b736ec34:6c8a0443",
-   "def.graphix_gates": "17ace17c95ba5577:6029ded9",
+   "assume.hamsim.gqsp_unopt_gates": "5465e0b3b736ec34:88651bc7",
+   "def.graphix_gates": "17ace17c95ba5577:b8ffd8b5",
    "def.jcz_construction": "392cb6fd4770bc56:b8ffd8b5",
    "transfer.gate_counts": "9740a55b0cf730e9:964b423a",
    "transfer.gate_to_mbqc": "5f98389b8ebf7c21:4f53cda1",
@@ -38,9 +36,9 @@
  "node": "hamsim.B.gqsp.N.unopt",
  "params": {},
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:40+00:00",
+  "finished": "2026-11-10T18:13:16+00:00",
   "quick": false,
   "seconds": 0.01,
   "versions": {
@@ -74,5 +72,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "statement uses only core Lean and 3 vetted node(s): assume.hamsim.gqsp_unopt_gates, def.graphix_gates, def.jcz_construction"
- }
+ },
+ "test": "vocabulary/vetted_constants"
 }

@@ -1,18 +1,18 @@
 {
- "input_hash": "36b6165d5da61bba",
+ "input_hash": "f05f1c5165455066",
  "inputs": {
   "check_code": {
-   "verification/faithfulness/mutation/check.py": "cbea16855919e7fa8b0abbd788652210b6a7126b2acda49c2c88d78d136fd97d",
-   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
-   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
+   "checks/_shared/grids.py": "0c5797261a67e7696eb32c9353644d6b9c0951aaa165b7fb96fa5df13d0834fe",
+   "checks/mutation/scaling_coefficients.py": "da2c6742fb0bb84c05046c559dd0998199296bf48c9045e535ba793d59749723",
+   "checks/scaling/_compare.py": "f4f6d53e502987dcb5157e2b3234629dd9c5fb406d673d308391424d0374ce94"
   },
-  "check_params": "cdb6ce06dd262a68",
+  "check_params": "44136fa355b3678a",
   "code": {
-   "experiments/compilers/results/cabaliser.json": "01bfb8d4905529f00f119ed447666921367fc452971240caf4472355c06a5cfe",
-   "src/mbqc_verify/compile/cabaliser_adapter.py": "846bf23cd045ac76af20fab9e20635311335aaf605b68e1931339b7d837640b9",
-   "src/mbqc_verify/compile/compilers.py": "6d307781077f0a192b28b84e79c1d4be6bea75b66ccb6caeafd5e2b5bea270b8",
-   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
-   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+   "experiments/compilers/results/cabaliser.json": "39c66cdacb8c01653e800e785de239920cf87a4b9947f714a89cd72904584e9e",
+   "src/mbqc_verify/compilers/__init__.py": "0adb465516f17389003ab8efcefbec63f751ca4bef471083940626684db6f277",
+   "src/mbqc_verify/compilers/cabaliser.py": "e32c9f3038d754b974337e6e63df60b7c1d9ea6080ab0b51b97913a6d055ee25",
+   "src/mbqc_verify/hamsim/analysis.py": "5889b248fb7f1e5b4eca83915882e8e6d667765ee4918dd59589cc86343779ef",
+   "src/mbqc_verify/hamsim/circuits.py": "40d1186477ef327acf62f99b60e9274d8111d7dfccdaae46a7dcbec34111576a"
   },
   "definitions": {},
   "parents": {
@@ -24,13 +24,11 @@
  "kind": "mutation",
  "name": "mutation",
  "node": "hamsim.B.trotter2.M.cabaliser",
- "params": {
-  "target": "scaling"
- },
+ "params": {},
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:26+00:00",
+  "finished": "2026-11-10T18:13:02+00:00",
   "quick": false,
   "seconds": 0.01,
   "versions": {
@@ -181,5 +179,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "all 8 coefficient mutants rejected"
- }
+ },
+ "test": "mutation/scaling_coefficients"
 }

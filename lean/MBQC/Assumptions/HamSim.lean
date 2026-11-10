@@ -8,7 +8,7 @@ theorem that uses them lists them, so the trust boundary stays visible.
 `QsvtOptN` (DAG node `assume.hamsim.qsvt_opt_N`): the vertex count of the
 optimized QSVT pattern (Pauli measurements removed) for n data qubits and QSVT
 degree D (odd). Evidence: exact on every grid point incl. held-out ones
-(verification/truth/scaling), and the per-degree blocks of the circuit are
+(checks/scaling), and the per-degree blocks of the circuit are
 concatenated copies, which is why the count is affine in D.
 -/
 

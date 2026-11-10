@@ -9,7 +9,7 @@ inputs:
     description: Install Lean and build lean/
     default: "true"
   tools:
-    description: Install the pinned external tools of requirements-tools.txt (Stim, PyMatching, sinter, Hypothesis, Qualtran, gridsynth, the Azure Resource Estimator)
+    description: Install the pinned external tools of tools/requirements.txt (Stim, PyMatching, sinter, Hypothesis, Qualtran, gridsynth, the Azure Resource Estimator)
     default: "true"
 
 runs:
@@ -21,7 +21,7 @@ runs:
         cache: pip
         cache-dependency-path: |
           requirements.txt
-          requirements-tools.txt
+          tools/requirements.txt
 
     - name: Install Python packages
       shell: bash
@@ -35,7 +35,7 @@ runs:
           python -m pip install -r requirements.txt
           if [ "$TOOLS" = true ]; then
             # every dependency is pinned in the file, so nothing in requirements.txt moves
-            python -m pip install --no-deps -r requirements-tools.txt
+            python -m pip install --no-deps -r tools/requirements.txt
           fi
         fi
         python -m pip install --no-deps -e .

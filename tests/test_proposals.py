@@ -143,10 +143,10 @@ def test_apply_formalized_without_checks_keeps_the_attempt_record(repo):
     r = raw(repo)
     assert r["statement"] == "Theorem 1. Counts add up."                      # never touched
     assert r["lean_decl"] == f"{NS}.counts_add"
-    pred = "checks/papers/paper.p_abc.theorem_1_counts_add.py"
-    assert r["checks"] == [{"kind": "lean", "origin": "verifier"}, {"kind": "vocabulary", "origin": "verifier"},
-                           {"kind": "nonvacuity", "params": {"witness": f"{NS}.counts_add_nonvacuous"}, "origin": "verifier"},
-                           {"kind": "finite", "name": "small", "params": {"predicate": f"{pred}:counts_add",
+    pred = "dag/predicates/paper.p_abc.theorem_1_counts_add.py"
+    assert r["checks"] == [{"test": "lean/proof", "origin": "verifier"}, {"test": "vocabulary/vetted_constants", "origin": "verifier"},
+                           {"test": "nonvacuity/witness", "params": {"witness": f"{NS}.counts_add_nonvacuous"}, "origin": "verifier"},
+                           {"test": "finite/exhaustive", "name": "small", "params": {"predicate": f"{pred}:counts_add",
                             "domain": {"a": {"range": [0, 12]}, "b": {"range": [0, 12]}}}, "origin": "proposal",
                             "rationale": "the identity on every a, b up to 12"}]
     assert r["code"] == [pred] and (repo / pred).read_text() == CHECKS_PY and "claim:exact_statement" in r["tags"]
@@ -232,7 +232,7 @@ def test_proposal_paths_allow_only_proposal_files():
     ok, bad = pr.proposal_paths([f"proposals/{TID}/proposal.json", f"proposals/{TID}/theorem.lean",
                                  f"proposals/{TID}/attempts.json"])
     assert ok and not bad
-    for path in ("verification/kinds.py", f"proposals/{TID}/run.sh", "proposals/x/proposal.json",
+    for path in ("checks/_kinds.py", "checks/scaling/bilinear_formula.py", f"dag/predicates/{TID}.py", f"proposals/{TID}/run.sh", "proposals/x/proposal.json",
                  f"proposals/{TID}/sub/theorem.lean", "dag/nodes/papers/x.yaml", ".github/workflows/proposals.yml"):
         assert not pr.proposal_paths([path])[0], path
 

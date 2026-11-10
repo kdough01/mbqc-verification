@@ -2,7 +2,7 @@ import MBQC
 import Lean
 
 /-!
-Inspect declarations for the Lean checks (verification/truth/lean and friends).
+Inspect declarations for the Lean checks (checks/lean, checks/_shared/lean.py and friends).
 
     MBQC_INSPECT=<request file> lake env lean scripts/Inspect.lean
 

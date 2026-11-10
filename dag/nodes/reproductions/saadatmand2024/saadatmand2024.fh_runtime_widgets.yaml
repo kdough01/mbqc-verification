@@ -22,7 +22,7 @@ source:
   url: https://arxiv.org/abs/2406.06015v3
   exact_form: Table II, Fermi Hubbard 4x4; Eq. (21); Appendix B
 checks:
-- kind: reproduction
+- test: reproduction/recorded_value
   name: coarser-level-below
   params:
     results: experiments/rre/results/calibrated/fh_widgets.json
@@ -30,7 +30,7 @@ checks:
     expect: 1
     op: le
     domain: FH 4×4, ≤ 40-qubit widgets (14 distinct, 2,948 steps)
-- kind: reproduction
+- test: reproduction/recorded_value
   name: finer-level-above
   params:
     results: experiments/rre/results/calibrated/fh_widgets.json
