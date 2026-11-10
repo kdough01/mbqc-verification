@@ -14,7 +14,7 @@ source:
   url: https://arxiv.org/abs/2406.06015v3
   exact_form: Appendix C
 checks:
-- kind: reproduction
+- test: reproduction/recorded_value
   name: worst-fidelity
   params:
     results: experiments/rre/results/cabaliser_inputs.json

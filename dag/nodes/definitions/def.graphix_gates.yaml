@@ -6,14 +6,13 @@ statement: |
 description: |
   How Graphix 0.4.1 turns gates into J/CZ instructions (instructions_to_jcz), reimplemented in Lean (lean/MBQC/Defs/GraphixGates.lean) with angles and global phases dropped, since they change no count. The differential check compares the two streams token for token, on every gate kind with several qubit orders and on whole transpiled circuits.
 lean_decl: [MBQC.Defs.GateKind, MBQC.Defs.Gate, MBQC.Defs.gatesToJcz, MBQC.Defs.countKind, MBQC.Defs.noCancelFrom, MBQC.Defs.NoCancel]
-code: [src/mbqc_verify/compile/qiskit_to_mbqc.py]
+code: [src/mbqc_verify/compilers/graphix.py]
 conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped}
 depends_on:
 - {node: def.jcz_construction, kind: uses}
 checks:
-- kind: differential
+- test: differential/lean_gate_streams
   params:
-    gates: true
     instances:
     - {method: trotter2, n: 2, k: 1}
     - {method: trotter2, n: 5, k: 4}

@@ -112,7 +112,7 @@
           ]
         },
         "compiler": {
-          "description": "Which circuit-to-MBQC compiler a count is about (mbqc_verify.compile.compilers).",
+          "description": "Which circuit-to-MBQC compiler a count is about (mbqc_verify.compilers).",
           "enum": [
             "graphix",
             "graphix_opt",
@@ -167,11 +167,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "kind"
+          "test"
         ],
         "properties": {
-          "kind": {
-            "type": "string"
+          "test": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*/[a-z][a-z0-9_]*$",
+            "description": "the test to run: the file checks/<type>/<name>.py (see `dagtool tests`)"
           },
           "name": {
             "type": "string",

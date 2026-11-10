@@ -16,7 +16,7 @@ Steps, following §III.2.2–III.3 and §II.4 of the paper:
   2. RRE widgetization (CirqWidgetizer with small_enough_pyliqtr_re(10000, 100), as in RRE's examples; the paper does
      not state them), transpilation to Clifford+T+Rz, Cabaliser graph-state compilation, Substrate Scheduler,
      and RRE's fault-tolerant estimate (estimation_pipeline, est_method="cabaliser").
-Writes every RRE output for the instance plus provenance to JSON. Needs the RRE environment (environment.sh).
+Writes every RRE output for the instance plus provenance to JSON. Needs the RRE environment (tools/rre/environment.sh).
 """
 
 from __future__ import annotations

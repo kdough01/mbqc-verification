@@ -6,7 +6,7 @@ statement: |
   Compiling the second-order Trotter circuit for n ≥ 2 data qubits gate by gate (unoptimized), with r ≥ 1, gives a pattern with M = (10n − 6)r + 2n measurements.
 statement_tex: M = (10n - 6)r + 2n
 lean_decl: MBQC.Results.HamSim.trotter2_measurements_unopt
-code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compilers/graphix.py, src/mbqc_verify/hamsim/analysis.py]
 conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps, compiler: graphix}
 depends_on:
 - {node: transfer.gate_to_mbqc, kind: instantiates}
@@ -16,18 +16,17 @@ depends_on:
 - {node: transfer.gate_to_mbqc_counts, kind: uses}
 - {node: assume.hamsim.trotter2_unopt_gates, kind: assumes}
 checks:
-- kind: scaling
+- test: scaling/bilinear_formula
   params:
     method: trotter2
-    optimize: false
+    compiler: graphix
     quantity: M
     coef: [10, -6, 2, 0]
-- kind: mutation
-  params: {target: scaling}
-- kind: differential
+- test: mutation/scaling_coefficients
+- test: differential/lean_counts
   params: {method: trotter2}
-- {kind: lean}
-- {kind: vocabulary}
-- kind: nonvacuity
+- test: lean/proof
+- test: vocabulary/vetted_constants
+- test: nonvacuity/witness
   params: {witness: MBQC.Results.HamSim.trotter2_unopt_nonvacuous}
 tags: [hamsim, trotter2, resources, unoptimized]

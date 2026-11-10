@@ -6,7 +6,7 @@ statement: |
   Compiling the GQSP circuit for n ≥ 2 data qubits gate by gate (unoptimized), with d ≥ 1, gives a pattern with M = (436n − 244)d + 10 measurements.
 statement_tex: M = (436n - 244)d + 10
 lean_decl: MBQC.Results.HamSim.gqsp_measurements_unopt
-code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compilers/graphix.py, src/mbqc_verify/hamsim/analysis.py]
 conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: gqsp_laurent_degree, compiler: graphix}
 depends_on:
 - {node: transfer.gate_to_mbqc, kind: instantiates}
@@ -16,18 +16,17 @@ depends_on:
 - {node: transfer.gate_to_mbqc_counts, kind: uses}
 - {node: assume.hamsim.gqsp_unopt_gates, kind: assumes}
 checks:
-- kind: scaling
+- test: scaling/bilinear_formula
   params:
     method: gqsp
-    optimize: false
+    compiler: graphix
     quantity: M
     coef: [436, -244, 0, 10]
-- kind: mutation
-  params: {target: scaling}
-- kind: differential
+- test: mutation/scaling_coefficients
+- test: differential/lean_counts
   params: {method: gqsp}
-- {kind: lean}
-- {kind: vocabulary}
-- kind: nonvacuity
+- test: lean/proof
+- test: vocabulary/vetted_constants
+- test: nonvacuity/witness
   params: {witness: MBQC.Results.HamSim.gqsp_unopt_nonvacuous}
 tags: [hamsim, gqsp, resources, unoptimized]

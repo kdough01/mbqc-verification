@@ -5,7 +5,7 @@ import MBQC.Defs.HamSimSlide
 
 Pure algebra on the slide's formulas, for n ≥ 2 and odd d ≥ g ≥ 3. Each proof
 writes the difference as a sum of products of nonnegative factors (the same
-positivity certificate verification/truth/symbolic finds with sympy), proves
+positivity certificate checks/symbolic finds with sympy), proves
 that identity with `grind`, and closes the linear rest with `omega`.
 -/
 

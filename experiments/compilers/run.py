@@ -4,10 +4,10 @@ run.py — record what compilers that need their own environment produce, for th
     CABALISER_PYTHON=.rre/venv/bin/python python experiments/compilers/run.py [--compiler cabaliser]
 
 Runs in the verifier's environment; each compiler's own half runs in its environment as a subprocess
-(src/mbqc_verify/compile/compilers.py). Writes experiments/compilers/results/<compiler>.json with
+(src/mbqc_verify/compilers/__init__.py). Writes experiments/compilers/results/<compiler>.json with
 
   counts:      N, E, M (and the compiler's extras) of every Hamiltonian-simulation circuit on the scaling grids
-               (verification/truth/scaling/grids.py), the same circuits the Graphix checks compile
+               (checks/_shared/grids.py), the same circuits the Graphix checks compile
   translation: fidelity of the compiled graph state with the circuit on every basis input and random inputs,
                for the instances small enough to simulate
 
@@ -30,9 +30,9 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "src"), str(ROOT)]
 
-from mbqc_verify.compile.compilers import get                       # noqa: E402
+from mbqc_verify.compilers import get                       # noqa: E402
 from mbqc_verify.hamsim.analysis import generic_circuit             # noqa: E402
-from verification.truth.scaling.grids import GRIDS                  # noqa: E402
+from checks._shared.grids import GRIDS                               # noqa: E402
 
 # Small enough for the statevector check (inputs + every graph vertex held at once)
 TRANSLATION = {"cabaliser": [{"method": "trotter2", "n": 2, "r": 1}, {"method": "trotter2", "n": 2, "r": 2},
@@ -70,7 +70,7 @@ def main(argv=None) -> int:
         counts[method] = rows
     translation = []
     if args.compiler == "cabaliser":
-        from mbqc_verify.compile.cabaliser_adapter import translate
+        from mbqc_verify.compilers.cabaliser import translate
         from mbqc_verify.hamsim.circuits import IsingChain, trotter_circuit
         for inst in TRANSLATION["cabaliser"]:
             H = IsingChain.random(inst["n"], seed=inst["n"])

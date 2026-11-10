@@ -11,7 +11,7 @@ conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped}
 depends_on:
 - {node: def.jcz_construction, kind: uses}
 checks:
-- {kind: lean}
-- {kind: vocabulary}
-- {kind: nonvacuity}
+- test: lean/proof
+- test: vocabulary/vetted_constants
+- test: nonvacuity/witness
 tags: [mbqc, transfer, resources]

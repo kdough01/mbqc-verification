@@ -10,9 +10,9 @@ depends_on:
 - {node: def.resource_counts, kind: uses}
 - {node: def.pattern, kind: uses}
 checks:
-- {kind: lean}
-- {kind: vocabulary}
-- kind: nonvacuity
+- test: lean/proof
+- test: vocabulary/vetted_constants
+- test: nonvacuity/witness
   params: {witness: MBQC.Core.resource_additivity_nonvacuous}
 tags: [mbqc, core, resources]
 notes: |

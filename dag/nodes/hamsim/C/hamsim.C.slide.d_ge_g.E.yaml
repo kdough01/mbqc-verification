@@ -13,10 +13,10 @@ conventions: {degree: slide_polynomial_degree}
 depends_on:
 - {node: def.hamsim.slide_formulas, kind: uses}
 checks:
-- kind: symbolic
-  params: {certificate: slide_d_ge_g, quantity: E}
-- {kind: lean}
-- {kind: vocabulary}
-- kind: nonvacuity
+- test: symbolic/slide_positivity
+  params: {quantity: E}
+- test: lean/proof
+- test: vocabulary/vetted_constants
+- test: nonvacuity/witness
   params: {witness: MBQC.Results.HamSim.slide_d_ge_g_nonvacuous}
 tags: [hamsim, slide, consequence]

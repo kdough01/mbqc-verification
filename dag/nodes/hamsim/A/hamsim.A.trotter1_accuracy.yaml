@@ -11,6 +11,6 @@ depends_on:
 - {node: hamsim.A.trotter_circuit_matches_formula, kind: uses}
 - {node: assume.trotter_commutator_bound, kind: assumes}
 checks:
-- kind: numerical
-  params: {which: accuracy, method: trotter1}
+- test: numerical/hamsim_accuracy
+  params: {method: trotter1}
 tags: [hamsim, trotter, accuracy]

@@ -9,6 +9,6 @@ conventions: {angle: radians, endian: little, input: zero, phase: exact}
 depends_on:
 - {node: def.hamsim.ising_chain, kind: uses}
 checks:
-- kind: numerical
-  params: {which: trotter_circuit, tol: 1.0e-10}
+- test: numerical/trotter_circuit
+  params: {tol: 1.0e-10}
 tags: [hamsim, trotter]

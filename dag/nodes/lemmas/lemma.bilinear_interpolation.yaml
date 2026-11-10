@@ -8,8 +8,8 @@ description: |
   Turns 'the fit is exact on held-out points' into a proof: prove the count is affine in each argument, then four values determine the formula everywhere.
 lean_decl: MBQC.Math.bilinear_interpolation
 checks:
-- {kind: lean}
-- {kind: vocabulary}
-- kind: nonvacuity
+- test: lean/proof
+- test: vocabulary/vetted_constants
+- test: nonvacuity/witness
   params: {witness: MBQC.Math.bilinear_interpolation_nonvacuous}
 tags: [math, interpolation]

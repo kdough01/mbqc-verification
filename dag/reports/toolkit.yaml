@@ -32,7 +32,7 @@ strategies:
     what: A proposal may add or change files in a few places (its Lean file, its node's statement draft, its results); a change anywhere else — check code, kinds, schema, transcribed claims, tolerances, acknowledgements, evidence — rejects the whole proposal.
     why: The boundary has to be mechanical; reviewing every diff for sneaky edits does not scale.
     example: "The `proposals` gate refuses a pull request that touches anything outside `proposals/<node>/`; `dagtool apply-proposals` rejects axioms, `sorry`, `native_decide`, IO, metaprogramming and proposer-chosen checks."
-    how: "Path allow-list enforced by the apply step; `.github/CODEOWNERS` on `verification/`, `tools/dagtool/`, `dag/schema/`, `dag/heldout/`, `experiments/*/paper_*.yaml`, the requirements and the workflows, enforced by the `main` ruleset (`.github/rulesets/main.json`, `scripts/protect-main.sh`), so those change only with the owner's review."
+    how: "Path allow-list enforced by the apply step; `.github/CODEOWNERS` on `checks/`, `dagtool/`, `tools/`, `dag/suites/`, `dag/schema/`, `dag/heldout/`, `experiments/*/paper_*.yaml`, the requirements and the workflows, enforced by the `main` ruleset (`.github/rulesets/main.json`, `scripts/protect-main.sh`), so those change only with the owner's review."
   - group: independence
     title: Freeze the claim before anyone tries to meet it
     what: Transcribe the paper's values once, with the printed text, and treat them as read-only. Checks compare against that file, never against a number the proposer supplies.
@@ -80,7 +80,7 @@ strategies:
     what: Each check kind can grant at most a fixed truth level; accepting a known refutation, loosening a tolerance or weakening a claim needs a person, not a proposer.
     why: Otherwise a proposer can acknowledge its own failures or turn empirical agreement into "proved".
     example: "`reproduction` caps at empirical; the Fermi–Hubbard and QFT N-25 acknowledgements came in reviewed commits, not from a proposer."
-    how: "Ceilings in `verification/kinds.py`; `acknowledged:` and `rel_tol` on the protected list; `dagtool check --before` fails when a claim got weaker."
+    how: "Ceilings in `checks/_kinds.py`; `acknowledged:` and `rel_tol` on the protected list; `dagtool check --before` fails when a claim got weaker."
   - group: independence
     title: Determinism and pinning
     what: Pin every tool and dependency, record versions and configuration hashes with each result, and re-run checks on a schedule to catch drift and nondeterminism.

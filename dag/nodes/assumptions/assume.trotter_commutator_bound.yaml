@@ -6,7 +6,7 @@ statement: |
 statement_tex: \|S_2(t/r)^r - e^{-iHt}\| \le \frac{t^3}{r^2}\Big(\tfrac{1}{12}\|[B,[B,A]]\| + \tfrac{1}{24}\|[A,[A,B]]\|\Big)
 code: [src/mbqc_verify/hamsim/analysis.py]
 checks:
-- {kind: literature}
+- test: literature/source_record
 source:
   citation: Childs, Su, Tran, Wiebe & Zhu, Theory of Trotter error with commutator scaling, Phys. Rev.
     X 11, 011020 (2021)

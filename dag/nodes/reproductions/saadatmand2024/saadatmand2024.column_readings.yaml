@@ -21,7 +21,7 @@ source:
   url: https://arxiv.org/abs/2406.06015v3
   exact_form: Table II header; Appendix A, Parameters 2, 14, 15, 35
 checks:
-- kind: reproduction
+- test: reproduction/recorded_value
   name: qft-n-4-n-logical
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-4.json
@@ -31,7 +31,7 @@ checks:
     op: eq
     rel_tol: 0.01
     domain: qft_N-4, calibrated configuration
-- kind: reproduction
+- test: reproduction/recorded_value
   name: qft-n-4-t-patches
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-4.json
@@ -41,7 +41,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: qft_N-4, calibrated configuration
-- kind: reproduction
+- test: reproduction/recorded_value
   name: qft-n-4-phys-qubits
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-4.json
@@ -51,7 +51,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: qft_N-4, calibrated configuration
-- kind: reproduction
+- test: reproduction/recorded_value
   name: qft-n-10-n-logical
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-10.json
@@ -61,7 +61,7 @@ checks:
     op: eq
     rel_tol: 0.01
     domain: qft_N-10, calibrated configuration
-- kind: reproduction
+- test: reproduction/recorded_value
   name: qft-n-10-t-patches
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-10.json
@@ -71,7 +71,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: qft_N-10, calibrated configuration
-- kind: reproduction
+- test: reproduction/recorded_value
   name: qft-n-10-phys-qubits
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-10.json
@@ -81,7 +81,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: qft_N-10, calibrated configuration
-- kind: reproduction
+- test: reproduction/recorded_value
   name: qft-n-100-n-logical
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json
@@ -91,7 +91,7 @@ checks:
     op: eq
     rel_tol: 0.01
     domain: qft_N-100, calibrated configuration
-- kind: reproduction
+- test: reproduction/recorded_value
   name: qft-n-100-t-patches
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json
@@ -101,7 +101,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: qft_N-100, calibrated configuration
-- kind: reproduction
+- test: reproduction/recorded_value
   name: qft-n-100-phys-qubits
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json
@@ -111,7 +111,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: qft_N-100, calibrated configuration
-- kind: reproduction
+- test: reproduction/recorded_value
   name: fh-4x4-n-logical
   params:
     results: experiments/rre/results/calibrated/table2_fh_4x4.json

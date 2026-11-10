@@ -2,12 +2,22 @@
 #
 # A formalization proposal names the claim type of its theorem and proposes checks beyond the fixed Lean ones.
 # The verifier always adds `required` itself; the suite must also satisfy every `require_one_of` group, and may
-# only use the `allowed` kinds, each within its `params` rules below. Expected values never come from a proposal:
+# only use the `allowed` types (folders of checks/), through the `tests` listed for each, within its `params`
+# rules below. Expected values never come from a proposal:
 # they name a frozen file already in the repository or a held-out value. Predicates for `finite` and `refuter`
 # come from the proposal's checks.py, which is scanned (an allow-list of Python constructs) before it runs.
 # Changing this file is a change to the verifier and needs the code owner's review.
 
 required: [lean, vocabulary, nonvacuity]          # added by the verifier for every formalized theorem
+
+# The tests a proposal may use for each type (checks/<type>/<name>.py).
+tests:
+  finite:       [finite/exhaustive]
+  refuter:      [refuter/hypothesis]
+  equivalence:  [equivalence/iff_proof]
+  reproduction: [reproduction/recorded_value]
+  tool:         [tool/surface_code_memory, tool/surface_code_fit, tool/gridsynth_rz, tool/qualtran_cost,
+                 tool/azure_re_logical_counts, tool/azure_re_qsharp]
 
 claim_types:
   exact_statement:
@@ -26,7 +36,7 @@ claim_types:
     describe: A logical-error or threshold model for an error-correcting code.
     require_one_of: [[tool]]
     allowed: [tool, finite, refuter, equivalence]
-    tools: [surface_code.memory, surface_code.fit]
+    tools: [tool/surface_code_memory, tool/surface_code_fit]
   translation:
     describe: A gate-to-MBQC translation or compilation preserves the computation.
     require_one_of: [[finite, refuter]]
@@ -34,7 +44,7 @@ claim_types:
 
 params:
   finite:      {max_points: 1000000}
-  refuter:     {source: hypothesis, min_examples: 200, max_examples: 20000}
+  refuter:     {min_examples: 200, max_examples: 20000}
   tool:        {max_shots: 1000000, max_distance: 11}
   equivalence: {}
   reproduction: {}

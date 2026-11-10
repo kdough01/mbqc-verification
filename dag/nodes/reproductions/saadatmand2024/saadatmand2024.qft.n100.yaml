@@ -25,7 +25,7 @@ source:
   url: https://arxiv.org/abs/2406.06015v3
   exact_form: Table II, QFT row N-100
 checks:
-- kind: reproduction
+- test: reproduction/recorded_value
   name: reproduction-n-logical
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json
@@ -35,7 +35,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: QFT N-100, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, one widget per circuit
-- kind: reproduction
+- test: reproduction/recorded_value
   name: reproduction-bus-patches
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json
@@ -45,7 +45,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: QFT N-100, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, one widget per circuit
-- kind: reproduction
+- test: reproduction/recorded_value
   name: reproduction-t-patches
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json
@@ -55,7 +55,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: QFT N-100, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, one widget per circuit
-- kind: reproduction
+- test: reproduction/recorded_value
   name: reproduction-phys-qubits
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json
@@ -65,7 +65,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: QFT N-100, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, one widget per circuit
-- kind: reproduction
+- test: reproduction/recorded_value
   name: reproduction-modules
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json
@@ -75,7 +75,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: QFT N-100, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, one widget per circuit
-- kind: reproduction
+- test: reproduction/recorded_value
   name: reproduction-time-s
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json
@@ -85,7 +85,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: QFT N-100, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, one widget per circuit
-- kind: reproduction
+- test: reproduction/recorded_value
   name: reproduction-p4k-w
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json
@@ -95,7 +95,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: QFT N-100, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, one widget per circuit
-- kind: reproduction
+- test: reproduction/recorded_value
   name: reproduction-p20mk-w
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json
@@ -105,7 +105,7 @@ checks:
     op: approx
     rel_tol: 0.01
     domain: QFT N-100, RRE 0.26.33 @ 9383b4d, config_calibrated.yaml, one widget per circuit
-- kind: reproduction
+- test: reproduction/recorded_value
   name: reproduction-energy-wh
   params:
     results: experiments/rre/results/calibrated/table2_qft_N-100.json

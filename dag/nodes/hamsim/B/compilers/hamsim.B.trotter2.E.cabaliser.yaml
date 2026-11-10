@@ -7,19 +7,18 @@ statement: |
 statement_tex: E = (4n - 2)r + 2n
 description: |
   The same circuit as the Graphix nodes (Qiskit transpile, level 1, here to Clifford + Rz with Rz by multiples of π/2 passed as Cliffords), compiled by Cabaliser in one widget with its inputs teleported in. Graphix-optimized E has no bilinear formula (hamsim.B.trotter2.E.opt), but Cabaliser's does: the two compilers build different graphs from the same rotations. Counts are recorded by experiments/compilers/run.py in the pinned RRE environment (Cabaliser 10f5c4e).
-code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/analysis.py, src/mbqc_verify/compile/compilers.py, src/mbqc_verify/compile/cabaliser_adapter.py,
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/hamsim/analysis.py, src/mbqc_verify/compilers/__init__.py, src/mbqc_verify/compilers/cabaliser.py,
   experiments/compilers/results/cabaliser.json]
 conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps, compiler: cabaliser}
 depends_on:
 - {node: hamsim.B.trotter2.E.opt, kind: variant_of}
 - {node: hamsim.B.cabaliser_graphs_match, kind: uses}
 checks:
-- kind: scaling
+- test: scaling/bilinear_formula
   params:
     method: trotter2
     compiler: cabaliser
     quantity: E
     coef: [4, -2, 2, 0]
-- kind: mutation
-  params: {target: scaling}
+- test: mutation/scaling_coefficients
 tags: [hamsim, trotter2, resources, cabaliser, compiler-variant]

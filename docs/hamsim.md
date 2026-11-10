@@ -12,13 +12,14 @@ It rebuilds everything the slide talks about, runs it, and tests each claim. Eve
 | `src/mbqc_verify/hamsim/qsp_angles.py` | Classical pre-processing: required degree and rotation angles; every routine checks its own output |
 | `src/mbqc_verify/hamsim/analysis.py` | Repetitions for accuracy ε, post-selected operators, MBQC resource counts |
 | `src/mbqc_verify/hamsim/slide.py` | The slide's formulas, as data |
-| `src/mbqc_verify/compile/qiskit_to_mbqc.py` | Qiskit circuit → Graphix pattern, resource counts, equivalence check |
-| `src/mbqc_verify/compile/compilers.py` | One interface for every compiler compared (Graphix unoptimized, Graphix-optimized, Cabaliser, …) |
-| `src/mbqc_verify/compile/cabaliser_adapter.py`, `experiments/compilers/run.py` | Cabaliser in the pinned RRE environment; records its counts and translation runs |
-| `verification/truth/numerical/` | Layer A accuracy; equal-accuracy comparison |
-| `verification/truth/translation/` | Compiled pattern equals its circuit, per instance |
-| `verification/truth/scaling/` | Layer B formulas against compiled counts |
-| `verification/truth/symbolic/`, `verification/truth/refuter/` | Layer C: positivity certificate; counterexample search |
+| `src/mbqc_verify/compilers/graphix.py` | Qiskit circuit → Graphix pattern, resource counts, equivalence check |
+| `src/mbqc_verify/compilers/__init__.py` | One interface for every compiler compared (Graphix unoptimized, Graphix-optimized, Cabaliser, …) |
+| `src/mbqc_verify/compilers/cabaliser.py`, `experiments/compilers/run.py` | Cabaliser in the pinned RRE environment; records its counts and translation runs |
+| `checks/numerical/` | Layer A accuracy; equal-accuracy comparison |
+| `checks/translation/` | Compiled pattern (or Cabaliser graph) equals its circuit, per instance |
+| `checks/scaling/` | Layer B formulas, gate counts, widths and no-cancel against compiled circuits |
+| `checks/differential/` | Lean's models of Graphix against Graphix itself |
+| `checks/symbolic/`, `checks/refuter/`, `checks/lean/disproof.py` | Layer C: positivity certificate; counterexample search; disproofs in Lean |
 | `lean/MBQC/Results/HamSim/` | Lean proofs: the slide's Layer C claims, all 9 unoptimized and 6 Graphix-optimized formulas (modulo named assumptions), the disproofs of the slide's claim with our formulas, and the Big-O bound |
 | `lean/MBQC/Defs/GraphixGates.lean`, `lean/MBQC/Assumptions/HamSim*.lean` | Graphix's per-gate J/CZ decompositions; what Lean takes on trust about the transpiled circuits and optimized patterns |
 | `experiments/hamsim/run_all.py` | The full printed report; writes `results/hamsim_results.json` |

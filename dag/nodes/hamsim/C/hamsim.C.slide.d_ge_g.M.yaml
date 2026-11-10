@@ -14,10 +14,10 @@ depends_on:
 - {node: def.hamsim.slide_formulas, kind: uses}
 - {node: hamsim.C.slide.d_ge_g.N, kind: uses, note: M = N − n on both sides}
 checks:
-- kind: symbolic
-  params: {certificate: slide_d_ge_g, quantity: M}
-- {kind: lean}
-- {kind: vocabulary}
-- kind: nonvacuity
+- test: symbolic/slide_positivity
+  params: {quantity: M}
+- test: lean/proof
+- test: vocabulary/vetted_constants
+- test: nonvacuity/witness
   params: {witness: MBQC.Results.HamSim.slide_d_ge_g_nonvacuous}
 tags: [hamsim, slide, consequence]

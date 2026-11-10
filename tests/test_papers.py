@@ -15,7 +15,8 @@ from dagtool.hashing import input_hash
 from dagtool.model import load_dag
 from dagtool.status import check_files, compute
 from dagtool.verdict import verdict
-from verification.kinds import LEAN_KINDS
+from checks._kinds import LEAN_KINDS
+from dagtool.legacy import DEFAULT_TEST
 
 REPO = Path(__file__).resolve().parents[1]
 SERVER = "https://review.example"
@@ -39,9 +40,11 @@ def node(root, id, kind="theorem", deps=(), checks=(), **extra):
 
 def evidence(root, node_id, kind, outcome="pass", grants=None):
     dag = load_dag(root)
-    ih, _ = input_hash(dag, dag.nodes[node_id], {}, check_files(root, kind), uses_lean=kind in LEAN_KINDS)
+    spec = next((c for c in dag.nodes[node_id].checks if c.name == kind), None)
+    test = spec.test if spec else DEFAULT_TEST[kind]
+    ih, _ = input_hash(dag, dag.nodes[node_id], {}, check_files(root, test), uses_lean=kind in LEAN_KINDS)
     write_evidence(dag, node_id, kind, {
-        "node": node_id, "kind": kind, "name": kind, "params": {},
+        "node": node_id, "test": test, "kind": kind, "name": kind, "params": {},
         "result": {"outcome": outcome, "grants": grants, "domain": "test", "summary": "", "evidence": {}},
         "input_hash": ih})
 
@@ -79,10 +82,10 @@ def test_pull_adds_open_nodes_that_validate(repo):
 def test_pull_is_idempotent_and_keeps_edits(repo):
     papers.pull(load_dag(repo), SERVER, theorems=[theorem()])
     path = repo / "dag/nodes/papers/p_abc/paper.p_abc.theorem_1_error_bound.yaml"
-    edited = yaml.safe_load(path.read_text()) | {"checks": [{"kind": "numerical"}]}
+    edited = yaml.safe_load(path.read_text()) | {"checks": [{"test": "numerical/hamsim_accuracy"}]}
     path.write_text(yaml.safe_dump(edited, sort_keys=False, allow_unicode=True))
     again = papers.pull(load_dag(repo), SERVER, theorems=[theorem(title="Renamed upstream")])
-    assert again == [] and yaml.safe_load(path.read_text())["checks"] == [{"kind": "numerical"}]
+    assert again == [] and yaml.safe_load(path.read_text())["checks"] == [{"test": "numerical/hamsim_accuracy"}]
 
 
 def test_pull_skips_bad_ids_withdrawn_and_nodes_that_already_cite_the_theorem(repo):
@@ -99,11 +102,11 @@ def test_statement_falls_back_when_nothing_was_quoted():
 
 def test_verdicts(repo):
     node(repo, "def.d", kind="definition")
-    node(repo, "core.c", kind="core", deps=[("def.d", "uses")], checks=[{"kind": "lean"}])
-    node(repo, "t.proved", deps=[("core.c", "uses")], checks=[{"kind": "lean"}, {"kind": "scaling"}])
-    node(repo, "t.refuted", checks=[{"kind": "refuter"}])
-    node(repo, "t.broken", deps=[("t.refuted", "uses")], checks=[{"kind": "numerical"}])
-    node(repo, "t.waiting", deps=[("t.open_parent", "uses")], checks=[{"kind": "numerical"}])
+    node(repo, "core.c", kind="core", deps=[("def.d", "uses")], checks=[{"test": "lean/proof"}])
+    node(repo, "t.proved", deps=[("core.c", "uses")], checks=[{"test": "lean/proof"}, {"test": "scaling/bilinear_formula"}])
+    node(repo, "t.refuted", checks=[{"test": "refuter/qsvt_exceeds_gqsp_formulas"}])
+    node(repo, "t.broken", deps=[("t.refuted", "uses")], checks=[{"test": "numerical/hamsim_accuracy"}])
+    node(repo, "t.waiting", deps=[("t.open_parent", "uses")], checks=[{"test": "numerical/hamsim_accuracy"}])
     node(repo, "t.open_parent")
     evidence(repo, "core.c", "lean", grants="proved")
     evidence(repo, "t.proved", "lean", grants="proved")
@@ -132,7 +135,7 @@ def test_rejection_labels_name_the_check_kind():
     assert rejection(["reproduction"])[0] == "Does not reproduce" and "unstated settings" in rejection(["reproduction"])[1]
     label, why = rejection(["scaling", "refuter"])                      # the most decisive kind names it
     assert label == "Counterexample found" and "does not pass scaling tests" in why
-    from verification.kinds import CHECK_KINDS
+    from checks._kinds import CHECK_KINDS
     refuting = {"lean", "refuter", "finite", "symbolic", "numerical", "translation", "tool", "reproduction", "scaling"}
     assert rejection(["lean", "refuter"])[0] == "Disproved in Lean"
     assert refuting <= {k for k, _, _ in REJECTION} and {k for k, _, _ in REJECTION} <= set(CHECK_KINDS)
@@ -140,11 +143,11 @@ def test_rejection_labels_name_the_check_kind():
 
 def test_export_carries_verdict_paper_and_checks(repo):
     papers.pull(load_dag(repo), SERVER, theorems=[theorem()])
-    node(repo, "t.other", checks=[{"kind": "numerical"}])
+    node(repo, "t.other", checks=[{"test": "numerical/hamsim_accuracy"}])
     data = json.loads(json.dumps(papers.export(load_dag(repo), circuits=False), default=str))
     by_id = {n["id"]: n for n in data["nodes"]}
     paper_node = by_id["paper.p_abc.theorem_1_error_bound"]
     assert paper_node["verdict"]["state"] == "open" and paper_node["paper"]["paper_id"] == "p_abc"
-    assert by_id["t.other"]["checks"] == [{"kind": "numerical", "name": "numerical"}]
+    assert by_id["t.other"]["checks"] == [{"test": "numerical/hamsim_accuracy", "kind": "numerical", "name": "numerical"}]
     assert data["meta"]["format"] == "mbqc-dag-v1" and "branch" in data["meta"]
 

@@ -1,11 +1,9 @@
 {
- "input_hash": "673f13c3d3f78654",
+ "input_hash": "a83433db6ab39966",
  "inputs": {
   "check_code": {
-   "verification/faithfulness/nonvacuity/check.py": "5ad89e0eb7bad489bde10d115ea53868f859c42a1ee8a4911ec93ca7843a43d9",
-   "verification/truth/lean/check.py": "029219c782e5286887cdcfb44b0b501ccf6fbfc576d524fddc51a7afb4b31807",
-   "verification/truth/lean/leanrun.py": "6cea0e6e8353cc39b75cc5e8e95ada1dba194a8cdf6dc71a55324b54fc69fb96",
-   "verification/truth/lean/proof.py": "6525c42aa321ab57f1107009507be1bb1cd81ebd4f58d40fa8f73866e082e7c5"
+   "checks/_shared/lean.py": "2a2901de98a2fcc7261dd2d3cfeb4e6ad73014ebedc11bfa22ec700c91448fc1",
+   "checks/nonvacuity/witness.py": "2e92876c92bac81ac9f87221bdad1517c00b972b463859c749137f5f16553a26"
   },
   "check_params": "44136fa355b3678a",
   "code": {},
@@ -15,7 +13,7 @@
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
-  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_sources": "70186db16941b81859b28589b418b3a69f519ce68964557d375181d587b317d8",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
    "def.jcz_construction": "392cb6fd4770bc56:b8ffd8b5"
@@ -28,9 +26,9 @@
  "node": "transfer.gate_to_mbqc_counts",
  "params": {},
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:39+00:00",
+  "finished": "2026-11-10T18:13:15+00:00",
   "quick": false,
   "seconds": 0.01,
   "versions": {
@@ -52,5 +50,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "the theorem has no hypotheses"
- }
+ },
+ "test": "nonvacuity/witness"
 }

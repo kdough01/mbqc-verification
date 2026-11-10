@@ -6,78 +6,77 @@ statement: |
 description: |
   What Lean cannot compute: what Qiskit's transpiler outputs. Stated as the axioms of MBQC.Assumptions.HamSim.Trotter2UnoptGates (lean/MBQC/Assumptions/HamSimGates.lean). The scaling checks count every gate kind of the real transpiled circuits on the whole grid, held-out points included, and check the qubit count and that no CZ cancels. A reviewer should judge whether exact bilinear gate counts are plausible beyond the grid: the circuit repeats one block per r, and each block grows linearly in n.
 lean_decl: [MBQC.Assumptions.HamSim.Trotter2UnoptGates]
-code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compilers/graphix.py, src/mbqc_verify/hamsim/analysis.py]
 conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: trotter_steps, compiler: graphix}
 depends_on:
 - {node: def.graphix_gates, kind: uses}
 checks:
-- kind: scaling
+- test: scaling/gate_counts
   name: gates-cnot
   params:
     method: trotter2
-    quantity: gate:cnot
+    gate: cnot
     coef: [0, 0, 0, 0]
-- kind: scaling
+- test: scaling/gate_counts
   name: gates-cz
   params:
     method: trotter2
-    quantity: gate:cz
+    gate: cz
     coef: [0, 0, 0, 0]
-- kind: scaling
+- test: scaling/gate_counts
   name: gates-rzz
   params:
     method: trotter2
-    quantity: gate:rzz
+    gate: rzz
     coef: [1, -1, 0, 0]
-- kind: scaling
+- test: scaling/gate_counts
   name: gates-ccx
   params:
     method: trotter2
-    quantity: gate:ccx
+    gate: ccx
     coef: [0, 0, 0, 0]
-- kind: scaling
+- test: scaling/gate_counts
   name: gates-h
   params:
     method: trotter2
-    quantity: gate:h
+    gate: h
     coef: [0, 0, 0, 0]
-- kind: scaling
+- test: scaling/gate_counts
   name: gates-x
   params:
     method: trotter2
-    quantity: gate:x
+    gate: x
     coef: [0, 0, 0, 0]
-- kind: scaling
+- test: scaling/gate_counts
   name: gates-rx
   params:
     method: trotter2
-    quantity: gate:rx
+    gate: rx
     coef: [0, 0, 1, 0]
-- kind: scaling
+- test: scaling/gate_counts
   name: gates-ry
   params:
     method: trotter2
-    quantity: gate:ry
+    gate: ry
     coef: [0, 0, 0, 0]
-- kind: scaling
+- test: scaling/gate_counts
   name: gates-rz
   params:
     method: trotter2
-    quantity: gate:rz
+    gate: rz
     coef: [0, 0, 0, 0]
-- kind: scaling
+- test: scaling/gate_counts
   name: gates-u
   params:
     method: trotter2
-    quantity: gate:u
+    gate: u
     coef: [1, 0, 0, 0]
-- kind: scaling
+- test: scaling/circuit_width
   name: width
   params:
     method: trotter2
-    quantity: width
     coef: [0, 0, 1, 0]
-- kind: scaling
+- test: scaling/no_cancel
   name: no-cancel
-  params: {method: trotter2, claim: no_cancel}
+  params: {method: trotter2}
 tags: [hamsim, trotter2, resources, unoptimized, gate-counts]

@@ -12,7 +12,7 @@ import pytest
 from dagtool import proposals as pr
 from dagtool.model import load_dag
 from dagtool.suites import load_policy, scan_python, suite_diff, validate_suite
-from verification.base import load_all
+from checks._framework import discover
 
 from test_proofs import LEAN_OK, REPO
 from test_proposals import CHECKS_PY, NS, SUITE, TID, quiet, raw, repo, submit, tree  # noqa: F401
@@ -20,7 +20,12 @@ from test_proposals import CHECKS_PY, NS, SUITE, TID, quiet, raw, repo, submit, 
 
 def test_policy_names_only_implemented_kinds():
     pol = load_policy(REPO)
-    kinds = set(load_all())
+    tests = discover()
+    kinds = {t.type for t in tests.values()}
+    for kind, allowed in pol["tests"].items():
+        assert all(t in tests and t.startswith(kind + "/") for t in allowed), kind
+    for spec in pol["claim_types"].values():
+        assert set(spec.get("tools", [])) <= set(pol["tests"]["tool"])
     assert set(pol["required"]) <= kinds
     for name, spec in pol["claim_types"].items():
         assert set(spec["allowed"]) <= kinds, name
@@ -34,7 +39,7 @@ def v(repo, suite, checks=CHECKS_PY):
 def test_a_good_suite_is_recorded_with_its_origin_and_rationale(repo):
     errs, out = v(repo, SUITE)
     assert errs == [] and out[0]["origin"] == "proposal" and out[0]["rationale"]
-    assert out[0]["params"]["predicate"] == f"checks/papers/{TID}.py:counts_add"
+    assert out[0]["params"]["predicate"] == f"dag/predicates/{TID}.py:counts_add"
 
 
 @pytest.mark.parametrize("change, why", [
@@ -52,7 +57,7 @@ def test_a_good_suite_is_recorded_with_its_origin_and_rationale(repo):
         "source": "hypothesis", "predicate": "checks.py:counts_add", "strategy": {"a": {"integers": [0, 9]}},
         "max_examples": 10}}]), "max_examples must be in"),
     (lambda s: s.update(checks=[{"kind": "refuter", "name": "h", "rationale": "r", "params": {
-        "predicate": "checks.py:counts_add", "strategy": {"a": {"integers": [0, 9]}}}}]), "source: hypothesis"),
+        "predicate": "checks.py:counts_add", "strategy": {"a": {"integers": [0, 9]}}}}]), "uses one of"),
     (lambda s: s.update(claim_type="resource_estimate", checks=[{"kind": "tool", "name": "t", "rationale": "r",
         "params": {"tool": "qualtran.cost", "args": {}, "path": "t", "expect": 4, "domain": "d"}}]), "never from the proposal"),
     (lambda s: s.update(claim_type="logical_error_model", checks=[{"kind": "tool", "name": "t", "rationale": "r",
@@ -173,3 +178,40 @@ def test_a_failing_proposed_check_rejects_with_its_counterexample(lean_repo):
     assert all(c["outcome"] == "pass" for c in fb["checks"] if c["origin"] == "verifier")
     shutil.rmtree(lean_repo / "in")
     assert tree(lean_repo) == before
+
+
+# ------------------------------------------------------------------ both ways of writing a check
+
+def test_a_suite_may_name_tests_or_use_the_older_kind_form(repo):
+    """The Quantum Genesis dashboard may still send {kind, params}; it is translated to the test it means."""
+    old = copy.deepcopy(SUITE)
+    new = copy.deepcopy(SUITE)
+    for c in new["checks"]:
+        c["test"] = {"finite": "finite/exhaustive", "refuter": "refuter/hypothesis"}[c.pop("kind")]
+        c.get("params", {}).pop("source", None)
+    e1, out_old = v(repo, old)
+    e2, out_new = v(repo, new)
+    assert e1 == e2 == [] and out_old == out_new and all("kind" not in c for c in out_old)
+
+
+def test_suite_diff_sees_through_the_form(repo):
+    a = {"claim_type": "count_formula", "checks": [
+        {"kind": "refuter", "name": "big", "params": {"source": "hypothesis", "predicate": "checks.py:f",
+                                                       "strategy": {"n": {"integers": [1, 9]}}, "max_examples": 500}}]}
+    b = {"claim_type": "count_formula", "checks": [
+        {"test": "refuter/hypothesis", "name": "big", "params": {"predicate": "checks.py:f",
+                                                                  "strategy": {"n": {"integers": [1, 9]}}, "max_examples": 500}}]}
+    d = suite_diff(a, b)
+    assert d["unchanged"] == ["big"] and not d["needs_signoff"]
+    b["checks"][0]["params"]["max_examples"] = 400
+    assert suite_diff(a, b)["loosened"] == ["big"]
+
+
+def test_an_unknown_test_or_bad_params_is_refused(repo):
+    s = copy.deepcopy(SUITE)
+    s["checks"][0] = {"test": "finite/exhaustive", "name": "small", "rationale": "r",
+                      "params": {"predicate": "checks.py:counts_add", "domain": {"a": {"range": [0, 3]}}, "extra": 1}}
+    errs, _ = v(repo, s)
+    assert any("Additional properties" in e and "extra" in e for e in errs), errs
+    s["checks"][0]["test"] = "finite/nope"
+    assert any("uses one of" in e for e in v(repo, s)[0])

@@ -3,7 +3,7 @@ conventions.py — the conventions every object, statement and check is stated i
 
 The code base juggles several conventions that silently change what a number
 means. Each DAG node declares the ones it uses (`conventions:` in its YAML), and
-`verification/graph/conventions` checks that both ends of every edge agree, or
+`dagtool/conventions.py` checks that both ends of every edge agree, or
 that the edge names a converter from CONVERTERS below.
 
     angle   pi_units | radians              Graphix angles are in units of pi, Qiskit's in radians
@@ -16,7 +16,7 @@ that the edge names a converter from CONVERTERS below.
             slide_polynomial_degree         or the slide's d_eps / g_eps (polynomial degree, undefined
                                             relative to ours; see docs/hamsim.md)
     compiler graphix | graphix_opt |        which circuit-to-MBQC compiler a count is about
-            cabaliser                       (mbqc_verify.compile.compilers; a count is a claim about
+            cabaliser                       (mbqc_verify.compilers; a count is a claim about
                                             one compiler, and a variant_of edge compares two)
 """
 
@@ -54,7 +54,7 @@ class Degree(str, Enum):
     SLIDE_POLYNOMIAL_DEGREE = "slide_polynomial_degree"
 
 
-class Compiler(str, Enum):      # one value per entry of mbqc_verify.compile.compilers.COMPILERS
+class Compiler(str, Enum):      # one value per entry of mbqc_verify.compilers.COMPILERS
     GRAPHIX = "graphix"
     GRAPHIX_OPT = "graphix_opt"
     CABALISER = "cabaliser"
@@ -97,7 +97,7 @@ class Conventions:
         return {k: (a[k], b[k]) for k in a.keys() & b.keys() if a[k] != b[k]}
 
 
-# The conventions of the Graphix pipeline in compile/qiskit_to_mbqc.py
+# The conventions of the Graphix pipeline in compilers/graphix.py
 # (Graphix side) and of the Qiskit circuits in hamsim/circuits.py.
 GRAPHIX = Conventions(angle=Angle.PI_UNITS, endian=Endian.BIG, input=InputState.PLUS,
                       phase=Phase.GLOBAL_DROPPED)

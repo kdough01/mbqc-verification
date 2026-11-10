@@ -1,15 +1,16 @@
 {
- "input_hash": "8c865cf5781bddb7",
+ "input_hash": "0f7702c3790b6145",
  "inputs": {
   "check_code": {
-   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
-   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
+   "checks/_shared/grids.py": "0c5797261a67e7696eb32c9353644d6b9c0951aaa165b7fb96fa5df13d0834fe",
+   "checks/scaling/_compare.py": "f4f6d53e502987dcb5157e2b3234629dd9c5fb406d673d308391424d0374ce94",
+   "checks/scaling/not_bilinear.py": "0fb7dcea0e74369ef3e68335a809b1b5bc287531eec38e9846d2d64bf1390584"
   },
-  "check_params": "f4adfbe1c7205f3d",
+  "check_params": "542ef27aa89adfb6",
   "code": {
-   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
-   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
-   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+   "src/mbqc_verify/compilers/graphix.py": "f435644e7a21a0782ef6f49f815d85e1c19ba45fb396a1acca91f6f3ac8b8d8f",
+   "src/mbqc_verify/hamsim/analysis.py": "5889b248fb7f1e5b4eca83915882e8e6d667765ee4918dd59589cc86343779ef",
+   "src/mbqc_verify/hamsim/circuits.py": "40d1186477ef327acf62f99b60e9274d8111d7dfccdaae46a7dcbec34111576a"
   },
   "definitions": {
    "def.graph_state": "49d988a8e94f1186",
@@ -27,15 +28,14 @@
  "name": "scaling",
  "node": "hamsim.B.gqsp.E.opt",
  "params": {
-  "claim": "not_bilinear",
+  "compiler": "graphix_opt",
   "method": "gqsp",
-  "optimize": true,
   "quantity": "E"
  },
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:26+00:00",
+  "finished": "2026-11-10T18:13:03+00:00",
   "quick": false,
   "seconds": 0.01,
   "versions": {
@@ -234,5 +234,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "no bilinear formula fits: the one through the 4 corners misses 6 of 10 points"
- }
+ },
+ "test": "scaling/not_bilinear"
 }

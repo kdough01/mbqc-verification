@@ -7,17 +7,16 @@ statement: |
 description: |
   The slide's conclusion re-tested on our compiler. Note the comparison pairs our QSVT D (calls per sequence) with our GQSP d (Laurent degree): the convention check flags it, because the two degrees measure different things. The equal-accuracy comparison avoids this. Lean disproves it too: at n = 2, D = d = 5 the Layer B formulas give QSVT fewer measurements than GQSP.
 lean_decl: MBQC.Results.HamSim.qsvt_gqsp_measurements_unopt_disproof
-code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compilers/graphix.py, src/mbqc_verify/hamsim/analysis.py]
 conventions: {degree: qsvt_calls_per_sequence}
 depends_on:
 - {node: hamsim.B.qsvt.M.unopt, kind: uses}
 - {node: hamsim.B.gqsp.M.unopt, kind: uses}
 checks:
-- kind: refuter
-  params: {quantity: M, source: formula, qsvt: hamsim.B.qsvt.M.unopt, gqsp: hamsim.B.gqsp.M.unopt, n_max: 50, k_max: 41}
-- kind: lean
-  params: {refutes: true}
-- {kind: vocabulary}
+- test: refuter/qsvt_exceeds_gqsp_formulas
+  params: {quantity: M, qsvt: hamsim.B.qsvt.M.unopt, gqsp: hamsim.B.gqsp.M.unopt, n_max: 50, k_max: 41}
+- test: lean/disproof
+- test: vocabulary/vetted_constants
 acknowledged:
 - {code: convention_mismatch, reason: 'the slide''s claim compares degrees directly, so re-testing it on our compiler has
     to pair our QSVT D with our GQSP d; hamsim.C.equal_accuracy is the convention-free comparison'}

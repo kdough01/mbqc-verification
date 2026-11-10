@@ -10,28 +10,36 @@ The first worked example is the slide *Hamiltonian simulation: explicit costs an
 ## Layout
 
 ```text
-src/mbqc_verify/          the objects: circuits, QSP angles, circuit -> MBQC compiler, conventions
+checks/                   every test a node can run: one file per test, checks/<type>/<name>.py (checks/README.md)
+  <type>/                 one folder per type (scaling, lean, numerical, translation, tool, ...), each with a README
+                          that explains the type and lists its tests; files starting with _ are helpers
+  _shared/                helpers several types use (Lean runs, scaling grids, predicates, held-out values)
+  _framework.py           what a test file is and how dagtool finds, validates and runs one
+  _kinds.py               each type's question and the highest status it may grant
+  _template.py            copy this (dagtool new-test TYPE NAME) to add a test
+src/mbqc_verify/          the code the tests call
+  compilers/              circuit -> MBQC compilers: graphix (unoptimized and optimized), cabaliser; add others here
+  hamsim/                 Hamiltonian-simulation circuits, QSP angles, cost analysis
+  tools/                  adapters for the pinned external tools (Stim, gridsynth, Qualtran, Azure RE)
+  conventions.py          the convention axes every node declares
 lean/                     Lean 4 project (core Lean, no Mathlib): definitions, proofs, assumption axioms
-verification/             the checks, sorted by the question each answers
-  faithfulness/           does the statement mean what we intend?   vocabulary, differential, mutation, nonvacuity,
-                          equivalence, review
-  truth/                  is it true?   lean, lean_proof, finite, symbolic, translation, numerical, scaling, refuter,
-                          literature, reproduction, tool (pinned external tools), heldout (sealed expected values)
-  graph/                  properties of the DAG: conventions, Lean-extracted edges, propagation, staleness, repro
+tools/                    external tools' pins and environments: requirements.txt (Stim, PyMatching, Qualtran, ...),
+                          rre/ (the RRE + Cabaliser environment)
 dag/
   nodes/<area>/<id>.yaml  one claim per file, hand-written (schema: dag/schema/node.schema.json)
   reviews/<id>.yaml       human statement reviews, pinned to the statement hash
   reports/<id>.yaml       narrative for a per-paper verification report (dagtool report)
   evidence/<id>/*.json    written by checks, committed
   heldout/<id>.json       sealed expected values (open only in CI on main)
-tools/dagtool/            CLI: validate, run, status, show, queue, review, repro, render, report, check
+  predicates/<id>.py      predicates a proposal's finite and refuter checks call (from its checks.py)
+  suites/policy.yaml      what a proposal's test suite must and may contain
+dagtool/                  CLI: validate, run, tests, test, status, show, queue, review, repro, render, report, check
 experiments/hamsim/       the full report (run_all.py), plots, results/hamsim_results.json, figures/
 experiments/rre/          reproduction of Saadatmand et al. (arXiv:2406.06015) with their pinned pipeline
 experiments/compilers/    counts and translation runs of compilers that need their own environment (Cabaliser)
 docs/                     write-ups and images
 .github/                  CI: verify (every push), papers (pull site theorems), proposals (gate for submitted proofs), reproduce (manual), review, repro (weekly), setup
-tests/                    unit tests for the status rules and check logic
-requirements-tools.txt    pinned external tools the checks call (Stim, PyMatching, sinter, Hypothesis, Qualtran, ...)
+tests/                    pytest for the verifier itself (status rules, the tests' logic, the file contract)
 scripts/protect-main.sh   applies the main ruleset (.github/rulesets/main.json) that enforces .github/CODEOWNERS
 ```
 
@@ -68,7 +76,7 @@ each method three ways: the Qiskit circuit as built, the MBQC pattern the compil
 each CZ drawn at the step it is applied), and the pattern after Pauli measurements are removed (edges this creates
 are drawn curved). Hover a vertex for its measurement. **Review queue** lists what a person should review next.
 Scaling claims plot the compiled counts against the claimed formula, one line per `n`, with held-out points and any
-miss marked, and a data table underneath. The circuit drawings come from `src/mbqc_verify/compile/export.py`.
+miss marked, and a data table underneath. The circuit drawings come from `src/mbqc_verify/compilers/graphix_export.py`.
 
 ### One-time setup
 
@@ -86,11 +94,12 @@ miss marked, and a data table underneath. The circuit drawings come from `src/mb
 
 ```bash
 pip install -r requirements.txt && pip install -e .     # Python 3.11+
-pip install --no-deps -r requirements-tools.txt         # the pinned external tools (every dependency listed)
+pip install --no-deps -r tools/requirements.txt         # the pinned external tools (every dependency listed)
 cd lean && lake build && cd ..                          # needs elan
 dagtool run --stale && dagtool status && dagtool check
 ```
 
+`dagtool tests` lists every test; `dagtool test <type>/<name> --node <id>` runs one without writing anything.
 Other commands: `dagtool show <id>`, `dagtool queue`, `dagtool render`, `dagtool summary`, `dagtool repro`,
 `dagtool pull-papers`, `dagtool export`, `dagtool report`, `dagtool open-theorems`, `dagtool feedback`,
 `dagtool apply-proposals`, `dagtool lean-check`, `dagtool proof-targets`, `dagtool heldout`, `dagtool tool`.
@@ -123,9 +132,11 @@ module becomes a DAG theorem, and the site's **Theorem DAG** tab shows this DAG.
 - **Test suites**: a formalization carries `suite.json`, the claim type and the checks the proposer suggests beyond the
   fixed `lean`, `vocabulary` and `nonvacuity` (which the verifier always adds), with a rationale each; predicates for
   `finite` and `refuter` checks go in `checks.py`. `dag/suites/policy.yaml` sets each claim type's minimum
-  (`require_one_of`), the kinds it may use and their parameter limits; expected values must name a frozen file or a
+  (`require_one_of`), the types it may use, the tests allowed for each, and their parameter limits. Each check names
+  its test (`{"test": "refuter/hypothesis", "name": ..., "params": ..., "rationale": ...}`); the older
+  `{"kind": ..., "params": ...}` form is still accepted and translated (`dagtool/legacy.py`). Expected values must name a frozen file or a
   held-out value; `checks.py` passes an allow-list scan (no I/O, no `eval`, no names starting with `_`, only the listed
-  imports) before it runs, and is stored as `checks/papers/<node>.py`. `dagtool suite-policy` prints the policy;
+  imports) before it runs, and is stored as `dag/predicates/<node>.py`. `dagtool suite-policy` prints the policy;
   `dagtool suite-diff OLD NEW` classifies a revision's changes as added, removed, tightened, loosened or modified (the
   dashboard uses it to hold each revision to its diagnosis). Recorded checks carry `origin` (verifier, proposal or
   author), and every theorem's sheet lists its tests with their result.
@@ -144,8 +155,8 @@ module becomes a DAG theorem, and the site's **Theorem DAG** tab shows this DAG.
 - **Out:** `verify` writes `dagtool export` (nodes, edges, computed status, evidence summaries and a verdict per
   node) to `site/dag.json`; on main it is published with the browser at
   `https://kdough01.github.io/mbqc-verification/dag.json`, and the site reads it from there.
-- **Verdict** (`tools/dagtool/verdict.py`): *rejected* if refuted or broken, *verified* if effective truth is at least
-  `empirical` (listing the check kinds that passed), otherwise *open*. `core_support` counts the definition, core and
+- **Verdict** (`dagtool/verdict.py`): *rejected* if refuted or broken, *verified* if effective truth is at least
+  `empirical` (listing the test types that passed), otherwise *open*. `core_support` counts the definition, core and
   transfer nodes a claim rests on.
 
 No secrets: this repository and its Pages site are public, and so is the site's theorem list. Pages must be on
@@ -205,7 +216,7 @@ Each node has two separate statuses:
 | `tested` | every applicable automatic faithfulness check passed |
 | `unreviewed` | neither |
 
-Each check kind has a ceiling (`verification/kinds.py`): a scaling fit can never grant more than `empirical`, whatever
+Each test type has a ceiling (`checks/_kinds.py`): a scaling fit can never grant more than `empirical`, whatever
 its code returns. Status then propagates down the DAG:
 
 - A node's effective truth is the weakest among itself and the parents it `uses`.
@@ -218,23 +229,28 @@ its code returns. Status then propagates down the DAG:
 - Evidence records a hash of everything it depends on (statement, definitions, parents, code files, check code,
   requirements, Lean sources). When any of these change, the evidence goes stale and stops counting until it is re-run.
 
-## Tools a check can call
+## Tests a node can run
+
+Every test is a file in [`checks/`](checks/README.md): `checks/<type>/<name>.py`, named from a node as
+`test: <type>/<name>`. Each folder's README explains its type and lists its tests, and each file's docstring
+says what the test checks, how it works, its parameters, when it passes and what it grants. To add one, run
+`dagtool new-test <type> <name>` and follow [checks/README.md](checks/README.md#adding-a-test).
 
 Every tool on the [toolkit page](https://kdough01.github.io/mbqc-verification/reports/toolkit.html) is pinned and
-runs in CI. A node uses one by naming a check kind and its parameters; nothing else is needed.
+runs in CI. A node uses one by naming its test and parameters; nothing else is needed.
 
-| Tool | Check | Example parameters |
+| Tool | Test | Example parameters |
 | --- | --- | --- |
-| Stim + PyMatching + sinter | `tool`, `tool: surface_code.memory` / `surface_code.fit` | `args: {distance: 5, p: 0.003, shots: 100000, seed: 1}`, `path: per_round` (also `interval`, `kappa`, `p_th`) |
-| gridsynth (Ross–Selinger) | `tool`, `tool: gridsynth.rz` | `args: {angles: [0.3, 1.1], epsilon: "1e-6"}`, `path: mean_t_count` (each circuit's error is recomputed) |
-| Qualtran | `tool`, `tool: qualtran.cost` | `args: {bloq: qualtran.bloqs.qft.QFTTextBook, kwargs: {bitsize: 8}}`, `path: total_t_count` |
-| Azure Resource Estimator (local, `qdk`) | `tool`, `tool: azure_re.logical_counts` / `azure_re.qsharp` | `args: {counts: {numQubits: 100, tCount: 1000000}}`, `path: physical_qubits` |
-| Hypothesis | `refuter`, `source: hypothesis` | `predicate: experiments/x/claims.py:holds`, `strategy: {n: {integers: [2, 500]}}`, `max_examples: 500` |
-| (exhaustive) | `finite` | `predicate: …`, `domain: {n: {range: [2, 50]}, d: {values: [3, 5, 7]}}` — grants `bounded` |
-| Lean | `equivalence` | `other: <second formalization>`, `proof: <theorem stmt(main) ↔ stmt(other)>` that uses neither proof |
-| Held-out values | any `tool` or `reproduction` check | `expect: {heldout: ID}` after `dagtool heldout seal ID VALUE` |
+| Stim + PyMatching + sinter | `tool/surface_code_memory`, `tool/surface_code_fit` | `args: {distance: 5, p: 0.003, shots: 100000, seed: 1}`, `path: per_round` (also `interval`, `kappa`, `p_th`) |
+| gridsynth (Ross–Selinger) | `tool/gridsynth_rz` | `args: {angles: [0.3, 1.1], epsilon: "1e-6"}`, `path: mean_t_count` (each circuit's error is recomputed) |
+| Qualtran | `tool/qualtran_cost` | `args: {bloq: qualtran.bloqs.qft.QFTTextBook, kwargs: {bitsize: 8}}`, `path: total_t_count` |
+| Azure Resource Estimator (local, `qdk`) | `tool/azure_re_logical_counts`, `tool/azure_re_qsharp` | `args: {counts: {numQubits: 100, tCount: 1000000}}`, `path: physical_qubits` |
+| Hypothesis | `refuter/hypothesis` | `predicate: experiments/x/claims.py:holds`, `strategy: {n: {integers: [2, 500]}}`, `max_examples: 500` |
+| (exhaustive) | `finite/exhaustive` | `predicate: …`, `domain: {n: {range: [2, 50]}, d: {values: [3, 5, 7]}}` — grants `bounded` |
+| Lean | `equivalence/iff_proof` | `other: <second formalization>`, `proof: <theorem stmt(main) ↔ stmt(other)>` that uses neither proof |
+| Held-out values | any `tool/…` or `reproduction/recorded_value` test | `expect: {heldout: ID}` after `dagtool heldout seal ID VALUE` |
 
-`tool` checks compare `path` of the tool's output with `expect` (a number, `{results: FILE, path: P}` in a frozen
+`tool/…` tests compare `path` of the tool's output with `expect` (a number, `{results: FILE, path: P}` in a frozen
 file, or `{heldout: ID}`) by `op` (`approx` with `rel_tol`, `eq`, `ge`, `le`, `within [low, high]`), grant at most
 `empirical` on `domain`, and record the tool versions. `dagtool tool NAME --args '{...}'` prints a tool's output
 without a node. A predicate file must be listed under the node's `code:`, so editing it re-runs the check.
@@ -242,9 +258,9 @@ without a node. A predicate file must be listed under the node's `code:`, so edi
 ## Adding a claim
 
 1. Write `dag/nodes/<area>/<id>.yaml`: `id`, `kind`, `title`, `statement`, `conventions`, `depends_on`, and the
-   `checks` that should run (see the existing nodes and the schema).
-2. If it is formalized, add the theorem under `lean/MBQC/`, set `lean_decl`, and add the `lean`, `vocabulary` and
-   `nonvacuity` checks (with a `…_nonvacuous` witness theorem when it has hypotheses). Unproved facts about code
+   `checks` that should run, each `- test: <type>/<name>` with its `params:` (`dagtool tests` lists them).
+2. If it is formalized, add the theorem under `lean/MBQC/`, set `lean_decl`, and add the `lean/proof`,
+   `vocabulary/vetted_constants` and `nonvacuity/witness` tests (with a `…_nonvacuous` witness theorem when it has hypotheses). Unproved facts about code
    output go in `lean/MBQC/Assumptions/` as axioms, owned by an `assumption` node.
 3. Push. CI runs its checks and commits the evidence; the run summary and the browser show the result.
 4. If it is a definition, core lemma, assumption or transfer theorem, a person reviews the statement with the

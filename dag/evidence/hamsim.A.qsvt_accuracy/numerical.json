@@ -1,15 +1,14 @@
 {
- "input_hash": "826dec548d97f221",
+ "input_hash": "f712df2c73940619",
  "inputs": {
   "check_code": {
-   "verification/truth/numerical/check.py": "f283567880e456ab56867e2f4128390e417708e0ee723d77aab3a4d344e6deab",
-   "verification/truth/numerical/equal_accuracy.py": "bfc7eaaf151dce7c32b9a0522298ea8bb4860b093a944d61a08789e3e870cf0b",
-   "verification/truth/numerical/hamsim_accuracy.py": "24111e0d9dd4fb3cfc8e0477b3712a13fe579805c2562c556f59a9eac036428b"
+   "checks/numerical/_accuracy.py": "e49ebc1bcd9ab6f85856e4b87958812ce045bbe6a5e53fee2e2357c62862f3f9",
+   "checks/numerical/hamsim_accuracy.py": "85c35ffbb7e26e41669c55d00f92fa400a6ae0278bb167125206bd08c490775c"
   },
-  "check_params": "1c98b3fb28ca3ef8",
+  "check_params": "291ff7fe66e2a597",
   "code": {
-   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
-   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f",
+   "src/mbqc_verify/hamsim/analysis.py": "5889b248fb7f1e5b4eca83915882e8e6d667765ee4918dd59589cc86343779ef",
+   "src/mbqc_verify/hamsim/circuits.py": "40d1186477ef327acf62f99b60e9274d8111d7dfccdaae46a7dcbec34111576a",
    "src/mbqc_verify/hamsim/qsp_angles.py": "ea2a2675f394feca697bbf445a2d5fb01c7468e9a3320010f236bf0fb59777ff"
   },
   "definitions": {
@@ -27,18 +26,17 @@
  "name": "numerical",
  "node": "hamsim.A.qsvt_accuracy",
  "params": {
-  "method": "qsvt",
-  "which": "accuracy"
+  "method": "qsvt"
  },
  "provenance": {
-  "commit": null,
-  "dirty": null,
-  "finished": "2026-10-29T13:26:36+00:00",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
+  "dirty": true,
+  "finished": "2026-11-10T18:13:01+00:00",
   "quick": false,
-  "seconds": 0.03,
+  "seconds": 0.01,
   "versions": {
    "graphix": "0.4.1",
-   "numpy": "2.5.3",
+   "numpy": "2.5.4",
    "python": "3.13.18",
    "qiskit": "2.5.0",
    "scipy": "1.18.1",
@@ -165,5 +163,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "12/12 cases within eps; worst error/eps = 0.034"
- }
+ },
+ "test": "numerical/hamsim_accuracy"
 }

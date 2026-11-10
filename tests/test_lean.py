@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from dagtool.model import load_dag
-from verification.base import RunContext, load_all
+from checks._framework import Context, module
 
 REPO = Path(__file__).resolve().parents[1]
 pytestmark = pytest.mark.skipif(not (shutil.which("lake") or (Path.home() / ".elan/bin/lake").exists()),
@@ -17,13 +17,13 @@ pytestmark = pytest.mark.skipif(not (shutil.which("lake") or (Path.home() / ".el
 
 @pytest.fixture(scope="module")
 def ctx():
-    return RunContext(dag=load_dag(REPO))
+    return Context(dag=load_dag(REPO))
 
 
 def run(ctx, node_id, kind):
     node = ctx.dag.nodes[node_id]
     spec = next(c for c in node.checks if c.kind == kind)
-    return load_all()[kind]().run(node, spec.params, ctx)
+    return module(spec.test).run(node, spec.params, ctx)
 
 
 def test_slide_claims_are_proved_outright(ctx):

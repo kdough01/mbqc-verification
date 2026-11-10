@@ -1,4 +1,4 @@
-"""Unit tests for the DAG status rules (tools/dagtool/status.py) on small synthetic DAGs."""
+"""Unit tests for the DAG status rules (dagtool/status.py) on small synthetic DAGs."""
 
 from __future__ import annotations
 
@@ -12,8 +12,9 @@ import yaml
 from dagtool.evidence import Review, append_review, write_evidence
 from dagtool.hashing import input_hash, statement_hash
 from dagtool.model import DagError, load_dag
+from dagtool.legacy import DEFAULT_TEST
 from dagtool.status import check_files, compute
-from verification.kinds import LEAN_KINDS
+from checks._kinds import LEAN_KINDS
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -37,9 +38,11 @@ def node(root, id, kind="theorem", deps=(), checks=(), **extra):
 def evidence(root, node_id, kind, outcome="pass", grants=None, name=None, params=None, fresh=True, payload=None):
     dag = load_dag(root)
     n = dag.nodes[node_id]
-    ih, _ = input_hash(dag, n, params or {}, check_files(root, kind), uses_lean=kind in LEAN_KINDS)
+    spec = next((c for c in n.checks if c.name == (name or kind)), None)
+    test = spec.test if spec else DEFAULT_TEST[kind]
+    ih, _ = input_hash(dag, n, params or {}, check_files(root, test), uses_lean=kind in LEAN_KINDS)
     write_evidence(dag, node_id, name or kind, {
-        "node": node_id, "kind": kind, "name": name or kind, "params": params or {},
+        "node": node_id, "test": test, "kind": kind, "name": name or kind, "params": params or {},
         "result": {"outcome": outcome, "grants": grants, "domain": "test", "summary": "", "evidence": payload or {}},
         "input_hash": ih if fresh else "0" * 16})
 
@@ -50,7 +53,7 @@ def status(root):
 
 def test_uses_parent_caps_truth(repo):
     node(repo, "t.parent")
-    node(repo, "t.child", deps=[("t.parent", "uses")], checks=[{"kind": "numerical"}])
+    node(repo, "t.child", deps=[("t.parent", "uses")], checks=[{"test": "numerical/hamsim_accuracy"}])
     evidence(repo, "t.child", "numerical", grants="empirical")
     st = status(repo)
     assert st["t.child"].own_truth == "empirical"
@@ -59,21 +62,21 @@ def test_uses_parent_caps_truth(repo):
 
 def test_instantiates_does_not_cap_observational_evidence(repo):
     node(repo, "t.transfer", kind="transfer")
-    node(repo, "t.formula", deps=[("t.transfer", "instantiates")], checks=[{"kind": "scaling"}])
+    node(repo, "t.formula", deps=[("t.transfer", "instantiates")], checks=[{"test": "scaling/bilinear_formula"}])
     evidence(repo, "t.formula", "scaling", grants="empirical")
     assert status(repo)["t.formula"].eff_truth == "empirical"
 
 
 def test_instantiates_caps_a_proof(repo):
     node(repo, "t.transfer", kind="transfer")
-    node(repo, "t.formula", deps=[("t.transfer", "instantiates")], checks=[{"kind": "lean"}])
+    node(repo, "t.formula", deps=[("t.transfer", "instantiates")], checks=[{"test": "lean/proof"}])
     evidence(repo, "t.formula", "lean", grants="proved")
     assert status(repo)["t.formula"].eff_truth == "conjecture"
 
 
 def test_assumption_joins_frontier_and_gives_proved_modulo(repo):
-    node(repo, "a.lit", kind="assumption", checks=[{"kind": "literature"}])
-    node(repo, "t.thm", deps=[("a.lit", "assumes")], checks=[{"kind": "lean"}])
+    node(repo, "a.lit", kind="assumption", checks=[{"test": "literature/source_record"}])
+    node(repo, "t.thm", deps=[("a.lit", "assumes")], checks=[{"test": "lean/proof"}])
     evidence(repo, "a.lit", "literature", grants="assumed")
     evidence(repo, "t.thm", "lean", grants="proved")
     s = status(repo)["t.thm"]
@@ -83,8 +86,8 @@ def test_assumption_joins_frontier_and_gives_proved_modulo(repo):
 
 def test_frontier_is_inherited(repo):
     node(repo, "a.lit", kind="assumption")
-    node(repo, "t.mid", deps=[("a.lit", "assumes")], checks=[{"kind": "lean"}])
-    node(repo, "t.top", deps=[("t.mid", "uses")], checks=[{"kind": "lean"}])
+    node(repo, "t.mid", deps=[("a.lit", "assumes")], checks=[{"test": "lean/proof"}])
+    node(repo, "t.top", deps=[("t.mid", "uses")], checks=[{"test": "lean/proof"}])
     evidence(repo, "t.mid", "lean", grants="proved")
     evidence(repo, "t.top", "lean", grants="proved")
     s = status(repo)["t.top"]
@@ -92,8 +95,8 @@ def test_frontier_is_inherited(repo):
 
 
 def test_listed_empirical_ancestor_is_allowed(repo):
-    node(repo, "t.emp", checks=[{"kind": "numerical"}])
-    node(repo, "t.thm", deps=[("t.emp", "uses")], assumptions=["t.emp"], checks=[{"kind": "lean"}])
+    node(repo, "t.emp", checks=[{"test": "numerical/hamsim_accuracy"}])
+    node(repo, "t.thm", deps=[("t.emp", "uses")], assumptions=["t.emp"], checks=[{"test": "lean/proof"}])
     evidence(repo, "t.emp", "numerical", grants="empirical")
     evidence(repo, "t.thm", "lean", grants="proved")
     s = status(repo)["t.thm"]
@@ -101,16 +104,16 @@ def test_listed_empirical_ancestor_is_allowed(repo):
 
 
 def test_unlisted_empirical_ancestor_weakens(repo):
-    node(repo, "t.emp", checks=[{"kind": "numerical"}])
-    node(repo, "t.thm", deps=[("t.emp", "uses")], checks=[{"kind": "lean"}])
+    node(repo, "t.emp", checks=[{"test": "numerical/hamsim_accuracy"}])
+    node(repo, "t.thm", deps=[("t.emp", "uses")], checks=[{"test": "lean/proof"}])
     evidence(repo, "t.emp", "numerical", grants="empirical")
     evidence(repo, "t.thm", "lean", grants="proved")
     assert status(repo)["t.thm"].eff_truth == "empirical"
 
 
 def test_refuted_parent_breaks_child(repo):
-    node(repo, "t.bad", checks=[{"kind": "refuter"}])
-    node(repo, "t.child", deps=[("t.bad", "uses")], checks=[{"kind": "numerical"}])
+    node(repo, "t.bad", checks=[{"test": "refuter/qsvt_exceeds_gqsp_formulas"}])
+    node(repo, "t.child", deps=[("t.bad", "uses")], checks=[{"test": "numerical/hamsim_accuracy"}])
     evidence(repo, "t.bad", "refuter", outcome="fail", grants="refuted")
     evidence(repo, "t.child", "numerical", grants="empirical")
     st = status(repo)
@@ -119,13 +122,13 @@ def test_refuted_parent_breaks_child(repo):
 
 
 def test_ceiling_clamps_grants(repo):
-    node(repo, "t.fit", checks=[{"kind": "scaling"}])
+    node(repo, "t.fit", checks=[{"test": "scaling/bilinear_formula"}])
     evidence(repo, "t.fit", "scaling", grants="proved")       # a scaling fit cannot prove
     assert status(repo)["t.fit"].own_truth == "empirical"
 
 
 def test_stale_evidence_does_not_count_and_propagates(repo):
-    node(repo, "t.a", checks=[{"kind": "numerical"}])
+    node(repo, "t.a", checks=[{"test": "numerical/hamsim_accuracy"}])
     node(repo, "t.b", deps=[("t.a", "uses")])
     evidence(repo, "t.a", "numerical", grants="empirical", fresh=False)
     st = status(repo)
@@ -134,10 +137,10 @@ def test_stale_evidence_does_not_count_and_propagates(repo):
 
 
 def test_editing_statement_makes_evidence_stale(repo):
-    node(repo, "t.a", checks=[{"kind": "numerical"}])
+    node(repo, "t.a", checks=[{"test": "numerical/hamsim_accuracy"}])
     evidence(repo, "t.a", "numerical", grants="empirical")
     assert status(repo)["t.a"].own_truth == "empirical"
-    node(repo, "t.a", checks=[{"kind": "numerical"}], statement_tex="x = 1")
+    node(repo, "t.a", checks=[{"test": "numerical/hamsim_accuracy"}], statement_tex="x = 1")
     s = status(repo)["t.a"]
     assert s.stale and s.own_truth == "conjecture"
 
@@ -155,7 +158,7 @@ def test_review_is_pinned_to_statement_hash(repo):
 
 
 def test_faithfulness_tested_needs_all_required_checks(repo):
-    node(repo, "t.f", checks=[{"kind": "scaling"}, {"kind": "mutation"}, {"kind": "differential"}])
+    node(repo, "t.f", checks=[{"test": "scaling/bilinear_formula"}, {"test": "mutation/scaling_coefficients"}, {"test": "differential/lean_counts"}])
     evidence(repo, "t.f", "mutation")
     s = status(repo)["t.f"]
     assert s.own_faith == "unreviewed" and s.faith_missing == ["differential"]
@@ -165,7 +168,7 @@ def test_faithfulness_tested_needs_all_required_checks(repo):
 
 def test_effective_faithfulness_limited_by_definitions(repo):
     node(repo, "d.def", kind="definition")
-    node(repo, "t.f", deps=[("d.def", "uses")], checks=[{"kind": "mutation"}])
+    node(repo, "t.f", deps=[("d.def", "uses")], checks=[{"test": "mutation/scaling_coefficients"}])
     evidence(repo, "t.f", "mutation")
     s = status(repo)["t.f"]
     assert s.own_faith == "tested" and s.eff_faith == "unreviewed"
@@ -211,7 +214,7 @@ def test_queue_ranks_by_descendants(repo):
 
 
 def test_evidence_json_roundtrip(repo):
-    node(repo, "t.a", checks=[{"kind": "numerical"}])
+    node(repo, "t.a", checks=[{"test": "numerical/hamsim_accuracy"}])
     evidence(repo, "t.a", "numerical", grants="empirical")
     rec = json.loads((repo / "dag/evidence/t.a/numerical.json").read_text())
     assert rec["result"]["grants"] == "empirical"
@@ -220,8 +223,8 @@ def test_evidence_json_roundtrip(repo):
 def test_lean_edges_replace_declared_edges(repo):
     node(repo, "t.transfer", kind="transfer")
     node(repo, "a.facts", kind="assumption")
-    node(repo, "t.lemma", checks=[{"kind": "lean"}])
-    node(repo, "t.thm", deps=[("t.transfer", "uses"), ("t.lemma", "uses")], checks=[{"kind": "lean"}])
+    node(repo, "t.lemma", checks=[{"test": "lean/proof"}])
+    node(repo, "t.thm", deps=[("t.transfer", "uses"), ("t.lemma", "uses")], checks=[{"test": "lean/proof"}])
     evidence(repo, "t.lemma", "lean", grants="proved")
     evidence(repo, "t.thm", "lean", grants="proved_modulo",
              payload={"node_deps": ["t.lemma"], "assumption_nodes": ["a.facts"]})
@@ -234,8 +237,8 @@ def test_lean_edges_replace_declared_edges(repo):
 
 def test_lean_edge_against_declared_order(repo):
     # node ids sort so that the user comes before the used node; the Lean edge must still order them
-    node(repo, "t.z_used", checks=[{"kind": "lean"}])
-    node(repo, "t.a_user", checks=[{"kind": "lean"}])
+    node(repo, "t.z_used", checks=[{"test": "lean/proof"}])
+    node(repo, "t.a_user", checks=[{"test": "lean/proof"}])
     evidence(repo, "t.z_used", "lean", grants="proved")
     evidence(repo, "t.a_user", "lean", grants="proved", payload={"node_deps": ["t.z_used"]})
     s = status(repo)["t.a_user"]
@@ -245,10 +248,10 @@ def test_lean_edge_against_declared_order(repo):
 
 def test_prune_removes_orphaned_evidence(repo):
     from dagtool.evidence import prune
-    node(repo, "t.a", checks=[{"kind": "numerical"}])
+    node(repo, "t.a", checks=[{"test": "numerical/hamsim_accuracy"}])
     evidence(repo, "t.a", "numerical", grants="empirical")
     evidence(repo, "t.a", "numerical", grants="empirical", name="old-check")
-    node(repo, "t.gone", checks=[{"kind": "numerical"}])
+    node(repo, "t.gone", checks=[{"test": "numerical/hamsim_accuracy"}])
     evidence(repo, "t.gone", "numerical", grants="empirical")
     (repo / "dag/nodes/t.gone.yaml").unlink()
     removed = {p.relative_to(repo).as_posix() for p in prune(load_dag(repo))}
@@ -259,7 +262,7 @@ def test_prune_removes_orphaned_evidence(repo):
 
 def test_summary_reports_changes_and_problems(repo):
     from dagtool.summary import markdown
-    node(repo, "t.a", checks=[{"kind": "numerical"}, {"kind": "mutation"}])
+    node(repo, "t.a", checks=[{"test": "numerical/hamsim_accuracy"}, {"test": "mutation/scaling_coefficients"}])
     evidence(repo, "t.a", "numerical", grants="empirical")
     evidence(repo, "t.a", "mutation", outcome="fail")
     md = markdown(load_dag(repo), before={"t.a": {"truth": "conjecture", "faithfulness": "unreviewed"}}, ran=[])
@@ -269,7 +272,7 @@ def test_summary_reports_changes_and_problems(repo):
 
 def test_regression_is_detected(repo):
     from dagtool.summary import regressions
-    node(repo, "t.a", checks=[{"kind": "scaling"}])
+    node(repo, "t.a", checks=[{"test": "scaling/bilinear_formula"}])
     evidence(repo, "t.a", "scaling", outcome="fail", grants="refuted")
     st = status(repo)
     assert regressions(st, {"t.a": {"truth": "empirical", "stale": False}}) == [("t.a", "empirical", "refuted")]

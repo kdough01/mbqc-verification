@@ -31,7 +31,7 @@ to other papers and the tools we use or may use are on
 ## Running
 
 ```bash
-bash experiments/rre/environment.sh            # once: builds .rre/ (git-ignored), runs RRE's own tests
+bash tools/rre/environment.sh            # once: builds .rre/ (git-ignored), runs RRE's own tests
 source .rre/venv/bin/activate
 bash experiments/rre/run.sh                    # calibration grid, Table II (small set), scaling, side studies
 dagtool run --stale && dagtool check           # in the verifier's own environment
@@ -130,7 +130,7 @@ the results files exist. To run them with the calibrated settings:
 ```bash
 git clone https://github.com/kdough01/mbqc-verification && cd mbqc-verification
 git checkout -b rre-large
-bash experiments/rre/environment.sh /scratch/rre          # any DIR; Linux x86-64 with AVX2
+bash tools/rre/environment.sh /scratch/rre          # any DIR; Linux x86-64 with AVX2
 source /scratch/rre/venv/bin/activate
 export RRE_COMMIT=9383b4d
 /usr/bin/time -v bash experiments/rre/run.sh --only fh:8          # start here: note time and peak memory
@@ -150,7 +150,7 @@ the machine as a GitHub self-hosted runner and start the **reproduce** workflow 
 
 | File | What it does |
 |---|---|
-| `environment.sh`, `requirements-rre.txt` | pinned environment (RRE, Cabaliser, pyLIQTR 1.3.3, Python 3.11) |
+| `tools/rre/environment.sh`, `tools/rre/requirements-rre.txt` | pinned environment (RRE, Cabaliser, pyLIQTR 1.3.3, Python 3.11) |
 | `config_paper_v3.yaml` | first pass: the configuration as printed |
 | `config_calibrated.yaml` | the configuration the QFT rows single out |
 | `paper_v3_table2.yaml` | Table II, all three families, as printed |

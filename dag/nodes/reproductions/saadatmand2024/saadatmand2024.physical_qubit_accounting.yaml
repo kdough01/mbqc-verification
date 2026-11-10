@@ -16,7 +16,7 @@ source:
   url: https://arxiv.org/abs/2406.06015v3
   exact_form: Appendix A, Parameters 14 and 35
 checks:
-- kind: reproduction
+- test: reproduction/recorded_value
   name: modules-times-param14-2x2
   params:
     results: experiments/rre/results/rederive_2x2.json
@@ -26,7 +26,7 @@ checks:
     op: approx
     rel_tol: 0.001
     domain: FH 2x2, RRE outputs
-- kind: reproduction
+- test: reproduction/recorded_value
   name: modules-times-param14-4x4
   params:
     results: experiments/rre/results/rederive_4x4.json

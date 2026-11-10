@@ -1,18 +1,16 @@
 {
- "input_hash": "999c5bb39ecc7f8b",
+ "input_hash": "e81f6e5e4ed27693",
  "inputs": {
   "check_code": {
-   "requirements-tools.txt": "10d7364009957536e3eafb782d1920d29f038968b0e734b33737e6f82d92f630",
-   "verification/truth/finite/check.py": "1863938a1758c22ee135df3f39480deaac2ec54a3bbb1eb3ee338afe4a3105e6",
-   "verification/truth/refuter/check.py": "e8dcd3592d5cebd490e18b127c6919baefe2f05c629ca1e17d2eaeda7a409fd3",
-   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
-   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
+   "checks/refuter/_d_ge_g.py": "6054b10091889873d53e65855b2367efeb074051c4c4ab6a481be82d94b7bb82",
+   "checks/refuter/qsvt_exceeds_gqsp_formulas.py": "90bf6f188e3e231fe28ed42d2b77600f624d09938c0f5aab9267c0594a8732e9",
+   "tools/requirements.txt": "e64646ef2ec1c77b9fb68c62f11e7f4476fd72d8b3533e1d05c0afb9144dfad6"
   },
-  "check_params": "0087cb994a3aa620",
+  "check_params": "a2e297e8b2630095",
   "code": {
-   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
-   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
-   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+   "src/mbqc_verify/compilers/graphix.py": "f435644e7a21a0782ef6f49f815d85e1c19ba45fb396a1acca91f6f3ac8b8d8f",
+   "src/mbqc_verify/hamsim/analysis.py": "5889b248fb7f1e5b4eca83915882e8e6d667765ee4918dd59589cc86343779ef",
+   "src/mbqc_verify/hamsim/circuits.py": "40d1186477ef327acf62f99b60e9274d8111d7dfccdaae46a7dcbec34111576a"
   },
   "definitions": {
    "def.graph_state": "49d988a8e94f1186",
@@ -21,11 +19,11 @@
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
-  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_sources": "70186db16941b81859b28589b418b3a69f519ce68964557d375181d587b317d8",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
-   "hamsim.B.gqsp.E.unopt": "ed2e1bad65aa8a37:6373b3d2",
-   "hamsim.B.qsvt.E.unopt": "a176154626105d50:16c40864"
+   "hamsim.B.gqsp.E.unopt": "ed2e1bad65aa8a37:752c8f8f",
+   "hamsim.B.qsvt.E.unopt": "a176154626105d50:d3837baf"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
   "statement": "0f506726e0fad46c"
@@ -38,13 +36,12 @@
   "k_max": 41,
   "n_max": 50,
   "qsvt": "hamsim.B.qsvt.E.unopt",
-  "quantity": "E",
-  "source": "formula"
+  "quantity": "E"
  },
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:37+00:00",
+  "finished": "2026-11-10T18:13:13+00:00",
   "quick": false,
   "seconds": 0.01,
   "versions": {
@@ -73,5 +70,6 @@
   "outcome": "fail",
   "seed": null,
   "summary": "QSVT E = 3685 <= GQSP E = 3832 at n=2, D=5, d=5"
- }
+ },
+ "test": "refuter/qsvt_exceeds_gqsp_formulas"
 }

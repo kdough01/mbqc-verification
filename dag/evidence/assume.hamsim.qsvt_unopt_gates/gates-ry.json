@@ -1,15 +1,16 @@
 {
- "input_hash": "99d86067a0b8b0a3",
+ "input_hash": "6677edfa804ccedd",
  "inputs": {
   "check_code": {
-   "verification/truth/scaling/check.py": "1e76e35be0991c3b8fedfe27a2667030ee535bd14cef2352f0ec24a026e19249",
-   "verification/truth/scaling/grids.py": "344de830712c1090a8a46b22e6c7bd06f4f2529bd95b3c60fe4f42131097f817"
+   "checks/_shared/grids.py": "0c5797261a67e7696eb32c9353644d6b9c0951aaa165b7fb96fa5df13d0834fe",
+   "checks/scaling/_compare.py": "f4f6d53e502987dcb5157e2b3234629dd9c5fb406d673d308391424d0374ce94",
+   "checks/scaling/gate_counts.py": "d8dc2767911f32e2a0fd64022d53294ea608b9d2fa8dc5a144e01c41fe0f0d54"
   },
-  "check_params": "0aa3a3b05c977477",
+  "check_params": "fec8ad7ef298c45f",
   "code": {
-   "src/mbqc_verify/compile/qiskit_to_mbqc.py": "704d7317591fc6a28a7f6c477e7bad657ae633989a3700cb7a931cb44806574a",
-   "src/mbqc_verify/hamsim/analysis.py": "08933ee835d4d5e880204f9c7269cdf4b1a341deb990ba96af998457b455a32f",
-   "src/mbqc_verify/hamsim/circuits.py": "565d4a13e460da9d970cbd7afda76035d0694f03f4dce4c394e718a41b31163f"
+   "src/mbqc_verify/compilers/graphix.py": "f435644e7a21a0782ef6f49f815d85e1c19ba45fb396a1acca91f6f3ac8b8d8f",
+   "src/mbqc_verify/hamsim/analysis.py": "5889b248fb7f1e5b4eca83915882e8e6d667765ee4918dd59589cc86343779ef",
+   "src/mbqc_verify/hamsim/circuits.py": "40d1186477ef327acf62f99b60e9274d8111d7dfccdaae46a7dcbec34111576a"
   },
   "definitions": {
    "def.graph_state": "49d988a8e94f1186",
@@ -18,10 +19,10 @@
    "def.pattern": "20379a417004e168",
    "def.resource_counts": "b75d507a2b247ac8"
   },
-  "lean_sources": "88f3ed491b504922d5f00166dfb29e6a770310dfe955ca5ff72775b8ece69e31",
+  "lean_sources": "70186db16941b81859b28589b418b3a69f519ce68964557d375181d587b317d8",
   "lean_toolchain": "d24fed434d3b13adfaab57724a0a7f270ea8bf1c818b5ae5cf25cbce24dd685c",
   "parents": {
-   "def.graphix_gates": "17ace17c95ba5577:6029ded9"
+   "def.graphix_gates": "17ace17c95ba5577:b8ffd8b5"
   },
   "requirements": "a79e25868d2d4a93733dd6d224b84c7b8199b0584a086cee8522c5d2380bed46",
   "statement": "2ef8d14e50a46ab9"
@@ -36,15 +37,15 @@
    0,
    0
   ],
-  "method": "qsvt",
-  "quantity": "gate:ry"
+  "gate": "ry",
+  "method": "qsvt"
  },
  "provenance": {
-  "commit": "de113b37f7af5d80b473bbe0dc5b4faeecaa89ff",
+  "commit": "b27868a6f993778c3e3222712ca6c09617478049",
   "dirty": true,
-  "finished": "2026-11-09T16:40:26+00:00",
+  "finished": "2026-11-10T18:12:50+00:00",
   "quick": false,
-  "seconds": 0.01,
+  "seconds": 0.02,
   "versions": {
    "graphix": "0.4.1",
    "numpy": "2.5.4",
@@ -57,7 +58,6 @@
  "result": {
   "domain": "n in [2, 3, 4], k in [3, 5, 7] (training) + held-out [(5, 9)]",
   "evidence": {
-   "compiler": "graphix",
    "counts": [
     {
      "gate:ry": 144,
@@ -134,7 +134,6 @@
    ],
    "method": "qsvt",
    "mismatches": [],
-   "optimize": false,
    "quantity": "gate:ry",
    "training": [
     [
@@ -180,5 +179,6 @@
   "outcome": "pass",
   "seed": null,
   "summary": "exact on all 9 training and 1 held-out points"
- }
+ },
+ "test": "scaling/gate_counts"
 }

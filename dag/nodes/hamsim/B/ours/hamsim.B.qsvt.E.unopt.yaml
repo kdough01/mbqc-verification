@@ -6,7 +6,7 @@ statement: |
   Compiling the QSVT circuit for n ≥ 2 data qubits gate by gate (unoptimized), with odd D ≥ 3, gives a pattern with E = (378n − 180)D + 418n − 31 CZ edges.
 statement_tex: E = (378n - 180)D + 418n - 31
 lean_decl: MBQC.Results.HamSim.qsvt_edges_unopt
-code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compile/qiskit_to_mbqc.py, src/mbqc_verify/hamsim/analysis.py]
+code: [src/mbqc_verify/hamsim/circuits.py, src/mbqc_verify/compilers/graphix.py, src/mbqc_verify/hamsim/analysis.py]
 conventions: {angle: pi_units, endian: big, input: plus, phase: global_dropped, degree: qsvt_calls_per_sequence, compiler: graphix}
 depends_on:
 - {node: transfer.gate_to_mbqc, kind: instantiates}
@@ -15,18 +15,17 @@ depends_on:
 - {node: transfer.gate_counts, kind: uses}
 - {node: assume.hamsim.qsvt_unopt_gates, kind: assumes}
 checks:
-- kind: scaling
+- test: scaling/bilinear_formula
   params:
     method: qsvt
-    optimize: false
+    compiler: graphix
     quantity: E
     coef: [378, -180, 418, -31]
-- kind: mutation
-  params: {target: scaling}
-- kind: differential
+- test: mutation/scaling_coefficients
+- test: differential/lean_counts
   params: {method: qsvt}
-- {kind: lean}
-- {kind: vocabulary}
-- kind: nonvacuity
+- test: lean/proof
+- test: vocabulary/vetted_constants
+- test: nonvacuity/witness
   params: {witness: MBQC.Results.HamSim.qsvt_unopt_nonvacuous}
 tags: [hamsim, qsvt, resources, unoptimized]

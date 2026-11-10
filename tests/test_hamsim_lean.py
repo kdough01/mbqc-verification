@@ -48,14 +48,14 @@ def test_gate_count_axioms_match_the_assumption_node(dag, method):
     axioms = {m.group(1): bilinear(m.group(2), k)
               for m in re.finditer(r"axiom count_(\w+) :.*?\n\s*\(countKind \.\w+ \(circuit n \w\) : Int\) = (.+)", text)}
     node = dag.nodes[f"assume.hamsim.{method}_unopt_gates"]
-    tested = {c.params["quantity"].split(":")[1]: [Fraction(str(x)) for x in c.params["coef"]]
-              for c in node.checks if c.kind == "scaling" and c.params.get("quantity", "").startswith("gate:")}
+    tested = {c.params["gate"]: [Fraction(str(x)) for x in c.params["coef"]]
+              for c in node.checks if c.test == "scaling/gate_counts"}
     assert axioms == tested and len(axioms) == 10
     # the width the Lean results compile on is the width the node's check measures
-    width = next(c.params["coef"] for c in node.checks if c.params.get("quantity") == "width")
+    width = next(c.params["coef"] for c in node.checks if c.test == "scaling/circuit_width")
     lean_width = re.search(r"axiom no_cancel : .*?NoCancel \((.+?)\) \(gatesToJcz", text).group(1)
     assert bilinear(lean_width, k) == [Fraction(x) for x in width]
-    assert any(c.params.get("claim") == "no_cancel" for c in node.checks)
+    assert any(c.test == "scaling/no_cancel" for c in node.checks)
 
 
 @pytest.mark.parametrize("method", sorted(NS))
@@ -66,7 +66,7 @@ def test_unopt_theorem_states_the_scaling_formula(dag, method, q, word):
     text = (LEAN / "Results" / "HamSim" / "Unopt.lean").read_text()
     m = re.search(rf"theorem {method}_{word}_unopt \(n (\w) : Nat\).*?\n.*?: Int\) = (.+?) := by", text)
     assert m, f"{node.lean_decl} not found"
-    coef = next(c.params["coef"] for c in node.checks if c.kind == "scaling")
+    coef = next(c.params["coef"] for c in node.checks if c.test == "scaling/bilinear_formula")
     assert bilinear(m.group(2), m.group(1)) == [Fraction(str(x)) for x in coef]
     assert f"{NS[method]}.circuit" in m.group(0) and {"lean", "vocabulary", "nonvacuity"} <= {c.kind for c in node.checks}
 
@@ -79,7 +79,7 @@ OPT = [("trotter2", "N", "Trotter2OptN"), ("trotter2", "M", "Trotter2OptM"), ("g
 def test_opt_corners_and_theorem_match_the_formula(dag, method, q, ns):
     from mbqc_verify.hamsim.analysis import evaluate
     node = dag.nodes[f"hamsim.B.{method}.{q}.opt"]
-    coef = next(c.params["coef"] for c in node.checks if c.kind == "scaling")
+    coef = next(c.params["coef"] for c in node.checks if c.test == "scaling/bilinear_formula")
     block = (LEAN / "Assumptions" / "HamSimOpt.lean").read_text().split(f"namespace MBQC.Assumptions.HamSim.{ns}")[1]
     block = block.split(f"end MBQC.Assumptions.HamSim.{ns}")[0]
     corners = {(int(a), int(b)): int(v) for a, b, v in re.findall(r"axiom at_(\d+)_(\d+) : count \d+ \d+ = (-?\d+)", block)}
@@ -91,11 +91,11 @@ def test_opt_corners_and_theorem_match_the_formula(dag, method, q, ns):
     assert bilinear(m.group(2), m.group(1)) == [Fraction(str(x)) for x in coef]
     assumption = dag.nodes[f"assume.hamsim.{method}_opt_{q}"]
     assert assumption.lean_names == [f"MBQC.Assumptions.HamSim.{ns}"]
-    assert next(c.params["coef"] for c in assumption.checks if c.kind == "scaling") == coef
+    assert next(c.params["coef"] for c in assumption.checks if c.test == "scaling/bilinear_formula") == coef
 
 
 def test_compiler_convention_names_every_registered_compiler():
-    from mbqc_verify.compile.compilers import COMPILERS
+    from mbqc_verify.compilers import COMPILERS
     from mbqc_verify.conventions import Compiler
     assert {c.value for c in Compiler} == set(COMPILERS)
 
@@ -111,8 +111,8 @@ def test_compiler_variants_point_at_their_graphix_claim(dag):
         assert "experiments/compilers/results/cabaliser.json" in n.raw["code"]
 
 
-def test_scaling_compiler_param_agrees_with_optimize():
-    from verification.truth.scaling.check import compiler_of
+def test_compiler_of_reads_the_older_optimize_spelling():
+    from checks._shared.grids import compiler_of
     assert compiler_of({"optimize": True}) == "graphix_opt" and compiler_of({}) == "graphix"
     assert compiler_of({"compiler": "cabaliser"}) == "cabaliser"
     with pytest.raises(ValueError):

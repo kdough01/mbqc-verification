@@ -8,7 +8,7 @@ description: |
   Used to pick the QSVT degree D and the GQSP degree d (qsp_angles.smallest_degree). The tail bound itself follows from |T_k(x)| ≤ 1 and |e^{ikω}| = 1, so it is a good first Lean target.
 code: [src/mbqc_verify/hamsim/qsp_angles.py]
 checks:
-- {kind: literature}
+- test: literature/source_record
 source:
   citation: 'Jacobi–Anger expansion: Abramowitz & Stegun, Handbook of Mathematical Functions (1964), §9.1;
     its use for QSVT Hamiltonian simulation: Gilyén, Su, Low & Wiebe, STOC 2019 (arXiv:1806.01838)'

@@ -1,7 +1,7 @@
 {
  "compiler": "cabaliser",
  "label": "Cabaliser",
- "description": "Cabaliser (Rigetti RRE's graph-state compiler, pinned in experiments/rre/environment.sh): the circuit, transpiled by Qiskit (level 1) to Clifford + Rz, is compiled to a graph state in one widget. Each non-Clifford Rz becomes a measured vertex; Clifford gates are absorbed into the graph and a local-Clifford frame.",
+ "description": "Cabaliser (Rigetti RRE's graph-state compiler, pinned in tools/rre/environment.sh): the circuit, transpiled by Qiskit (level 1) to Clifford + Rz, is compiled to a graph state in one widget. Each non-Clifford Rz becomes a measured vertex; Clifford gates are absorbed into the graph and a local-Clifford frame.",
  "versions": {
   "qiskit": "2.5.0",
   "python": "3.13.18",

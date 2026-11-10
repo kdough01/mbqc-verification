@@ -104,14 +104,14 @@ def test_toolkit_is_consistent(spec):
     assert set(spec["tools_used"]) <= ids
     for m in tk["applicability"]:
         assert set(m["tools"]) <= ids, m["claim"]
-    from verification.kinds import CHECK_KINDS
+    from checks._kinds import CHECK_KINDS
     for tl in tk["tools"]:
         assert tl["status"] in ("verifier", "used", "candidate")
         assert set(tl.get("check_kinds", [])) <= set(CHECK_KINDS), tl["id"]
         if tl["status"] == "verifier" and tl.get("category") != "Repository controls":
             assert tl.get("check_kinds"), tl["id"]      # a verifier tool backs an implemented check kind
-    from verification.base import load_all
-    implemented = set(load_all())
+    from checks._framework import discover
+    implemented = {t.type for t in discover().values()}
     for tl in tk["tools"]:
         if tl["status"] == "verifier":                  # and every kind it names is implemented, not only declared
             assert set(tl.get("check_kinds", [])) <= implemented, (tl["id"], set(tl["check_kinds"]) - implemented)

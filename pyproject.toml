@@ -28,8 +28,8 @@ dev = ["pytest"]
 dagtool = "dagtool.cli:main"
 
 [tool.setuptools.packages.find]
-where = ["src", ".", "tools"]
-include = ["mbqc_verify*", "verification*", "dagtool*"]
+where = ["src", "."]
+include = ["mbqc_verify*", "checks*", "dagtool*"]
 
 [tool.setuptools.package-data]
 dagtool = ["*.html"]

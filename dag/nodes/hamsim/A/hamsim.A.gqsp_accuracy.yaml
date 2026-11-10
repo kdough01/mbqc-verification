@@ -11,6 +11,6 @@ depends_on:
 - {node: hamsim.A.block_encoding, kind: instantiates}
 - {node: assume.jacobi_anger_truncation, kind: assumes}
 checks:
-- kind: numerical
-  params: {which: accuracy, method: gqsp}
+- test: numerical/hamsim_accuracy
+  params: {method: gqsp}
 tags: [hamsim, gqsp, accuracy]

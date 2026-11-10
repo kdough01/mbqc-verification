@@ -3,13 +3,15 @@
 # decides them with the base branch's code, and they cannot reach these paths.
 # Last matching pattern wins; every pattern below names the same owner.
 
-/verification/                   @kdough01
-/tools/dagtool/                  @kdough01
+/checks/                         @kdough01
+/dagtool/                        @kdough01
+/tools/                          @kdough01
 /src/                            @kdough01
 /dag/schema/                     @kdough01
 /dag/heldout/                    @kdough01
 /dag/reviews/                    @kdough01
 /dag/reports/toolkit.yaml        @kdough01
+/dag/suites/                     @kdough01
 /experiments/*/paper_*.yaml      @kdough01
 /experiments/rre/settings_space.yaml @kdough01
 /experiments/rre/compare.py      @kdough01
@@ -17,5 +19,4 @@
 /lean/lean-toolchain             @kdough01
 /lean/lakefile.lean              @kdough01
 /requirements.txt                @kdough01
-/requirements-tools.txt          @kdough01
 /.github/                        @kdough01

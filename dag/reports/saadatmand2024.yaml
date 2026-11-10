@@ -101,8 +101,8 @@ steps:
   - 'RRE''s example script calls `get_all_non_trivial_op_labeller_list`, which no longer exists: used `GraphStateEquivalenceMapper()`
     defaults.'
   code:
-  - experiments/rre/environment.sh
-  - experiments/rre/requirements-rre.txt
+  - tools/rre/environment.sh
+  - tools/rre/requirements-rre.txt
 - id: config
   title: Transcribe the configuration (first pass)
   what: Wrote the paper's settings as an overlay on RRE's default `params.yaml`. Where the paper and RRE's defaults differ,
@@ -276,7 +276,7 @@ steps:
     are listed under each node''s `code:`, so new results make the evidence stale and CI re-runs exactly those checks. The
     first pass''s results are kept beside the calibrated ones, so both are reproducible.'
   code:
-  - verification/truth/reproduction/check.py
+  - checks/reproduction/recorded_value.py
   - .github/workflows/reproduce.yml
 - id: large
   title: Prepare the larger lattices (not run)
